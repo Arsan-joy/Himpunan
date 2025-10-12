@@ -1,89 +1,87 @@
 <?php
-// File berada di pages/departemensamagri/, naik 2 level ke root
-require_once dirname(__DIR__, 2) . '/includes/functions.php';
-
-$page_title     = 'Departemen Media Informasi Komunikasi';
-
-// Pastikan nama CSS sesuai file yang ada. Saya gunakan pmpd.css (lihat file CSS di bawah).
-$additional_css = ['pmpd.css'];
-
-// Muat JS yang diperlukan:
-// - mobile_menu.js: animasi on scroll + mobile nav
-// - department.js: counter, filter divisi, toggle konten
-// - medkom-init.js: jaring pengaman bila animasi/JS lain gagal (paksa tampilkan [data-aos] dan buka konten divisi)
-$additional_js  = [ 'department.js', 'medkom-init.js'];
+require_once dirname(__DIR__, 2) . '/includes/functions.php';   
+$page_title     = 'Departemen Internal';
+$additional_css = ['internal.css'];
+$additional_js  = ['department.js', 'medkom-init.js'];
 
 include dirname(__DIR__, 2) . '/includes/header.php';
 ?>
 
 <main>
-    <!-- Department Header -->
+<!-- Department Header -->
     <section class="department-header">
         <div class="container">
             <div class="header-content">
-                <img src="<?php echo BASE_URL; ?>Resource/logo kabinet/Logo Departemen Medkomvis.jpg"
-                     alt="Logo Departemen Medkomvis"
-                     class="dept-logo"
-                     onerror="this.src='https://via.placeholder.com/120?text=MEDKOM'">
-                <h1>Departemen Media Informasi Komunikasi</h1>
-                <p>Menyebarkan Informasi dan Membangun Komunikasi yang Efektif</p>
+                <img src="../Resource/logo kabinet/DEPARTEMEN INTERNAL.LOGO.png" alt="Logo Departemen Internal" class="dept-logo">
+                <h1>Departemen Internal</h1>
+                <p>Membangun Solidaritas dan Kekeluargaan dalam HMTA ITERA</p>
             </div>
         </div>
     </section>
 
-    <!-- Visi & Misi -->
+    <!-- Department Mission -->
     <section class="department-mission">
         <div class="container">
             <h2><i class="fas fa-bullseye"></i> Visi & Misi</h2>
             <div class="mission-content">
-                <div class="mission-box" data-aos="fade-up">
+                <div class="mission-box">
                     <h3><i class="fas fa-eye"></i> Visi</h3>
-                    <p>Menjadi departemen yang unggul dalam mengelola media dan komunikasi HMTA secara kreatif dan inovatif.</p>
+                    <p>Menjadikan Departemen Internal sebagai penggerak utama dalam membangun kekeluargaan, solidaritas, dan kesejahteraan anggota HMTA ITERA.</p>
                 </div>
-                <div class="mission-box" data-aos="fade-up" data-aos-delay="100">
+                <div class="mission-box">
                     <h3><i class="fas fa-tasks"></i> Misi</h3>
                     <ul>
-                        <li>Mengelola media sosial dan publikasi HMTA</li>
-                        <li>Mendokumentasikan seluruh kegiatan organisasi</li>
-                        <li>Menyebarkan informasi secara efektif</li>
-                        <li>Membangun branding HMTA yang positif</li>
-                        <li>Mengembangkan konten kreatif dan edukatif</li>
+                        <li>Menjalin hubungan kekeluargaan antar anggota HMTA</li>
+                        <li>Mengkoordinasi kegiatan internal organisasi</li>
+                        <li>Memfasilitasi komunikasi antar departemen</li>
+                        <li>Mengelola kesejahteraan anggota HMTA</li>
+                        <li>Membangun budaya organisasi yang positif</li>
                     </ul>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Tanggung Jawab -->
+    <!-- Responsibilities Section -->
     <section class="responsibilities">
         <div class="container">
             <h2><i class="fas fa-clipboard-list"></i> Tanggung Jawab</h2>
             <div class="responsibilities-grid">
                 <div class="responsibility-card" data-aos="fade-up">
-                    <div class="icon-box"><i class="fas fa-camera"></i></div>
-                    <h3>Dokumentasi</h3>
-                    <p>Mendokumentasikan seluruh kegiatan HMTA dalam bentuk foto dan video.</p>
+                    <div class="icon-box">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>Koordinasi Internal</h3>
+                    <p>Mengkoordinasikan seluruh kegiatan internal organisasi dan memastikan komunikasi antar departemen berjalan efektif.</p>
                 </div>
                 <div class="responsibility-card" data-aos="fade-up" data-aos-delay="100">
-                    <div class="icon-box"><i class="fas fa-bullhorn"></i></div>
-                    <h3>Publikasi</h3>
-                    <p>Mempublikasikan informasi dan kegiatan HMTA melalui berbagai media.</p>
+                    <div class="icon-box">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <h3>Kekeluargaan</h3>
+                    <p>Membangun dan menjaga suasana kekeluargaan antar anggota HMTA melalui berbagai kegiatan bonding.</p>
                 </div>
                 <div class="responsibility-card" data-aos="fade-up" data-aos-delay="200">
-                    <div class="icon-box"><i class="fas fa-palette"></i></div>
-                    <h3>Desain Grafis</h3>
-                    <p>Membuat desain poster, banner, dan konten visual untuk kegiatan HMTA.</p>
+                    <div class="icon-box">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <h3>Manajemen Kegiatan</h3>
+                    <p>Mengelola dan mengatur jadwal kegiatan internal serta memastikan partisipasi aktif anggota.</p>
                 </div>
                 <div class="responsibility-card" data-aos="fade-up" data-aos-delay="300">
-                    <div class="icon-box"><i class="fas fa-hashtag"></i></div>
-                    <h3>Social Media</h3>
-                    <p>Mengelola dan mengembangkan media sosial HMTA secara profesional.</p>
+                    <div class="icon-box">
+                        <i class="fas fa-hands-helping"></i>
+                    </div>
+                    <h3>Kesejahteraan Anggota</h3>
+                    <p>Memperhatikan dan mengurus kesejahteraan anggota HMTA dalam berbagai aspek.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Pimpinan Inti -->
+    <!--team Section -->
+    <section class="team-section">
+         <!-- Pimpinan Inti -->
     <section class="team-section">
         <div class="container">
             <h2><i class="fas fa-users"></i> Pimpinan Inti</h2>
@@ -127,40 +125,7 @@ include dirname(__DIR__, 2) . '/includes/header.php';
         </div>
     </section>
 
-    <!-- Program Kerja -->
-    <section class="programs-section">
-        <div class="container">
-            <h2><i class="fas fa-rocket"></i> Program Kerja</h2>
-            <div class="programs-grid">
-                <div class="program-card" data-aos="fade-right">
-                    <div class="program-icon"><i class="fas fa-video"></i></div>
-                    <h3>Content Creation</h3>
-                    <p>Produksi konten video dan artikel edukatif tentang pertambangan untuk media sosial.</p>
-                    <span class="program-frequency">Mingguan</span>
-                </div>
-                <div class="program-card" data-aos="fade-right" data-aos-delay="100">
-                    <div class="program-icon"><i class="fas fa-newspaper"></i></div>
-                    <h3>Newsletter</h3>
-                    <p>Publikasi newsletter bulanan tentang kegiatan dan informasi terkini HMTA.</p>
-                    <span class="program-frequency">Bulanan</span>
-                </div>
-                <div class="program-card" data-aos="fade-right" data-aos-delay="200">
-                    <div class="program-icon"><i class="fas fa-podcast"></i></div>
-                    <h3>HMTA Podcast</h3>
-                    <p>Podcast yang membahas topik pertambangan dan pengalaman mahasiswa.</p>
-                    <span class="program-frequency">Bulanan</span>
-                </div>
-                <div class="program-card" data-aos="fade-right" data-aos-delay="300">
-                    <div class="program-icon"><i class="fas fa-chart-line"></i></div>
-                    <h3>Social Media Campaign</h3>
-                    <p>Kampanye media sosial untuk meningkatkan engagement dan awareness HMTA.</p>
-                    <span class="program-frequency">Berkelanjutan</span>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Divisi & Anggota -->
+        <!-- Divisi & Anggota -->
     <section class="department-divisions">
         <div class="section-division">
             <h2><i class="fa-solid fa-people-group"></i> Divisi & Anggota</h2>
@@ -290,10 +255,6 @@ include dirname(__DIR__, 2) . '/includes/header.php';
                             <img src="https://placehold.co/50x50/fd7e14/white?text=KD" alt="Kepala Divisi">
                             <div><h5>Andi Setiawan</h5><span>Kepala Divisi</span></div>
                         </div>
-                        <div class="leader-info">
-                            <img src="https://placehold.co/50x50/20c997/white?text=SD" alt="Sekretaris Divisi">
-                            <div><h5>Fitri Ramadhani</h5><span>Sekretaris Divisi</span></div>
-                        </div>
                     </div>
 
                     <div class="staff-section">
@@ -318,4 +279,6 @@ include dirname(__DIR__, 2) . '/includes/header.php';
     </section>
 </main>
 
-<?php include dirname(__DIR__, 2) . '/includes/footer.php'; ?>
+<?php
+include dirname(__DIR__, 2) . '/includes/footer.php';
+?>
