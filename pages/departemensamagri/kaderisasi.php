@@ -4,7 +4,7 @@ require_once dirname(__DIR__, 2) . '/includes/functions.php';
 $page_title     = 'Departemen Kaderisasi';
 
 // Pastikan nama CSS sesuai file yang ada. Saya gunakan kaderisasi.css (lihat file CSS di bawah).
-$additional_css = ['kaderisasi.css'];
+$additional_css = ['eksternal.css'];
 
 // Muat JS yang diperlukan:
 // - mobile_menu.js: animasi on scroll + mobile nav
@@ -176,16 +176,17 @@ include dirname(__DIR__, 2) . '/includes/header.php';
     </section>
 
     
-    <!-- Divisi & Anggota -->
-    <section class="department-divisions">
-        <div class="section-division">
+ <section class="department-divisions">
+        <div class="container">
+            <div class="section-header">
             <h2><i class="fa-solid fa-people-group"></i> Divisi & Anggota</h2>
-        </div>
-
+            </div>
+        </div>  
         <div class="division-filter">
             <button class="filter-btn active" data-filter="all">Semua Divisi</button>
             <button class="filter-btn" data-filter="Konseptor">Konseptor</button>
             <button class="filter-btn" data-filter="Eksekutor">Eksekutor</button>
+        </div>
         </div>
 
         <div class="divisions-container">
