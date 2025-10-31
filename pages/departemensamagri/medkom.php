@@ -4,14 +4,14 @@ require_once dirname(__DIR__, 2) . '/includes/functions.php';
 
 $page_title     = 'Departemen Media Informasi Komunikasi';
 
-// Pastikan nama CSS sesuai file yang ada. Saya gunakan pmpd.css (lihat file CSS di bawah).
-$additional_css = ['pmpd.css'];
+// Pastikan nama CSS sesuai file yang ada. Saya gunakan medkom.css (lihat file CSS di bawah).
+$additional_css = ['medkom.css'];
 
 // Muat JS yang diperlukan:
 // - mobile_menu.js: animasi on scroll + mobile nav
 // - department.js: counter, filter divisi, toggle konten
 // - medkom-init.js: jaring pengaman bila animasi/JS lain gagal (paksa tampilkan [data-aos] dan buka konten divisi)
-$additional_js  = [ 'department.js', 'medkom-init.js'];
+$additional_js  = ['mobile_menu.js', 'department.js', 'medkom-init.js'];
 
 include dirname(__DIR__, 2) . '/includes/header.php';
 ?>
@@ -162,8 +162,9 @@ include dirname(__DIR__, 2) . '/includes/header.php';
 
     <!-- Divisi & Anggota -->
     <section class="department-divisions">
-        <div class="section-division">
-            <h2><i class="fa-solid fa-people-group"></i> Divisi & Anggota</h2>
+        <div class="section-header">
+            <h2>Divisi & Anggota</h2>
+            <p>Tim-tim spesialis yang menggerakkan setiap aspek komunikasi dan media</p>
         </div>
 
         <div class="division-filter">

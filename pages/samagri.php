@@ -83,23 +83,24 @@ include __DIR__ . '/../includes/header.php';
             <div class="cabinet-departments">
                 <h3>Departemen</h3>
                 <div class="department-grid">
-                    <a href="<?php echo getBaseUrl(); ?>pages/departemensamagri/internal.php" class="department-card">
+                    <a href="<?php echo getBaseUrl(); ?>pages/internal.php" class="department-card">
                         <img class="logo-kabinet" src="<?php echo getBaseUrl(); ?>Resource/logo kabinet/DEPARTEMEN INTERNAL.LOGO.png" alt="Departemen Internal" onerror="this.src='<?php echo getBaseUrl(); ?>Resource/default-dept.png'">
                         <h4>Departemen Internal</h4>
                     </a>
-                    <a href="<?php echo getBaseUrl(); ?>pages/departemensamagri/external.php" class="department-card">
+                    <a href="<?php echo getBaseUrl(); ?>pages/external.php" class="department-card">
                         <img class="logo-kabinet" src="<?php echo getBaseUrl(); ?>Resource/logo kabinet/DEPARTEMEN EKSTERNAL.LOGO.png" alt="Departemen Eksternal" onerror="this.src='<?php echo getBaseUrl(); ?>Resource/default-dept.png'">
                         <h4>Departemen Eksternal</h4>
                     </a>
-                    <a href="<?php echo getBaseUrl(); ?>pages/departemensamagri/kaderisasi.php" class="department-card">
-                        <img class="logo-kabinet" src="<?php echo getBaseUrl(); ?>Resource/logo kabinet/DEPARTEMEN KADERISASI.LOGO.png" alt="Departemen Kaderisasi" onerror="this.src='<?php echo getBaseUrl(); ?>Resource/default-dept.png'">
+                    <a href="<?php echo getBaseUrl(); ?>pages/kaderisasi.php" class="department-card">
+                        <img class="logo-kabinet" s
+                        rc="<?php echo getBaseUrl(); ?>Resource/logo kabinet/DEPARTEMEN KADERISASI.LOGO.png" alt="Departemen Kaderisasi" onerror="this.src='<?php echo getBaseUrl(); ?>Resource/default-dept.png'">
                         <h4>Departemen Kaderisasi</h4>
                     </a>
-                    <a href="<?php echo getBaseUrl(); ?>pages/departemensamagri/psda.php" class="department-card">
+                    <a href="<?php echo getBaseUrl(); ?>pages/psda.php" class="department-card">
                         <img class="logo-kabinet" src="<?php echo getBaseUrl(); ?>Resource/logo kabinet/DEPARTEMEN PSDA.LOGO.png" alt="Departemen PSDA" onerror="this.src='<?php echo getBaseUrl(); ?>Resource/default-dept.png'">
                         <h4>Departemen Pengembangan Sumberdaya Anggota</h4>
                     </a>
-                    <a href="<?php echo getBaseUrl(); ?>pages/departemensamagri/keilmuan.php" class="department-card">
+                    <a href="<?php echo getBaseUrl(); ?>pages/keilmuan.php" class="department-card">
                         <img class="logo-kabinet" src="<?php echo getBaseUrl(); ?>Resource/logo kabinet/DEPARTEMEN KEILMUAN.LOGO.png" alt="Departemen Keilmuan" onerror="this.src='<?php echo getBaseUrl(); ?>Resource/default-dept.png'">
                         <h4>Departemen Keilmuan</h4>
                     </a>
