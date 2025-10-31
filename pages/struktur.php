@@ -46,8 +46,8 @@ include __DIR__ . '/../includes/header.php';
                 <div class="kabinet-card current" data-year="2024" data-status="current">
                     <div class="kabinet-badge">Kabinet Aktif</div>
                     <div class="kabinet-image">
-                        <img src="<?php echo IMG_URL; ?>samagri-logo.png"
-                             onerror="this.src='<?php echo BASE_URL; ?>Resource/samagri-logo.png'"
+                        <img src="<?php echo IMG_URL; ?>banner1.png"
+                             onerror="this.src='<?php echo BASE_URL; ?>Resource/img/banner1.png'"
                              alt="Kabinet Samagri">
                         <div class="kabinet-overlay">
                             <div class="kabinet-year">2024-2025</div>
@@ -78,8 +78,8 @@ include __DIR__ . '/../includes/header.php';
                 <!-- Past Cabinets -->
                 <div class="kabinet-card" data-year="2023" data-status="past">
                     <div class="kabinet-image">
-                        <img src="<?php echo IMG_URL; ?>radiant-logo.png"
-                             onerror="this.src='<?php echo BASE_URL; ?>Resource/radiant-logo.png'"
+                        <img src="<?php echo IMG_URL; ?>banner1.png"
+                             onerror="this.src='<?php echo BASE_URL; ?>Resource/img/banner1.png'"
                              alt="Kabinet Radiant">
                         <div class="kabinet-overlay">
                             <div class="kabinet-year">2023-2024</div>
@@ -109,8 +109,8 @@ include __DIR__ . '/../includes/header.php';
 
                 <div class="kabinet-card" data-year="2022" data-status="past">
                     <div class="kabinet-image">
-                        <img src="<?php echo IMG_URL; ?>sradhakorsa-logo.png"
-                             onerror="this.src='<?php echo BASE_URL; ?>Resource/sradhakorsa-logo.png'"
+                        <img src="<?php echo IMG_URL; ?>banner1.png"
+                             onerror="this.src='<?php echo BASE_URL; ?>Resource/img/banner1.png'"
                              alt="Kabinet Sradhakorsa">
                         <div class="kabinet-overlay">
                             <div class="kabinet-year">2022-2023</div>
@@ -140,8 +140,8 @@ include __DIR__ . '/../includes/header.php';
 
                 <div class="kabinet-card" data-year="2021" data-status="past">
                     <div class="kabinet-image">
-                        <img src="<?php echo IMG_URL; ?>reformasi-logo.png"
-                             onerror="this.src='<?php echo BASE_URL; ?>Resource/reformasi-logo.png'"
+                        <img src="<?php echo IMG_URL; ?>banner1.png"
+                             onerror="this.src='<?php echo BASE_URL; ?>Resource/img/banner1.png'"
                              alt="Kabinet Reformasi">
                         <div class="kabinet-overlay">
                             <div class="kabinet-year">2021-2022</div>
@@ -171,8 +171,8 @@ include __DIR__ . '/../includes/header.php';
 
                 <div class="kabinet-card" data-year="2020" data-status="past">
                     <div class="kabinet-image">
-                        <img src="<?php echo IMG_URL; ?>pionir-logo.png"
-                             onerror="this.src='<?php echo BASE_URL; ?>Resource/pionir-logo.png'"
+                        <img src="<?php echo IMG_URL; ?>banner1.png"
+                             onerror="this.src='<?php echo BASE_URL; ?>Resource/img/banner1.png'"
                              alt="Kabinet Pionir">
                         <div class="kabinet-overlay">
                             <div class="kabinet-year">2020-2021</div>
