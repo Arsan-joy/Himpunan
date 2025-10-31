@@ -2,89 +2,106 @@
 require_once __DIR__ . '/../includes/functions.php';
 require_admin();
 
+/* Konfigurasi modul + field
+   - type: text|textarea|number|date|bool|password|select|file
+   - untuk file, gunakan key tambahan:
+     'target' => nama kolom tujuan di DB,
+     'subdir' => sub folder upload,
+     'allowed'=> ['jpg','png',...],
+     'maxMB'  => batas ukuran MB,
+     'accept' => atribut input accept
+*/
 $modules = [
   'departemen' => [
+      'title' => 'Departemen',
       'table' => 'departments',
       'fields' => [
-          'name' => 'Nama',
-          'slug' => 'Slug',
-          'description' => 'Deskripsi',
+          'name' => ['label'=>'Nama'],
+          'slug' => ['label'=>'Slug'],
+          'description' => ['label'=>'Deskripsi','type'=>'textarea'],
       ],
       'order' => 'id DESC',
   ],
   'divisi' => [
+      'title' => 'Divisi',
       'table' => 'divisions',
       'fields' => [
-          'department_id' => 'Department ID',
-          'name' => 'Nama',
-          'slug' => 'Slug',
-          'description' => 'Deskripsi',
-          'member_count' => 'Jumlah Anggota',
+          'department_id' => ['label'=>'Department ID'],
+          'name' => ['label'=>'Nama'],
+          'slug' => ['label'=>'Slug'],
+          'description' => ['label'=>'Deskripsi','type'=>'textarea'],
+          'member_count' => ['label'=>'Jumlah Anggota'],
       ],
       'order' => 'id DESC',
   ],
   'kabinet' => [
+      'title' => 'Kabinet',
       'table' => 'kabinet',
       'fields' => [
-          'name' => 'Nama Kabinet',
-          'period' => 'Periode',
-          'description' => 'Deskripsi',
-          'logo_url' => 'Logo URL',
+          'name' => ['label'=>'Nama Kabinet'],
+          'period' => ['label'=>'Periode'],
+          'description' => ['label'=>'Deskripsi','type'=>'textarea'],
+          // Upload logo langsung
+          'logo_upload' => ['label'=>'Upload Logo','type'=>'file','accept'=>'image/*','target'=>'logo_url','subdir'=>'kabinet','allowed'=>['jpg','jpeg','png','webp','svg'],'maxMB'=>8],
       ],
       'order' => 'id DESC',
   ],
   'foto' => [
+      'title' => 'Foto',
       'table' => 'photos',
       'fields' => [
-          'album' => 'Album',
-          'url' => 'URL Gambar',
-          'caption' => 'Caption',
+          'album' => ['label'=>'Album'],
+          // Upload gambar -> simpan ke kolom url
+          'photo_file' => ['label'=>'Upload Gambar','type'=>'file','accept'=>'image/*','target'=>'url','subdir'=>'photos','allowed'=>['jpg','jpeg','png','webp'],'maxMB'=>10],
+          'caption' => ['label'=>'Caption'],
       ],
       'order' => 'id DESC',
   ],
   'materi' => [
+      'title' => 'Materi',
       'table' => 'materials',
       'fields' => [
-          'title' => 'Judul',
-          'file_url' => 'URL File',
-          'is_public' => ['label' => 'Publik?', 'type' => 'bool'],
+          'title' => ['label'=>'Judul'],
+          // Upload file -> simpan ke kolom file_url
+          'file_upload' => ['label'=>'Upload File (PDF/DOC/PPT)','type'=>'file','accept'=>'.pdf,.doc,.docx,.ppt,.pptx','target'=>'file_url','subdir'=>'materials','allowed'=>['pdf','doc','docx','ppt','pptx'],'maxMB'=>50],
+          'is_public' => ['label'=>'Publik?','type'=>'bool'],
       ],
       'order' => 'id DESC',
   ],
   'kegiatan' => [
+      'title' => 'Kegiatan',
       'table' => 'events',
       'fields' => [
-          'title' => 'Judul',
-          'description' => 'Deskripsi',
-          'start_date' => ['label' => 'Mulai', 'type' => 'date'],
-          'end_date' => ['label' => 'Selesai', 'type' => 'date'],
-          'is_all_day' => ['label' => 'Sehari Penuh?', 'type' => 'bool'],
-          'type' => 'Tipe (academic/holiday/event)',
-          'image_url' => 'Gambar (URL opsional)',
+          'title' => ['label'=>'Judul'],
+          'description' => ['label'=>'Deskripsi','type'=>'textarea'],
+          'start_date' => ['label'=>'Mulai','type'=>'date'],
+          'end_date' => ['label'=>'Selesai','type'=>'date'],
+          'is_all_day' => ['label'=>'Sehari Penuh?','type'=>'bool'],
+          'type' => ['label'=>'Tipe (academic/holiday/event)'],
+          // Gambar opsional untuk kartu event
+          'image_upload' => ['label'=>'Gambar (opsional)','type'=>'file','accept'=>'image/*','target'=>'image_url','subdir'=>'events','allowed'=>['jpg','jpeg','png','webp'],'maxMB'=>6],
       ],
       'order' => 'start_date DESC',
   ],
   'users' => [
+      'title' => 'Pengguna',
       'table' => 'users',
       'fields' => [
-          'username' => 'Username',
-          'password' => ['label' => 'Password (kosong = tidak ganti)', 'type' => 'password'],
-          'role' => 'Role (admin/user)',
-          'active' => ['label' => 'Aktif?', 'type' => 'bool'],
+          'username' => ['label'=>'Username'],
+          'password' => ['label'=>'Password (kosong = tidak ganti)','type'=>'password'],
+          'role' => ['label'=>'Role (admin/user)'],
+          'active' => ['label'=>'Aktif?','type'=>'bool'],
       ],
       'order' => 'id DESC',
   ],
 ];
 
 $moduleKey = $_GET['m'] ?? 'departemen';
-if (!isset($modules[$moduleKey])) {
-    http_response_code(404);
-    echo "Modul tidak ditemukan";
-    exit;
-}
+if (!isset($modules[$moduleKey])) { http_response_code(404); echo "Modul tidak ditemukan"; exit; }
 $mod = $modules[$moduleKey];
 $table = $mod['table'];
 $order = $mod['order'] ?? 'id DESC';
+$title = $mod['title'] ?? ucfirst($moduleKey);
 
 // Create / Update
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -92,8 +109,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $cols = [];
     $vals = [];
+    $fileAssignments = []; // [target_col => uploaded_url]
+
+    // Tangani fields
     foreach ($mod['fields'] as $col => $meta) {
-        $type = is_array($meta) ? ($meta['type'] ?? 'text') : 'text';
+        $type = $meta['type'] ?? 'text';
+
+        if ($type === 'file') {
+            // Upload file; jika user tidak upload saat edit, biarkan kolom lama
+            try {
+                $uploaded = save_uploaded_file($col, $meta['subdir'], $meta['allowed'], (int)($meta['maxMB'] ?? 50));
+                if ($uploaded) {
+                    $targetCol = $meta['target']; // kolom tujuan di DB
+                    $fileAssignments[$targetCol] = $uploaded;
+                }
+            } catch (Throwable $e) {
+                // Bisa tampilkan pesan error sederhana
+                $_SESSION['flash_error'] = 'Upload gagal: ' . $e->getMessage();
+            }
+            continue;
+        }
+
         if ($moduleKey === 'users' && $col === 'password') {
             $pwd = trim($_POST['password'] ?? '');
             if ($pwd !== '') {
@@ -102,24 +138,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             continue;
         }
+
         $val = $_POST[$col] ?? null;
         if ($type === 'bool') $val = isset($_POST[$col]) ? 1 : 0;
+
         $cols[] = $col;
         $vals[] = $val;
     }
 
+    // Gabungkan fileAssignments (hanya jika ada upload)
+    foreach ($fileAssignments as $tcol => $url) {
+        $cols[] = $tcol;
+        $vals[] = $url;
+    }
+
     if ($id) {
-        $sets = implode(',', array_map(fn($c) => "$c = ?", $cols));
-        $sql = "UPDATE $table SET $sets WHERE id = ?";
-        $stmt = db()->prepare($sql);
-        $vals[] = $id;
-        $stmt->execute($vals);
+        if (!empty($cols)) {
+            $sets = implode(',', array_map(fn($c) => "$c = ?", $cols));
+            $sql = "UPDATE $table SET $sets WHERE id = ?";
+            $stmt = db()->prepare($sql);
+            $vals[] = $id;
+            $stmt->execute($vals);
+        }
     } else {
-        $colStr = implode(',', $cols);
-        $qStr   = implode(',', array_fill(0, count($cols), '?'));
-        $sql = "INSERT INTO $table ($colStr) VALUES ($qStr)";
-        $stmt = db()->prepare($sql);
-        $stmt->execute($vals);
+        if (!empty($cols)) {
+            $colStr = implode(',', $cols);
+            $qStr   = implode(',', array_fill(0, count($cols), '?'));
+            $sql = "INSERT INTO $table ($colStr) VALUES ($qStr)";
+            $stmt = db()->prepare($sql);
+            $stmt->execute($vals);
+        }
     }
 
     header('Location: manage.php?m=' . urlencode($moduleKey));
@@ -130,8 +178,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 if (isset($_GET['del'])) {
     $delId = (int)$_GET['del'];
     db()->prepare("DELETE FROM $table WHERE id = ?")->execute([$delId]);
-    header('Location: manage.php?m=' . urlencode($moduleKey));
-    exit;
+    header('Location: manage.php?m=' . urlencode($moduleKey)); exit;
 }
 
 // List + edit
@@ -146,112 +193,152 @@ if (isset($_GET['id'])) {
 <!doctype html>
 <html lang="id">
 <head>
-<meta charset="utf-8">
-<title>Kelola <?= htmlspecialchars(ucfirst($moduleKey)) ?></title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<style>
-body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#f5f7fb;margin:0}
-header{background:#263b50;color:#fff;padding:14px 18px;display:flex;justify-content:space-between;align-items:center}
-header a{color:#fff;text-decoration:none;font-size:14px}
-.wrap{max-width:1100px;margin:24px auto;padding:0 16px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.card{background:#fff;border-radius:14px;box-shadow:0 16px 40px rgba(0,0,0,.06);padding:18px}
-table{width:100%;border-collapse:collapse}
-th,td{padding:10px;border-bottom:1px solid #eef2f7;font-size:14px}
-th{text-align:left;color:#6b7280}
-.field{display:flex;flex-direction:column;margin-bottom:10px}
-label{font-size:13px;color:#374151;margin-bottom:6px}
-input,textarea,select{padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;font-size:14px}
-.row{display:flex;gap:8px;align-items:center}
-.btn{display:inline-block;background:#3e6fa0;color:#fff;padding:8px 12px;border-radius:8px;text-decoration:none;font-weight:700}
-.muted{color:#6b7280;font-size:13px}
-.switch{display:flex;align-items:center;gap:8px}
-@media (max-width: 900px){.grid{grid-template-columns:1fr}}
-</style>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kelola <?= htmlspecialchars($title) ?></title>
+  <link rel="stylesheet" href="<?= BASE_URL ?>Resource/css/admin.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
-<header>
-  <div><a href="index.php">&larr; Dashboard</a></div>
-  <strong>Kelola <?= htmlspecialchars(ucfirst($moduleKey)) ?></strong>
-  <div><a href="<?= BASE_URL ?>admin/logout.php">Logout</a></div>
-</header>
+<div class="admin-wrap">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-logo"><i class="fa-solid fa-check"></i></div>
+      <div><h1>HMTA Admin</h1><div style="opacity:.8;font-size:12px">Control Panel</div></div>
+    </div>
+    <nav class="nav">
+      <a href="<?= BASE_URL ?>admin/"><i class="fa-solid fa-house"></i> Dashboard</a>
+      <a class="<?= $moduleKey==='departemen'?'active':'' ?>" href="?m=departemen"><i class="fa-solid fa-building"></i> Kelola Departemen</a>
+      <a class="<?= $moduleKey==='divisi'?'active':'' ?>" href="?m=divisi"><i class="fa-solid fa-people-group"></i> Kelola Divisi</a>
+      <a class="<?= $moduleKey==='kabinet'?'active':'' ?>" href="?m=kabinet"><i class="fa-solid fa-layer-group"></i> Kelola Kabinet</a>
+      <a class="<?= $moduleKey==='foto'?'active':'' ?>" href="?m=foto"><i class="fa-solid fa-image"></i> Kelola Foto</a>
+      <a class="<?= $moduleKey==='materi'?'active':'' ?>" href="?m=materi"><i class="fa-solid fa-book"></i> Kelola Materi</a>
+      <a class="<?= $moduleKey==='kegiatan'?'active':'' ?>" href="?m=kegiatan"><i class="fa-solid fa-calendar-days"></i> Kelola Kegiatan</a>
+      <a class="<?= $moduleKey==='users'?'active':'' ?>" href="?m=users"><i class="fa-solid fa-user-shield"></i> Kelola Pengguna</a>
+      <a href="logout.php"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+    </nav>
+  </aside>
 
-<div class="wrap grid">
-  <div class="card">
-    <h3><?= $editing ? 'Edit' : 'Tambah' ?> Data</h3>
-    <form method="post">
-      <?php if ($editing): ?>
-        <input type="hidden" name="id" value="<?= (int)$editing['id'] ?>">
-      <?php endif; ?>
+  <main class="main">
+    <div class="topbar">
+      <div class="title"><button id="sidebarToggle" class="btn btn-primary" style="display:none;"><i class="fa-solid fa-bars"></i></button><h2><i class="fa-solid fa-gear"></i> Kelola <?= htmlspecialchars($title) ?></h2></div>
+      <div class="pill"><div class="avatar"><i class="fa-solid fa-user"></i></div><div><div style="font-weight:800"><?= htmlspecialchars($_SESSION['user']['username']) ?></div><div style="font-size:12px;opacity:.8">Administrator</div></div></div>
+    </div>
 
-      <?php foreach ($mod['fields'] as $col => $meta):
-        $label = is_array($meta) ? ($meta['label'] ?? ucfirst($col)) : $meta;
-        $type  = is_array($meta) ? ($meta['type'] ?? 'text') : 'text';
-        $val   = $editing[$col] ?? '';
-      ?>
-        <div class="field">
-          <label><?= htmlspecialchars($label) ?></label>
-          <?php if ($type === 'bool'): ?>
-            <label class="switch">
-              <input type="checkbox" name="<?= $col ?>" <?= $val ? 'checked' : '' ?>> <span class="muted">Ya</span>
-            </label>
-          <?php elseif ($type === 'date'): ?>
-            <input type="date" name="<?= $col ?>" value="<?= htmlspecialchars($val) ?>">
-          <?php elseif ($type === 'password'): ?>
-            <input type="password" name="<?= $col ?>" placeholder="Kosongkan jika tidak ganti">
-          <?php else: ?>
-            <?php if ($col === 'description'): ?>
+    <?php if (!empty($_SESSION['flash_error'])): ?>
+      <div class="content-card" style="border-left:4px solid #ef4444;color:#b91c1c;background:#fff7f7;margin-bottom:12px">
+        <?= htmlspecialchars($_SESSION['flash_error']); unset($_SESSION['flash_error']); ?>
+      </div>
+    <?php endif; ?>
+
+    <div class="manage-wrap">
+      <div class="content-card form">
+        <div class="section-title"><i class="fa-solid fa-plus"></i> <?= $editing?'Edit':'Tambah' ?> Data</div>
+        <form method="post" enctype="multipart/form-data">
+          <?php if ($editing): ?>
+            <input type="hidden" name="id" value="<?= (int)$editing['id'] ?>">
+          <?php endif; ?>
+
+          <?php foreach ($mod['fields'] as $col => $meta):
+              $label = $meta['label'] ?? ucfirst($col);
+              $type  = $meta['type'] ?? 'text';
+              $val   = $editing[$meta['target'] ?? $col] ?? '';
+              $accept= $meta['accept'] ?? null;
+          ?>
+          <div class="field">
+            <label><?= htmlspecialchars($label) ?></label>
+
+            <?php if ($type === 'bool'): ?>
+              <label style="display:flex;align-items:center;gap:8px">
+                <input type="checkbox" name="<?= $col ?>" <?= $val ? 'checked' : '' ?>> <span>Ya</span>
+              </label>
+
+            <?php elseif ($type === 'date'): ?>
+              <input type="date" name="<?= $col ?>" value="<?= htmlspecialchars($val) ?>">
+
+            <?php elseif ($type === 'password'): ?>
+              <input type="password" name="<?= $col ?>" placeholder="Kosongkan jika tidak ganti">
+
+            <?php elseif ($type === 'textarea'): ?>
               <textarea name="<?= $col ?>" rows="3"><?= htmlspecialchars($val) ?></textarea>
+
+            <?php elseif ($type === 'file'): 
+              $currentUrl = $editing[$meta['target'] ?? ''] ?? '';
+            ?>
+              <input type="file" name="<?= $col ?>" <?= $accept ? 'accept="'.htmlspecialchars($accept).'"' : '' ?>>
+              <?php if ($currentUrl): ?>
+                <div class="preview">
+                  <?php if (preg_match('~\.(jpg|jpeg|png|webp|gif|svg)$~i', $currentUrl)): ?>
+                    <img class="thumb" src="<?= htmlspecialchars($currentUrl) ?>" alt="">
+                  <?php else: ?>
+                    <a class="badge" href="<?= htmlspecialchars($currentUrl) ?>" target="_blank">File saat ini</a>
+                  <?php endif; ?>
+                </div>
+                <div class="hint">Biarkan kosong jika tidak ingin mengganti.</div>
+              <?php endif; ?>
+
             <?php else: ?>
               <input name="<?= $col ?>" value="<?= htmlspecialchars($val) ?>">
             <?php endif; ?>
-          <?php endif; ?>
-        </div>
-      <?php endforeach; ?>
-
-      <button class="btn" type="submit"><?= $editing ? 'Update' : 'Simpan' ?></button>
-    </form>
-  </div>
-
-  <div class="card">
-    <h3>Data</h3>
-    <div class="muted" style="margin-bottom:8px">Klik Edit untuk mengubah, Hapus untuk menghapus.</div>
-    <table>
-      <thead>
-        <tr>
-          <th>ID</th>
-          <?php foreach ($mod['fields'] as $col => $_): ?>
-            <th><?= htmlspecialchars(is_array($_)?($_['label'] ?? ucfirst($col)) : $_) ?></th>
+          </div>
           <?php endforeach; ?>
-          <th>Aksi</th>
-        </tr>
-      </thead>
-      <tbody>
-        <?php foreach ($list as $row): ?>
-          <tr>
-            <td><?= (int)$row['id'] ?></td>
-            <?php foreach ($mod['fields'] as $col => $meta):
-              $type = is_array($meta) ? ($meta['type'] ?? 'text') : 'text';
-              $val  = $row[$col] ?? ($col === 'password' ? '' : '');
-              if ($col === 'password') $val = '••••••';
-            ?>
-              <td>
-                <?php if ($type === 'bool'): ?>
-                  <?= ($row[$col] ?? 0) ? 'Ya' : 'Tidak' ?>
-                <?php else: ?>
-                  <?= htmlspecialchars((string)$val) ?>
-                <?php endif; ?>
-              </td>
+
+          <button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i> <?= $editing ? 'Update' : 'Simpan' ?></button>
+        </form>
+      </div>
+
+      <div class="content-card">
+        <div class="section-title"><i class="fa-solid fa-list"></i> Data</div>
+        <div style="overflow:auto">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <?php foreach ($mod['fields'] as $col => $meta): ?>
+                <th><?= htmlspecialchars($meta['label'] ?? ucfirst($col)) ?></th>
+              <?php endforeach; ?>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php foreach ($list as $row): ?>
+              <tr>
+                <td><?= (int)$row['id'] ?></td>
+                <?php foreach ($mod['fields'] as $col => $meta):
+                    $type = $meta['type'] ?? 'text';
+                    $showKey = $meta['target'] ?? $col;
+                    $v = $row[$showKey] ?? '';
+                ?>
+                  <td>
+                    <?php if ($type === 'bool'): ?>
+                      <?= ($row[$col] ?? 0) ? 'Ya' : 'Tidak' ?>
+                    <?php elseif ($type === 'password'): ?>
+                      ••••••
+                    <?php elseif ($type === 'file'): ?>
+                      <?php if ($v && preg_match('~\.(jpg|jpeg|png|webp|gif|svg)$~i', $v)): ?>
+                        <img class="thumb" src="<?= htmlspecialchars($v) ?>" alt="">
+                      <?php elseif ($v): ?>
+                        <a class="badge" href="<?= htmlspecialchars($v) ?>" target="_blank">Lihat</a>
+                      <?php else: ?>
+                        <span class="hint">-</span>
+                      <?php endif; ?>
+                    <?php else: ?>
+                      <?= htmlspecialchars((string)$v) ?>
+                    <?php endif; ?>
+                  </td>
+                <?php endforeach; ?>
+                <td>
+                  <a class="btn btn-primary" href="?m=<?= urlencode($moduleKey) ?>&id=<?= (int)$row['id'] ?>"><i class="fa-solid fa-pen"></i> Edit</a>
+                  <a class="btn btn-danger" href="?m=<?= urlencode($moduleKey) ?>&del=<?= (int)$row['id'] ?>" onclick="return confirm('Hapus data ini?')"><i class="fa-solid fa-trash"></i> Hapus</a>
+                </td>
+              </tr>
             <?php endforeach; ?>
-            <td class="row">
-              <a class="btn" href="?m=<?= urlencode($moduleKey) ?>&id=<?= (int)$row['id'] ?>">Edit</a>
-              <a class="btn" style="background:#dc2626" href="?m=<?= urlencode($moduleKey) ?>&del=<?= (int)$row['id'] ?>" onclick="return confirm('Hapus data ini?')">Hapus</a>
-            </td>
-          </tr>
-        <?php endforeach; ?>
-      </tbody>
-    </table>
-  </div>
+          </tbody>
+        </table>
+        </div>
+      </div>
+    </div>
+  </main>
 </div>
+<script src="<?= BASE_URL ?>Resource/js/admin.js"></script>
 </body>
 </html>

@@ -3,62 +3,80 @@ require_once __DIR__ . '/../includes/functions.php';
 require_admin();
 
 $counts = [
-    'departments' => (int)db()->query("SELECT COUNT(*) c FROM departments")->fetch()['c'],
-    'divisions'   => (int)db()->query("SELECT COUNT(*) c FROM divisions")->fetch()['c'],
-    'materials'   => (int)db()->query("SELECT COUNT(*) c FROM materials")->fetch()['c'],
-    'photos'      => (int)db()->query("SELECT COUNT(*) c FROM photos")->fetch()['c'],
-    'events'      => (int)db()->query("SELECT COUNT(*) c FROM events")->fetch()['c'],
-    'users'       => (int)db()->query("SELECT COUNT(*) c FROM users")->fetch()['c'],
+  'Departemen' => (int)db()->query("SELECT COUNT(*) c FROM departments")->fetch()['c'],
+  'Divisi'     => (int)db()->query("SELECT COUNT(*) c FROM divisions")->fetch()['c'],
+  'Materi'     => (int)db()->query("SELECT COUNT(*) c FROM materials")->fetch()['c'],
+  'Foto'       => (int)db()->query("SELECT COUNT(*) c FROM photos")->fetch()['c'],
+  'Kegiatan'   => (int)db()->query("SELECT COUNT(*) c FROM events")->fetch()['c'],
+  'Pengguna'   => (int)db()->query("SELECT COUNT(*) c FROM users")->fetch()['c'],
 ];
 ?>
 <!doctype html>
 <html lang="id">
 <head>
-<meta charset="utf-8">
-<title>Dashboard Admin</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<style>
-body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#f5f7fb;margin:0}
-header{background:#263b50;color:#fff;padding:14px 18px;display:flex;justify-content:space-between;align-items:center}
-header a{color:#fff;text-decoration:none;font-size:14px}
-.wrap{max-width:1100px;margin:24px auto;padding:0 16px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
-.card{background:#fff;border-radius:14px;box-shadow:0 16px 40px rgba(0,0,0,.06);padding:18px}
-.nav{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}
-.btn{display:inline-block;background:#3e6fa0;color:#fff;padding:10px 14px;border-radius:9px;text-decoration:none;font-weight:700}
-.small{font-size:12px;color:#cbd5e1}
-</style>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dashboard Admin</title>
+  <link rel="stylesheet" href="<?= BASE_URL ?>Resource/css/admin.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
-<header>
-  <strong>Dashboard Admin</strong>
-  <div>
-    <span class="small">Hai, <?= htmlspecialchars($_SESSION['user']['username']) ?></span>
-    &nbsp;|&nbsp;
-    <a href="<?= BASE_URL ?>">Lihat Situs</a>
-    &nbsp;|&nbsp;
-    <a href="<?= BASE_URL ?>admin/logout.php">Logout</a>
-  </div>
-</header>
-<div class="wrap">
-  <div class="nav">
-    <a class="btn" href="manage.php?m=departemen">Kelola Departemen</a>
-    <a class="btn" href="manage.php?m=divisi">Kelola Divisi</a>
-    <a class="btn" href="manage.php?m=kabinet">Kelola Kabinet</a>
-    <a class="btn" href="manage.php?m=foto">Kelola Foto</a>
-    <a class="btn" href="manage.php?m=materi">Kelola Materi</a>
-    <a class="btn" href="manage.php?m=kegiatan">Kelola Kegiatan</a>
-    <a class="btn" href="manage.php?m=users">Kelola Pengguna</a>
-  </div>
-
-  <div class="grid">
-    <?php foreach ($counts as $label => $val): ?>
-      <div class="card">
-        <h3><?= ucfirst($label) ?></h3>
-        <div><strong style="font-size:28px"><?= $val ?></strong></div>
+<div class="admin-wrap">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-logo"><i class="fa-solid fa-check"></i></div>
+      <div>
+        <h1>HMTA Admin</h1>
+        <div style="opacity:.8;font-size:12px">Control Panel</div>
       </div>
-    <?php endforeach; ?>
-  </div>
+    </div>
+    <nav class="nav">
+      <a class="active" href="<?= BASE_URL ?>admin/"><i class="fa-solid fa-house"></i> Dashboard</a>
+      <a href="manage.php?m=departemen"><i class="fa-solid fa-building"></i> Kelola Departemen</a>
+      <a href="manage.php?m=divisi"><i class="fa-solid fa-people-group"></i> Kelola Divisi</a>
+      <a href="manage.php?m=kabinet"><i class="fa-solid fa-layer-group"></i> Kelola Kabinet</a>
+      <a href="manage.php?m=foto"><i class="fa-solid fa-image"></i> Kelola Foto</a>
+      <a href="manage.php?m=materi"><i class="fa-solid fa-book"></i> Kelola Materi</a>
+      <a href="manage.php?m=kegiatan"><i class="fa-solid fa-calendar-days"></i> Kelola Kegiatan</a>
+      <a href="manage.php?m=users"><i class="fa-solid fa-user-shield"></i> Kelola Pengguna</a>
+      <a href="<?= BASE_URL ?>" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> Lihat Website</a>
+      <a href="logout.php" style="margin-top:8px"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+    </nav>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div class="title">
+        <button id="sidebarToggle" class="btn btn-primary" style="display:none;"><i class="fa-solid fa-bars"></i></button>
+        <h2><i class="fa-solid fa-chart-line"></i> Dashboard</h2>
+      </div>
+      <div class="pill">
+        <div class="avatar"><i class="fa-solid fa-user"></i></div>
+        <div>
+          <div style="font-weight:800"><?= htmlspecialchars($_SESSION['user']['username']) ?></div>
+          <div style="font-size:12px;opacity:.8">Administrator</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card metric"><div class="ico ico-blue"><i class="fa-solid fa-building"></i></div><div><div class="num"><?= $counts['Departemen'] ?></div><div class="label">Departemen</div></div></div>
+      <div class="card metric"><div class="ico ico-violet"><i class="fa-solid fa-people-group"></i></div><div><div class="num"><?= $counts['Divisi'] ?></div><div class="label">Divisi</div></div></div>
+      <div class="card metric"><div class="ico ico-green"><i class="fa-solid fa-book"></i></div><div><div class="num"><?= $counts['Materi'] ?></div><div class="label">Materi</div></div></div>
+      <div class="card metric"><div class="ico ico-amber"><i class="fa-solid fa-image"></i></div><div><div class="num"><?= $counts['Foto'] ?></div><div class="label">Foto</div></div></div>
+      <div class="card metric"><div class="ico ico-blue"><i class="fa-solid fa-calendar-days"></i></div><div><div class="num"><?= $counts['Kegiatan'] ?></div><div class="label">Kegiatan</div></div></div>
+      <div class="card metric"><div class="ico ico-violet"><i class="fa-solid fa-user-shield"></i></div><div><div class="num"><?= $counts['Pengguna'] ?></div><div class="label">Pengguna</div></div></div>
+    </div>
+
+    <div class="content-card" style="margin-top:16px">
+      <div class="section-title"><i class="fa-solid fa-wand-magic-sparkles"></i> Aksi Cepat</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <a class="btn btn-primary" href="manage.php?m=kegiatan"><i class="fa-solid fa-plus"></i> Tambah Kegiatan</a>
+        <a class="btn btn-primary" href="manage.php?m=materi"><i class="fa-solid fa-upload"></i> Upload Materi</a>
+        <a class="btn btn-primary" href="manage.php?m=foto"><i class="fa-solid fa-image"></i> Upload Foto</a>
+      </div>
+    </div>
+  </main>
 </div>
+<script src="<?= BASE_URL ?>Resource/js/admin.js"></script>
 </body>
 </html>

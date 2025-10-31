@@ -68,11 +68,6 @@ $cssHref = function(string $css): string {
 
     <?php if (is_logged_in()): ?>
         <div style="display:flex; gap:8px; align-items:center;">
-            <?php if (is_admin()): ?>
-                <button class="btn-signin" onclick="window.location.href='<?= BASE_URL ?>admin/'">
-                    <i class="fas fa-gauge"></i> Dashboard
-                </button>
-            <?php endif; ?>
             <button class="btn-signin" onclick="window.location.href='<?= BASE_URL ?>admin/logout.php'">
                 <i class="fas fa-sign-out-alt"></i> Logout
             </button>
