@@ -41,7 +41,7 @@ function slugify_simple($s) {
   </section>
 
   <section class="gallery-grid">
-    <div class="container">
+    <div class="container"> 
       <div class="gallery-items" id="galleryItems">
         <?php if ($photos): ?>
           <?php foreach ($photos as $p): $cat = slugify_simple($p['album'] ?: 'lainnya'); ?>

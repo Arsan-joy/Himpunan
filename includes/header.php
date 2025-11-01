@@ -1,4 +1,8 @@
 <?php
+// Guard agar header tidak dicetak dua kali jika ter-include ganda
+if (defined('HMTA_HEADER_PRINTED')) return;
+define('HMTA_HEADER_PRINTED', true);
+
 require_once __DIR__ . '/functions.php';
 if (!isset($page_title)) $page_title = '';
 if (!isset($additional_css) || !is_array($additional_css)) $additional_css = [];
@@ -42,15 +46,11 @@ $cssHref = fn($css)=> (preg_match('~^https?://|^/~',$css)?$css:(CSS_URL ?? (BASE
 
   <?php if (is_logged_in()): ?>
     <div style="display:flex; gap:8px; align-items:center;">
-      <?php if (is_admin()): ?>
-        <button class="btn-signin" onclick="location.href='<?= BASE_URL ?>admin/'"><i class="fas fa-gauge"></i> Dashboard</button>
-      <?php endif; ?>
       <button class="btn-signin" onclick="location.href='<?= BASE_URL ?>admin/logout.php'"><i class="fas fa-sign-out-alt"></i> Logout</button>
     </div>
   <?php else: ?>
     <div style="display:flex; gap:8px;">
       <button class="btn-signin" onclick="location.href='<?= BASE_URL ?>pages/login.php'"><i class="fas fa-user"></i> Login</button>
-      <button class="btn-signin" style="background:#0ea5e9" onclick="location.href='<?= BASE_URL ?>admin/login.php'"><i class="fas fa-user-shield"></i> Admin</button>
     </div>
   <?php endif; ?>
   <div class="mobile-menu-overlay" id="mobileMenuOverlay" aria-hidden="true"></div>
