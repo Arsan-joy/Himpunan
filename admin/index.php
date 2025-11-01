@@ -24,10 +24,7 @@ $counts = [
   <aside class="sidebar">
     <div class="brand">
       <div class="brand-logo"><i class="fa-solid fa-check"></i></div>
-      <div>
-        <h1>HMTA Admin</h1>
-        <div style="opacity:.8;font-size:12px">Control Panel</div>
-      </div>
+      <div><h1>HMTA Admin</h1><div style="opacity:.8;font-size:12px">Control Panel</div></div>
     </div>
     <nav class="nav">
       <a class="active" href="<?= BASE_URL ?>admin/"><i class="fa-solid fa-house"></i> Dashboard</a>
@@ -37,25 +34,18 @@ $counts = [
       <a href="manage.php?m=foto"><i class="fa-solid fa-image"></i> Kelola Foto</a>
       <a href="manage.php?m=materi"><i class="fa-solid fa-book"></i> Kelola Materi</a>
       <a href="manage.php?m=kegiatan"><i class="fa-solid fa-calendar-days"></i> Kelola Kegiatan</a>
-      <a href="manage.php?m=users"><i class="fa-solid fa-user-shield"></i> Kelola Pengguna</a>
+      <?php if (is_super_admin()): ?>
+        <a href="manage.php?m=users"><i class="fa-solid fa-user-shield"></i> Kelola Pengguna</a>
+      <?php endif; ?>
       <a href="<?= BASE_URL ?>" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> Lihat Website</a>
-      <a href="logout.php" style="margin-top:8px"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+      <a href="logout.php"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
     </nav>
   </aside>
 
   <main class="main">
     <div class="topbar">
-      <div class="title">
-        <button id="sidebarToggle" class="btn btn-primary" style="display:none;"><i class="fa-solid fa-bars"></i></button>
-        <h2><i class="fa-solid fa-chart-line"></i> Dashboard</h2>
-      </div>
-      <div class="pill">
-        <div class="avatar"><i class="fa-solid fa-user"></i></div>
-        <div>
-          <div style="font-weight:800"><?= htmlspecialchars($_SESSION['user']['username']) ?></div>
-          <div style="font-size:12px;opacity:.8">Administrator</div>
-        </div>
-      </div>
+      <div class="title"><h2><i class="fa-solid fa-chart-line"></i> Dashboard</h2></div>
+      <div class="pill"><div class="avatar"><i class="fa-solid fa-user"></i></div><div><div style="font-weight:800"><?= htmlspecialchars($_SESSION['user']['username']) ?></div><div style="font-size:12px;opacity:.8"><?= is_super_admin()?'Super Admin':'Admin' ?></div></div></div>
     </div>
 
     <div class="grid">
@@ -64,19 +54,11 @@ $counts = [
       <div class="card metric"><div class="ico ico-green"><i class="fa-solid fa-book"></i></div><div><div class="num"><?= $counts['Materi'] ?></div><div class="label">Materi</div></div></div>
       <div class="card metric"><div class="ico ico-amber"><i class="fa-solid fa-image"></i></div><div><div class="num"><?= $counts['Foto'] ?></div><div class="label">Foto</div></div></div>
       <div class="card metric"><div class="ico ico-blue"><i class="fa-solid fa-calendar-days"></i></div><div><div class="num"><?= $counts['Kegiatan'] ?></div><div class="label">Kegiatan</div></div></div>
+      <?php if (is_super_admin()): ?>
       <div class="card metric"><div class="ico ico-violet"><i class="fa-solid fa-user-shield"></i></div><div><div class="num"><?= $counts['Pengguna'] ?></div><div class="label">Pengguna</div></div></div>
-    </div>
-
-    <div class="content-card" style="margin-top:16px">
-      <div class="section-title"><i class="fa-solid fa-wand-magic-sparkles"></i> Aksi Cepat</div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap">
-        <a class="btn btn-primary" href="manage.php?m=kegiatan"><i class="fa-solid fa-plus"></i> Tambah Kegiatan</a>
-        <a class="btn btn-primary" href="manage.php?m=materi"><i class="fa-solid fa-upload"></i> Upload Materi</a>
-        <a class="btn btn-primary" href="manage.php?m=foto"><i class="fa-solid fa-image"></i> Upload Foto</a>
-      </div>
+      <?php endif; ?>
     </div>
   </main>
 </div>
-<script src="<?= BASE_URL ?>Resource/js/admin.js"></script>
 </body>
 </html>

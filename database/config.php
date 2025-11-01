@@ -40,3 +40,7 @@ define('DB_CHARSET', 'utf8mb4');
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+
+// Atur identitas Super Admin (hanya 1 akun ini yang boleh role 'super_admin')
+if (!defined('SUPER_ADMIN_USERNAME')) define('SUPER_ADMIN_USERNAME', 'superadmin'); // ganti sesuai keinginan
+if (!defined('SUPER_ADMIN_PASSWORD')) define('SUPER_ADMIN_PASSWORD', 'admin0105');  // ganti sesuai keinginan
