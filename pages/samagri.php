@@ -1,126 +1,99 @@
 <?php
 require_once __DIR__ . '/../includes/functions.php';
 
-$page_title     = 'Kabinet Samagri HMTA ITERA';
-$additional_css = ['stylesamagri.css']; // pastikan file ada di folder css/
-$additional_js  = [];                   // tambahkan jika ada JS khusus halaman ini, misal ['home2.js']
+$page_title     = 'Kabinet HMTA ITERA';
+$additional_css = ['stylesamagri.css']; // pastikan file CSS ini ada
+$additional_js  = [];                   // tambahkan jika ada JS khusus
 
 include __DIR__ . '/../includes/header.php';
-?>
 
+// Ambil Kabinet dari DB
+$kabinetRows = db()->query("SELECT id, name, period, description, logo_url FROM kabinet ORDER BY id DESC")->fetchAll();
+
+// Tentukan kabinet aktif (period memuat tahun berjalan). Jika tak ada yang cocok, pakai terbaru.
+$currentYear = (int)date('Y');
+$activeCabinet = null;
+foreach ($kabinetRows as $row) {
+    $period = strtolower((string)($row['period'] ?? ''));
+    if ($period !== '' && strpos($period, (string)$currentYear) !== false) {
+        $activeCabinet = $row;
+        break;
+    }
+}
+if (!$activeCabinet && !empty($kabinetRows)) {
+    $activeCabinet = $kabinetRows[0];
+}
+
+// Ambil daftar departemen dari DB
+$departments = db()->query("SELECT id, name, slug, description FROM departments ORDER BY name ASC")->fetchAll();
+
+// Helper ringkas
+function h($s){ return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
+function dept_link(string $slug): string {
+    // Pakai template generik departemen
+    return BASE_URL . 'pages/department.php?slug=' . rawurlencode($slug);
+}
+?>
 <main>
-    <!-- Hero Section -->
+    <!-- Hero Section (dinamis dari Kabinet Aktif) -->
     <section class="hero">
         <div class="hero-content">
-            <h1>Himpunan Mahasiswa Teknik Pertambangan ITERA</h1>
-            <p>Membangun Karakter Profesional dan Berkompeten dalam Bidang Pertambangan</p>
-            <a href="<?php echo getBaseUrl(); ?>pages/struktur.php" class="btn-primary">Lihat Struktur Organisasi</a>
+            <h1><?= h($activeCabinet['name'] ?? 'Himpunan Mahasiswa Teknik Pertambangan ITERA') ?></h1>
+            <?php if (!empty($activeCabinet['period'])): ?>
+                <p style="margin:.25rem 0;opacity:.9">Periode: <?= h($activeCabinet['period']) ?></p>
+            <?php endif; ?>
+            <p><?= h($activeCabinet['description'] ?? 'Membangun Karakter Profesional dan Berkompeten dalam Bidang Pertambangan') ?></p>
+            <a href="<?= BASE_URL ?>pages/struktur.php" class="btn-primary">Lihat Struktur Organisasi</a>
         </div>
     </section>
 
-    <!-- Organization Overview -->
+    <!-- Organization Overview (konten ringkas) -->
     <section class="org-overview">
         <div class="container">
             <h2>Tentang HMTA ITERA</h2>
             <div class="overview-content">
                 <div class="overview-text">
-                    <p>Himpunan Mahasiswa Teknik Pertambangan Institut Teknologi Sumatera (HMTA ITERA) merupakan organisasi kemahasiswaan yang menaungi seluruh mahasiswa teknik pertambangan ITERA. HMTA ITERA berfokus pada pengembangan akademik, profesionalisme, dan soft skill mahasiswa dalam bidang pertambangan.</p>
-                    <p>Dengan visi menjadi organisasi kemahasiswaan yang profesional, inovatif, dan berkontribusi nyata untuk kemajuan industri pertambangan di Indonesia, HMTA ITERA terus berkarya melalui berbagai program kerja dan kegiatan.</p>
-                    <a href="<?php echo getBaseUrl(); ?>pages/profile.php" class="btn-secondary">Selengkapnya</a>
+                    <p>Himpunan Mahasiswa Teknik Pertambangan (HMTA) ITERA merupakan organisasi kemahasiswaan yang menaungi seluruh mahasiswa Teknik Pertambangan ITERA.</p>
+                    <p>Dengan visi menjadi organisasi kemahasiswaan yang profesional, inovatif, dan berkontribusi nyata untuk kemajuan industri pertambangan di Indonesia, HMTA ITERA terus berkarya melalui program-program unggulan.</p>
+                    <a href="<?= BASE_URL ?>pages/profile.php" class="btn-secondary">Selengkapnya</a>
                 </div>
                 <div class="overview-image">
-                    <img src="<?php echo getBaseUrl(); ?>Resource/hmta-group.jpg" alt="HMTA ITERA Group Photo" onerror="this.src='<?php echo getBaseUrl(); ?>Resource/default.jpg'">
+                    <img src="<?= h($activeCabinet['logo_url'] ?? (BASE_URL . 'Resource/hmta-group.jpg')) ?>"
+                         alt="<?= h($activeCabinet['name'] ?? 'Kabinet HMTA') ?>"
+                         onerror="this.src='<?= BASE_URL ?>Resource/hmta-group.jpg'">
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Current Cabinet -->
+    <!-- Daftar Departemen (terhubung ke department.php?slug=...) -->
     <section class="current-cabinet">
         <div class="container">
-            <h2>Kabinet Samagri</h2>
-            <p class="cabinet-tagline">"Bersinergi dalam Keberagaman untuk Membangun Prestasi"</p>
-            
-            <div class="cabinet-leaders">
-                <div class="leader-card">
-                    <img src="<?php echo getBaseUrl(); ?>Resource/leader-ketua.jpg" alt="Ketua HMTA" onerror="this.src='<?php echo getBaseUrl(); ?>Resource/default-profile.jpg'">
-                    <h3>Ahmad Fadilah</h3>
-                    <p>Ketua Senator HMTA</p>
-                    <a href="<?php echo getBaseUrl(); ?>pages/samagri.php#ketua" class="btn-tertiary">Profil</a>
-                </div>
-                <div class="leader-card">
-                    <img src="<?php echo getBaseUrl(); ?>Resource/leader-wakil.jpg" alt="Wakil Ketua HMTA" onerror="this.src='<?php echo getBaseUrl(); ?>Resource/default-profile.jpg'">
-                    <h3>Putri Ramadhani</h3>
-                    <p>Ketua Himpunan HMTA</p>
-                    <a href="<?php echo getBaseUrl(); ?>pages/samagri.php#wakil" class="btn-tertiary">Profil</a>
-                </div>
-                <div class="leader-card">
-                    <img src="<?php echo getBaseUrl(); ?>Resource/leader-bendahara.jpg" alt="BPO" onerror="this.src='<?php echo getBaseUrl(); ?>Resource/default-profile.jpg'">
-                    <h3>Budi Santoso<br>Welly Hardianto</h3>
-                    <p>Badan Penasihat Organisasi</p>
-                    <a href="<?php echo getBaseUrl(); ?>pages/samagri.php#bpo" class="btn-tertiary">Profil</a>
-                </div>
-                <div class="leader-card">
-                    <img src="<?php echo getBaseUrl(); ?>Resource/leader-sekretaris.jpg" alt="Sekretaris Jendral" onerror="this.src='<?php echo getBaseUrl(); ?>Resource/default-profile.jpg'">
-                    <h3>Dewi Anggraini</h3>
-                    <p>Sekretaris Jendral HMTA</p>
-                    <a href="<?php echo getBaseUrl(); ?>pages/samagri.php#sekjen" class="btn-tertiary">Profil</a>
-                </div>
-                <div class="leader-card">
-                    <img src="<?php echo getBaseUrl(); ?>Resource/leader-bendahara.jpg" alt="Sekum" onerror="this.src='<?php echo getBaseUrl(); ?>Resource/default-profile.jpg'">
-                    <h3>Budi Santoso</h3>
-                    <p>Sekretaris Umum HMTA</p>
-                    <a href="<?php echo getBaseUrl(); ?>pages/samagri.php#sekum" class="btn-tertiary">Profil</a>
-                </div>
-                <div class="leader-card">
-                    <img src="<?php echo getBaseUrl(); ?>Resource/leader-bendahara.jpg" alt="Bendum" onerror="this.src='<?php echo getBaseUrl(); ?>Resource/default-profile.jpg'">
-                    <h3>Budi Santoso</h3>
-                    <p>Bendahara Umum HMTA</p>
-                    <a href="<?php echo getBaseUrl(); ?>pages/samagri.php#bendum" class="btn-tertiary">Profil</a>
-                </div>
-            </div>
-            
-            <div class="cabinet-departments">
-                <h3>Departemen</h3>
-                <div class="department-grid">
-                    <a href="<?php echo getBaseUrl(); ?>pages/internal.php" class="department-card">
-                        <img class="logo-kabinet" src="<?php echo getBaseUrl(); ?>Resource/logo kabinet/DEPARTEMEN INTERNAL.LOGO.png" alt="Departemen Internal" onerror="this.src='<?php echo getBaseUrl(); ?>Resource/default-dept.png'">
-                        <h4>Departemen Internal</h4>
-                    </a>
-                    <a href="<?php echo getBaseUrl(); ?>pages/external.php" class="department-card">
-                        <img class="logo-kabinet" src="<?php echo getBaseUrl(); ?>Resource/logo kabinet/DEPARTEMEN EKSTERNAL.LOGO.png" alt="Departemen Eksternal" onerror="this.src='<?php echo getBaseUrl(); ?>Resource/default-dept.png'">
-                        <h4>Departemen Eksternal</h4>
-                    </a>
-                    <a href="<?php echo getBaseUrl(); ?>pages/kaderisasi.php" class="department-card">
-                        <img class="logo-kabinet" s
-                        rc="<?php echo getBaseUrl(); ?>Resource/logo kabinet/DEPARTEMEN KADERISASI.LOGO.png" alt="Departemen Kaderisasi" onerror="this.src='<?php echo getBaseUrl(); ?>Resource/default-dept.png'">
-                        <h4>Departemen Kaderisasi</h4>
-                    </a>
-                    <a href="<?php echo getBaseUrl(); ?>pages/psda.php" class="department-card">
-                        <img class="logo-kabinet" src="<?php echo getBaseUrl(); ?>Resource/logo kabinet/DEPARTEMEN PSDA.LOGO.png" alt="Departemen PSDA" onerror="this.src='<?php echo getBaseUrl(); ?>Resource/default-dept.png'">
-                        <h4>Departemen Pengembangan Sumberdaya Anggota</h4>
-                    </a>
-                    <a href="<?php echo getBaseUrl(); ?>pages/keilmuan.php" class="department-card">
-                        <img class="logo-kabinet" src="<?php echo getBaseUrl(); ?>Resource/logo kabinet/DEPARTEMEN KEILMUAN.LOGO.png" alt="Departemen Keilmuan" onerror="this.src='<?php echo getBaseUrl(); ?>Resource/default-dept.png'">
-                        <h4>Departemen Keilmuan</h4>
-                    </a>
-                    <a href="<?php echo getBaseUrl(); ?>pages/departemensamagri/medkom.php" class="department-card">
-                        <img class="logo-kabinet" src="<?php echo getBaseUrl(); ?>Resource/logo kabinet/Logo Departemen Medkomvis.jpg" alt="Departemen Media Informasi Komunikasi" onerror="this.src='<?php echo getBaseUrl(); ?>Resource/default-dept.png'">
-                        <h4>Departemen Media Informasi Komunikasi</h4>
-                    </a>
-                </div>
-            </div>
-            
-            <div class="text-center">
-                <a href="<?php echo getBaseUrl(); ?>pages/samagri.php" class="btn-primary">Lihat Struktur Lengkap</a>
-            </div>
-        </div>
-    </section>
+            <h2>Departemen</h2>
+            <p class="cabinet-tagline" style="margin-bottom:10px">"Bersinergi dalam Keberagaman untuk Membangun Prestasi"</p>
 
-    <!-- Upcoming Events -->
-    <section class="upcoming-events">
-            <div class="text-center">
-                <a href="<?php echo getBaseUrl(); ?>pages/upcoming.php" class="btn-secondary">Lihat Semua Event</a>
+            <div class="cabinet-departments">
+                <div class="department-grid">
+                    <?php if (!empty($departments)): ?>
+                        <?php foreach ($departments as $d): ?>
+                            <a href="<?= dept_link($d['slug']) ?>" class="department-card" title="Lihat <?= h($d['name']) ?>">
+                                <img class="logo-kabinet"
+                                     src="<?= BASE_URL ?>Resource/default-dept.png"
+                                     alt="<?= h($d['name']) ?>"
+                                     onerror="this.src='<?= BASE_URL ?>Resource/default-dept.png'">
+                                <h4><?= h($d['name']) ?></h4>
+                            </a>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <div style="grid-column:1/-1; text-align:center; color:#6b7280">
+                            Belum ada data departemen. Tambahkan melalui Dashboard → Kelola Departemen.
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <div class="text-center" style="margin-top:16px">
+                <a href="<?= BASE_URL ?>pages/upcoming.php" class="btn-secondary">Lihat Semua Event</a>
             </div>
         </div>
     </section>

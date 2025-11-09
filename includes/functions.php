@@ -67,3 +67,24 @@ function get_upcoming_events(int $limit = 6): array {
     $stmt->execute();
     return $stmt->fetchAll();
 }
+
+function count_members(bool $onlyActive = true): int {
+    $sql = "SELECT COUNT(*) c FROM members" . ($onlyActive ? " WHERE active=1" : "");
+    return (int) db()->query($sql)->fetch()['c'];
+}
+
+// Count anggota per kabinet
+function count_members_by_kabinet(int $kabinetId, bool $onlyActive = true): int {
+    $stmt = db()->prepare("SELECT COUNT(*) c FROM members WHERE kabinet_id = ? " . ($onlyActive ? "AND active=1" : ""));
+    $stmt->execute([$kabinetId]);
+    return (int) $stmt->fetch()['c'];
+}
+
+// Ambil daftar pilihan kabinet untuk select
+function get_kabinet_options(): array {
+    $rows = db()->query("SELECT id, name, period FROM kabinet ORDER BY id DESC")->fetchAll();
+    return array_map(fn($r) => [
+        'value' => (string)$r['id'],
+        'label' => $r['name'] . ($r['period'] ? " ({$r['period']})" : "")
+    ], $rows);
+}

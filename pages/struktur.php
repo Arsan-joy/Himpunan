@@ -2,10 +2,38 @@
 require_once __DIR__ . '/../includes/functions.php';
 
 $page_title     = 'Struktur Organisasi';
-$additional_css = ['struktur.css'];       // pastikan ada di assets/css/struktur.css
-$additional_js  = ['struktur.js'];        // pastikan ada di assets/js/struktur.js
+$additional_css = ['struktur.css'];
+$additional_js  = ['struktur.js'];
 
 include __DIR__ . '/../includes/header.php';
+
+// Ambil data kabinet dari DB
+$kabinet = db()->query("SELECT id, name, period, description, logo_url, created_at FROM kabinet ORDER BY id DESC")->fetchAll();
+
+// Tentukan kabinet aktif:
+// - Cari yang periodenya memuat tahun berjalan
+// - Jika tidak ketemu, gunakan baris pertama (terbaru)
+$currentYear = (int)date('Y');
+$activeIndex = null;
+foreach ($kabinet as $i => $row) {
+    $period = strtolower(trim((string)$row['period']));
+    if ($period !== '' && strpos($period, (string)$currentYear) !== false) {
+        $activeIndex = $i;
+        break;
+    }
+}
+if ($activeIndex === null && !empty($kabinet)) $activeIndex = 0;
+
+$activeCabinet = $activeIndex !== null ? $kabinet[$activeIndex] : null;
+$pastCabinets  = [];
+if ($activeIndex !== null) {
+    foreach ($kabinet as $i => $row) {
+        if ($i !== $activeIndex) $pastCabinets[] = $row;
+    }
+} else {
+    // Tidak ada data kabinet sama sekali
+    $pastCabinets = [];
+}
 ?>
 <main>
     <!-- Page Header -->
@@ -14,7 +42,7 @@ include __DIR__ . '/../includes/header.php';
             <h1>Struktur Organisasi</h1>
             <p>Kabinet-kabinet yang telah memimpin HMTA ITERA dari masa ke masa</p>
             <div class="breadcrumb">
-                <a href="<?php echo BASE_URL; ?>">Beranda</a>
+                <a href="<?= BASE_URL; ?>">Beranda</a>
                 <i class="fas fa-chevron-right"></i>
                 <span>Struktur</span>
             </div>
@@ -42,163 +70,82 @@ include __DIR__ . '/../includes/header.php';
     <section class="kabinet-section">
         <div class="container">
             <div class="kabinet-grid" id="kabinetGrid">
-                <!-- Current Active Cabinet -->
-                <div class="kabinet-card current" data-year="2024" data-status="current">
-                    <div class="kabinet-badge">Kabinet Aktif</div>
-                    <div class="kabinet-image">
-                        <img src="<?php echo IMG_URL; ?>banner1.png"
-                             onerror="this.src='<?php echo BASE_URL; ?>Resource/img/banner1.png'"
-                             alt="Kabinet Samagri">
-                        <div class="kabinet-overlay">
-                            <div class="kabinet-year">2024-2025</div>
-                        </div>
-                    </div>
-                    <div class="kabinet-content">
-                        <h3 class="kabinet-name">Kabinet Samagri</h3>
-                        <p class="kabinet-description">
-                            Kabinet yang fokus pada integrasi teknologi dan pengembangan sumber daya manusia dalam bidang pertambangan.
-                        </p>
-                        <div class="kabinet-stats">
-                            <div class="stat-item">
-                                <i class="fas fa-users"></i>
-                                <span>25 Anggota</span>
-                            </div>
-                            <div class="stat-item">
-                                <i class="fas fa-calendar"></i>
-                                <span>2024-2025</span>
+                <?php if ($activeCabinet): ?>
+                    <!-- Kabinet Aktif -->
+                    <div class="kabinet-card current" data-year="<?= htmlspecialchars(preg_replace('~[^0-9-]~','', (string)$activeCabinet['period'])) ?>" data-status="current">
+                        <div class="kabinet-badge">Kabinet Aktif</div>
+                        <div class="kabinet-image">
+                            <img src="<?= htmlspecialchars($activeCabinet['logo_url'] ?: (BASE_URL . 'Resource/img/banner1.png')) ?>"
+                                 onerror="this.src='<?= BASE_URL; ?>Resource/img/banner1.png'"
+                                 alt="<?= htmlspecialchars($activeCabinet['name']) ?>">
+                            <div class="kabinet-overlay">
+                                <div class="kabinet-year"><?= htmlspecialchars($activeCabinet['period'] ?: date('Y')) ?></div>
                             </div>
                         </div>
-                        <a href="<?php echo BASE_URL; ?>pages/samagri.php" class="kabinet-btn">
-                            <span>Lihat Detail</span>
-                            <i class="fas fa-arrow-right"></i>
-                        </a>
+                        <div class="kabinet-content">
+                            <h3 class="kabinet-name"><?= htmlspecialchars($activeCabinet['name']) ?></h3>
+                            <p class="kabinet-description">
+                                <?= htmlspecialchars($activeCabinet['description'] ?: 'Deskripsi kabinet aktif belum tersedia.') ?>
+                            </p>
+                            <div class="kabinet-stats">
+                                <div class="stat-item">
+                                    <i class="fas fa-users"></i>
+                                    <span>— Anggota</span>
+                                </div>
+                                <div class="stat-item">
+                                    <i class="fas fa-calendar"></i>
+                                    <span><?= htmlspecialchars($activeCabinet['period'] ?: date('Y')) ?></span>
+                                </div>
+                            </div>
+                            <a href="<?= BASE_URL; ?>pages/samagri.php" class="kabinet-btn">
+                                <span>Lihat Detail</span>
+                                <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
                     </div>
-                </div>
+                <?php endif; ?>
 
-                <!-- Past Cabinets -->
-                <div class="kabinet-card" data-year="2023" data-status="past">
-                    <div class="kabinet-image">
-                        <img src="<?php echo IMG_URL; ?>banner1.png"
-                             onerror="this.src='<?php echo BASE_URL; ?>Resource/img/banner1.png'"
-                             alt="Kabinet Radiant">
-                        <div class="kabinet-overlay">
-                            <div class="kabinet-year">2023-2024</div>
-                        </div>
-                    </div>
-                    <div class="kabinet-content">
-                        <h3 class="kabinet-name">Kabinet Radiant</h3>
-                        <p class="kabinet-description">
-                            Kabinet yang berfokus pada pencerahan dan inovasi dalam pengembangan organisasi mahasiswa.
-                        </p>
-                        <div class="kabinet-stats">
-                            <div class="stat-item">
-                                <i class="fas fa-users"></i>
-                                <span>23 Anggota</span>
+                <!-- Kabinet-kabinet sebelumnya -->
+                <?php if (!empty($pastCabinets)): ?>
+                    <?php foreach ($pastCabinets as $row): ?>
+                        <div class="kabinet-card" data-year="<?= htmlspecialchars(preg_replace('~[^0-9-]~','', (string)$row['period'])) ?>" data-status="past">
+                            <div class="kabinet-image">
+                                <img src="<?= htmlspecialchars($row['logo_url'] ?: (BASE_URL . 'Resource/img/banner1.png')) ?>"
+                                     onerror="this.src='<?= BASE_URL; ?>Resource/img/banner1.png'"
+                                     alt="<?= htmlspecialchars($row['name']) ?>">
+                                <div class="kabinet-overlay">
+                                    <div class="kabinet-year"><?= htmlspecialchars($row['period'] ?: '-') ?></div>
+                                </div>
                             </div>
-                            <div class="stat-item">
-                                <i class="fas fa-calendar"></i>
-                                <span>2023-2024</span>
-                            </div>
-                        </div>
-                        <a href="<?php echo BASE_URL; ?>radiant.php" class="kabinet-btn">
-                            <span>Lihat Detail</span>
-                            <i class="fas fa-arrow-right"></i>
-                        </a>
-                    </div>
-                </div>
-
-                <div class="kabinet-card" data-year="2022" data-status="past">
-                    <div class="kabinet-image">
-                        <img src="<?php echo IMG_URL; ?>banner1.png"
-                             onerror="this.src='<?php echo BASE_URL; ?>Resource/img/banner1.png'"
-                             alt="Kabinet Sradhakorsa">
-                        <div class="kabinet-overlay">
-                            <div class="kabinet-year">2022-2023</div>
-                        </div>
-                    </div>
-                    <div class="kabinet-content">
-                        <h3 class="kabinet-name">Kabinet Sradhakorsa</h3>
-                        <p class="kabinet-description">
-                            Kabinet yang mengusung semangat gotong royong dan kerjasama dalam setiap kegiatan organisasi.
-                        </p>
-                        <div class="kabinet-stats">
-                            <div class="stat-item">
-                                <i class="fas fa-users"></i>
-                                <span>22 Anggota</span>
-                            </div>
-                            <div class="stat-item">
-                                <i class="fas fa-calendar"></i>
-                                <span>2022-2023</span>
+                            <div class="kabinet-content">
+                                <h3 class="kabinet-name"><?= htmlspecialchars($row['name']) ?></h3>
+                                <p class="kabinet-description">
+                                    <?= htmlspecialchars(mb_strimwidth((string)($row['description'] ?? ''), 0, 160, '…')) ?: 'Deskripsi belum tersedia.' ?>
+                                </p>
+                                <div class="kabinet-stats">
+                                    <div class="stat-item">
+                                        <i class="fas fa-users"></i>
+                                        <span>— Anggota</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <i class="fas fa-calendar"></i>
+                                        <span><?= htmlspecialchars($row['period'] ?: '-') ?></span>
+                                    </div>
+                                </div>
+                                <a href="<?= BASE_URL; ?>pages/samagri.php" class="kabinet-btn">
+                                    <span>Lihat Detail</span>
+                                    <i class="fas fa-arrow-right"></i>
+                                </a>
                             </div>
                         </div>
-                        <a href="<?php echo BASE_URL; ?>Sradhakorsa.php" class="kabinet-btn">
-                            <span>Lihat Detail</span>
-                            <i class="fas fa-arrow-right"></i>
-                        </a>
-                    </div>
-                </div>
-
-                <div class="kabinet-card" data-year="2021" data-status="past">
-                    <div class="kabinet-image">
-                        <img src="<?php echo IMG_URL; ?>banner1.png"
-                             onerror="this.src='<?php echo BASE_URL; ?>Resource/img/banner1.png'"
-                             alt="Kabinet Reformasi">
-                        <div class="kabinet-overlay">
-                            <div class="kabinet-year">2021-2022</div>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <?php if (!$activeCabinet): ?>
+                        <div style="grid-column:1/-1; text-align:center; color:#6b7280">
+                            Belum ada data kabinet. Tambahkan melalui Dashboard &rarr; Kelola Kabinet.
                         </div>
-                    </div>
-                    <div class="kabinet-content">
-                        <h3 class="kabinet-name">Kabinet Reformasi</h3>
-                        <p class="kabinet-description">
-                            Kabinet yang membawa perubahan besar dalam sistem organisasi dan manajemen kegiatan mahasiswa.
-                        </p>
-                        <div class="kabinet-stats">
-                            <div class="stat-item">
-                                <i class="fas fa-users"></i>
-                                <span>20 Anggota</span>
-                            </div>
-                            <div class="stat-item">
-                                <i class="fas fa-calendar"></i>
-                                <span>2021-2022</span>
-                            </div>
-                        </div>
-                        <a href="<?php echo BASE_URL; ?>Reformasi.php" class="kabinet-btn">
-                            <span>Lihat Detail</span>
-                            <i class="fas fa-arrow-right"></i>
-                        </a>
-                    </div>
-                </div>
-
-                <div class="kabinet-card" data-year="2020" data-status="past">
-                    <div class="kabinet-image">
-                        <img src="<?php echo IMG_URL; ?>banner1.png"
-                             onerror="this.src='<?php echo BASE_URL; ?>Resource/img/banner1.png'"
-                             alt="Kabinet Pionir">
-                        <div class="kabinet-overlay">
-                            <div class="kabinet-year">2020-2021</div>
-                        </div>
-                    </div>
-                    <div class="kabinet-content">
-                        <h3 class="kabinet-name">Kabinet Pionir</h3>
-                        <p class="kabinet-description">
-                            Kabinet pertama HMTA ITERA yang menjadi perintis dan fondasi organisasi hingga saat ini.
-                        </p>
-                        <div class="kabinet-stats">
-                            <div class="stat-item">
-                                <i class="fas fa-users"></i>
-                                <span>18 Anggota</span>
-                            </div>
-                            <div class="stat-item">
-                                <i class="fas fa-calendar"></i>
-                                <span>2020-2021</span>
-                            </div>
-                        </div>
-                        <a href="<?php echo BASE_URL; ?>Pionir.php" class="kabinet-btn">
-                            <span>Lihat Detail</span>
-                            <i class="fas fa-arrow-right"></i>
-                        </a>
-                    </div>
-                </div>
+                    <?php endif; ?>
+                <?php endif; ?>
             </div>
         </div>
     </section>
@@ -208,36 +155,28 @@ include __DIR__ . '/../includes/header.php';
         <div class="container">
             <div class="stats-grid">
                 <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-users"></i>
-                    </div>
+                    <div class="stat-icon"><i class="fas fa-users"></i></div>
                     <div class="stat-content">
-                        <div class="stat-number" data-target="5">0</div>
+                        <div class="stat-number" data-target="<?= (int)db()->query('SELECT COUNT(*) c FROM kabinet')->fetch()['c'] ?>">0</div>
                         <div class="stat-label">Kabinet Terbentuk</div>
                     </div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-calendar-alt"></i>
-                    </div>
+                    <div class="stat-icon"><i class="fas fa-calendar-alt"></i></div>
                     <div class="stat-content">
-                        <div class="stat-number" data-target="5">0</div>
-                        <div class="stat-label">Tahun Berkarya</div>
+                        <div class="stat-number" data-target="<?= (int)db()->query('SELECT COUNT(*) c FROM events')->fetch()['c'] ?>">0</div>
+                        <div class="stat-label">Total Kegiatan</div>
                     </div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-award"></i>
-                    </div>
+                    <div class="stat-icon"><i class="fas fa-award"></i></div>
                     <div class="stat-content">
-                        <div class="stat-number" data-target="108">0</div>
+                        <div class="stat-number" data-target="<?= (int)db()->query('SELECT COUNT(*) c FROM members')->fetch()['c'] ?>">0</div>
                         <div class="stat-label">Total Anggota</div>
                     </div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-star"></i>
-                    </div>
+                    <div class="stat-icon"><i class="fas fa-star"></i></div>
                     <div class="stat-content">
                         <div class="stat-number" data-target="50">0</div>
                         <div class="stat-label">Program Terlaksana</div>

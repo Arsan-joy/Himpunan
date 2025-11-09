@@ -2,23 +2,30 @@
 require_once __DIR__ . '/../includes/functions.php';
 require_admin();
 
-// Batasi akses "users" hanya untuk super_admin
-if (($_GET['m'] ?? '') === 'users' && !is_super_admin()) {
-    http_response_code(403); echo 'Forbidden'; exit;
+// Batasi akses "users" hanya super admin
+if (($_GET['m'] ?? '') === 'users' && !is_super_admin()) { http_response_code(403); echo 'Forbidden'; exit; }
+
+/* Helper untuk opsi dinamis dari SQL */
+function fetch_options_sql(string $sql, string $valueCol = 'id', string $labelCol = 'name'): array {
+    $rows = db()->query($sql)->fetchAll();
+    return array_map(fn($r)=>[
+        'value' => (string)($r[$valueCol] ?? ''),
+        'label' => (string)($r[$labelCol] ?? '')
+    ], $rows);
 }
 
+/* Modul konfigurasi */
 $modules = [
   'departemen' => [
-      'title' => 'Departemen', 'table' => 'departments',
+      'title' => 'Departemen','table' => 'departments','order' => 'id DESC',
       'fields' => [
           'name' => ['label'=>'Nama','required'=>true],
           'slug' => ['label'=>'Slug','required'=>true],
           'description' => ['label'=>'Deskripsi','type'=>'textarea'],
       ],
-      'order' => 'id DESC',
   ],
   'divisi' => [
-      'title' => 'Divisi', 'table' => 'divisions',
+      'title' => 'Divisi','table' => 'divisions','order' => 'id DESC',
       'fields' => [
           'department_id' => ['label'=>'Department ID','required'=>true],
           'name' => ['label'=>'Nama','required'=>true],
@@ -26,38 +33,52 @@ $modules = [
           'description' => ['label'=>'Deskripsi','type'=>'textarea'],
           'member_count' => ['label'=>'Jumlah Anggota'],
       ],
-      'order' => 'id DESC',
   ],
   'kabinet' => [
-      'title' => 'Kabinet', 'table' => 'kabinet',
+      'title' => 'Kabinet','table' => 'kabinet','order' => 'id DESC',
       'fields' => [
           'name' => ['label'=>'Nama Kabinet','required'=>true],
-          'period' => ['label'=>'Periode','required'=>true],
+          'period' => ['label'=>'Periode (mis. 2024-2025)','required'=>true],
           'description' => ['label'=>'Deskripsi','type'=>'textarea'],
           'logo_upload' => ['label'=>'Upload Logo','type'=>'file','accept'=>'image/*','target'=>'logo_url','subdir'=>'kabinet','allowed'=>['jpg','jpeg','png','webp','svg'],'maxMB'=>10],
       ],
-      'order' => 'id DESC',
+  ],
+  // MODUL BARU: Anggota
+  'anggota' => [
+      'title' => 'Anggota','table' => 'members','order' => 'id DESC',
+      'fields' => [
+          'name' => ['label'=>'Nama Lengkap','required'=>true],
+          'student_id' => ['label'=>'NIM/NPM'],
+          'email' => ['label'=>'Email'],
+          'phone' => ['label'=>'No. HP'],
+          'photo_file' => ['label'=>'Foto','type'=>'file','accept'=>'image/*','target'=>'photo_url','subdir'=>'members','allowed'=>['jpg','jpeg','png','webp'],'maxMB'=>5],
+          // Select dinamis dari kabinet
+          'kabinet_id' => ['label'=>'Kabinet','type'=>'select','options_sql'=>"SELECT id, CONCAT(name, ' (', IFNULL(period,''), ')') AS name FROM kabinet ORDER BY id DESC"],
+          'department_id' => ['label'=>'Departemen ID'],
+          'division_id' => ['label'=>'Divisi ID'],
+          'role' => ['label'=>'Jabatan/Peran'],
+          'active' => ['label'=>'Aktif?','type'=>'bool'],
+          'joined_at' => ['label'=>'Tanggal Bergabung','type'=>'date'],
+      ],
   ],
   'foto' => [
-      'title' => 'Foto', 'table' => 'photos',
+      'title' => 'Foto','table' => 'photos','order' => 'id DESC',
       'fields' => [
           'album' => ['label'=>'Album','required'=>true],
           'photo_file' => ['label'=>'Upload Gambar','type'=>'file','accept'=>'image/*','target'=>'url','subdir'=>'photos','allowed'=>['jpg','jpeg','png','webp'],'maxMB'=>20,'required'=>true],
           'caption' => ['label'=>'Caption'],
       ],
-      'order' => 'id DESC',
   ],
   'materi' => [
-      'title' => 'Materi', 'table' => 'materials',
+      'title' => 'Materi','table' => 'materials','order' => 'id DESC',
       'fields' => [
           'title' => ['label'=>'Judul','required'=>true],
           'file_upload' => ['label'=>'Upload File (PDF/DOC/PPT)','type'=>'file','accept'=>'.pdf,.doc,.docx,.ppt,.pptx','target'=>'file_url','subdir'=>'materials','allowed'=>['pdf','doc','docx','ppt','pptx'],'maxMB'=>128,'required'=>true],
           'is_public' => ['label'=>'Publik?','type'=>'bool'],
       ],
-      'order' => 'id DESC',
   ],
   'kegiatan' => [
-      'title' => 'Kegiatan', 'table' => 'events',
+      'title' => 'Kegiatan','table' => 'events','order' => 'start_date DESC',
       'fields' => [
           'title' => ['label'=>'Judul','required'=>true],
           'description' => ['label'=>'Deskripsi','type'=>'textarea'],
@@ -67,124 +88,96 @@ $modules = [
           'type' => ['label'=>'Tipe (academic/holiday/event)','type'=>'select','options'=>['academic','holiday','event'],'required'=>true],
           'image_upload' => ['label'=>'Gambar (opsional)','type'=>'file','accept'=>'image/*','target'=>'image_url','subdir'=>'events','allowed'=>['jpg','jpeg','png','webp'],'maxMB'=>10],
       ],
-      'order' => 'start_date DESC',
   ],
   'users' => [
-      'title' => 'Pengguna', 'table' => 'users',
+      'title' => 'Pengguna','table' => 'users','order' => 'id DESC',
       'fields' => [
           'username' => ['label'=>'Username','required'=>true],
           'password' => ['label'=>'Password (kosong = tidak ganti)','type'=>'password'],
-          // HANYA user dan admin yang boleh dipilih; super_admin tidak bisa dibuat dari sini
           'role' => ['label'=>'Role','type'=>'select','options'=>['user','admin'],'required'=>true],
           'active' => ['label'=>'Aktif?','type'=>'bool'],
       ],
-      'order' => 'id DESC',
   ],
 ];
+
+/* Guard over-limit POST */
+function ini_to_bytes(string $val): int { $val=trim($val); $u=strtolower(substr($val,-1)); $n=(int)$val; return $u==='g'?$n*1024*1024*1024:($u==='m'?$n*1024*1024:($u==='k'?$n*1024:(int)$val)); }
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $cl = (int)($_SERVER['CONTENT_LENGTH'] ?? 0);
+    $postMax = ini_to_bytes(ini_get('post_max_size'));
+    if ($cl>0 && $postMax>0 && $cl>$postMax) { $_SESSION['flash_error']='Ukuran unggahan melebihi post_max_size.'; header('Location: manage.php?m='.urlencode($_GET['m'] ?? 'departemen')); exit; }
+}
 
 $moduleKey = $_GET['m'] ?? 'departemen';
 if (!isset($modules[$moduleKey])) { http_response_code(404); echo "Modul tidak ditemukan"; exit; }
 $mod = $modules[$moduleKey];
-$table = $mod['table'];
-$order = $mod['order'] ?? 'id DESC';
-$title = $mod['title'] ?? ucfirst($moduleKey);
+$table = $mod['table']; $order = $mod['order'] ?? 'id DESC'; $title = $mod['title'] ?? ucfirst($moduleKey);
 
-/* POST over-limit guard */
-function ini_to_bytes(string $val): int { $val=trim($val); $last=strtolower(substr($val,-1)); $num=(int)$val; return $last==='g'?$num*1024*1024*1024:($last==='m'?$num*1024*1024:($last==='k'?$num*1024:(int)$val)); }
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $contentLen = (int)($_SERVER['CONTENT_LENGTH'] ?? 0);
-    $postMax = ini_to_bytes(ini_get('post_max_size'));
-    if ($contentLen > $postMax && $postMax>0) {
-        $_SESSION['flash_error'] = 'Ukuran total unggahan melebihi batas server (post_max_size). Tingkatkan limit dan coba lagi.';
-        header('Location: manage.php?m=' . urlencode($moduleKey)); exit;
-    }
-}
-
-/* Create / Update */
+/* Create/Update */
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id = isset($_POST['id']) && $_POST['id'] !== '' ? (int)$_POST['id'] : null;
 
     // Validasi required
-    $errors = [];
+    $errors=[];
     foreach ($mod['fields'] as $col => $meta) {
         if (!empty($meta['required'])) {
             $type = $meta['type'] ?? 'text';
-            if ($type === 'file') {
-                if (!$id && (empty($_FILES[$col]) || $_FILES[$col]['error']===UPLOAD_ERR_NO_FILE)) {
-                    $errors[] = ($meta['label'] ?? $col).' wajib diunggah.';
-                }
+            if ($type==='file') {
+                if (!$id && (empty($_FILES[$col]) || $_FILES[$col]['error']===UPLOAD_ERR_NO_FILE)) $errors[] = ($meta['label'] ?? $col).' wajib diunggah.';
             } else {
                 $val = trim((string)($_POST[$col] ?? ''));
-                if ($val === '') $errors[] = ($meta['label'] ?? $col).' wajib diisi.';
+                if ($val==='') $errors[] = ($meta['label'] ?? $col).' wajib diisi.';
             }
         }
     }
-    // Batasan role: non-superadmin tidak boleh mengubah role & tidak boleh menyentuh super_admin
-    if ($moduleKey==='users') {
-        if (!is_super_admin() && isset($_POST['role'])) {
-            $errors[] = 'Hanya Super Admin yang boleh mengubah peran pengguna.';
-        }
-        if ($id) {
-            $u = db()->prepare("SELECT role, username FROM users WHERE id=?"); $u->execute([$id]); $ur = $u->fetch();
-            if ($ur && $ur['role']==='super_admin' && !is_super_admin()) {
-                $errors[] = 'Anda tidak berwenang mengubah akun Super Admin.';
-            }
-            // Cegah mengubah super_admin menjadi apapun via form
-            if ($ur && $ur['role']==='super_admin' && is_super_admin() && isset($_POST['role'])) {
-                $_POST['role'] = 'super_admin';
-            }
-        }
-    }
+    if ($moduleKey==='users' && !is_super_admin() && isset($_POST['role'])) $errors[]='Hanya Super Admin yang boleh mengubah peran pengguna.';
+    if ($errors){ $_SESSION['flash_error']=implode(' ', $errors); header('Location: manage.php?m='.urlencode($moduleKey).($id?'&id='.$id:'')); exit; }
 
-    if ($errors) {
-        $_SESSION['flash_error'] = implode(' ', $errors);
-        header('Location: manage.php?m=' . urlencode($moduleKey) . ($id ? '&id='.$id : '')); exit;
-    }
-
-    $cols = [];
-    $vals = [];
-    $fileAssignments = [];
+    $cols=[]; $vals=[]; $fileAssignments=[];
 
     foreach ($mod['fields'] as $col => $meta) {
         $type = $meta['type'] ?? 'text';
 
         if ($type === 'file') {
             try {
-                $uploaded = save_uploaded_file($col, $meta['subdir'], (array)$meta['allowed'], (int)($meta['maxMB'] ?? 50));
+                $uploaded = save_uploaded_file($col, $meta['subdir'] ?? 'uploads', (array)($meta['allowed'] ?? []), (int)($meta['maxMB'] ?? 50));
                 if ($uploaded) { $fileAssignments[$meta['target']] = $uploaded; }
             } catch (Throwable $e) {
                 $_SESSION['flash_error'] = 'Upload gagal: '.$e->getMessage();
-                header('Location: manage.php?m=' . urlencode($moduleKey) . ($id ? '&id='.$id : '')); exit;
+                header('Location: manage.php?m='.urlencode($moduleKey).($id?'&id='.$id:'')); exit;
             }
             continue;
         }
+
         if ($moduleKey==='users' && $col==='password') {
             $pwd = trim($_POST['password'] ?? '');
-            if ($pwd !== '') { $cols[]='password_hash'; $vals[]=password_hash($pwd, PASSWORD_DEFAULT); }
+            if ($pwd!==''){ $cols[]='password_hash'; $vals[]=password_hash($pwd, PASSWORD_DEFAULT); }
             continue;
         }
+
+        if (($meta['type'] ?? '') === 'bool') {
+            $val = isset($_POST[$col]) ? 1 : 0;
+            $cols[] = $col; $vals[] = $val; continue;
+        }
+
+        // Select / text / date
         $val = $_POST[$col] ?? null;
-        if (($meta['type'] ?? '') === 'bool') $val = isset($_POST[$col]) ? 1 : 0;
         $cols[] = $col; $vals[] = $val;
     }
-    foreach ($fileAssignments as $tcol => $url) { $cols[]=$tcol; $vals[]=$url; }
+
+    foreach ($fileAssignments as $tcol => $url){ $cols[]=$tcol; $vals[]=$url; }
 
     if ($id) {
         if ($cols) {
             $sets = implode(',', array_map(fn($c)=>"$c = ?", $cols));
-            $sql = "UPDATE $table SET $sets WHERE id = ?";
-            $stmt = db()->prepare($sql); $vals[]=$id; $stmt->execute($vals);
+            $stmt = db()->prepare("UPDATE $table SET $sets WHERE id = ?");
+            $vals[] = $id; $stmt->execute($vals);
         }
     } else {
         if ($cols) {
-            // Cegah pembuatan super_admin lewat form
-            if ($moduleKey==='users') {
-                $roleIdx = array_search('role', $cols, true);
-                if ($roleIdx !== false && $vals[$roleIdx] === 'super_admin') $vals[$roleIdx] = 'admin';
-            }
-            $colStr = implode(',', $cols); $qStr = implode(',', array_fill(0,count($cols),'?'));
-            $sql = "INSERT INTO $table ($colStr) VALUES ($qStr)";
-            $stmt = db()->prepare($sql); $stmt->execute($vals);
+            $colStr = implode(',', $cols); $qStr = implode(',', array_fill(0, count($cols), '?'));
+            $stmt = db()->prepare("INSERT INTO $table ($colStr) VALUES ($qStr)");
+            $stmt->execute($vals);
         }
     }
 
@@ -194,11 +187,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 /* Delete */
 if (isset($_GET['del'])) {
     $delId = (int)$_GET['del'];
-    if ($moduleKey==='users') {
-        $u = db()->prepare("SELECT role, username FROM users WHERE id=?"); $u->execute([$delId]); $ur = $u->fetch();
-        if ($ur && $ur['role']==='super_admin') { $_SESSION['flash_error']='Akun Super Admin tidak boleh dihapus.'; header('Location: manage.php?m=users'); exit; }
-        if (!is_super_admin()) { $_SESSION['flash_error']='Hanya Super Admin yang boleh menghapus pengguna.'; header('Location: manage.php?m=users'); exit; }
-    }
+    if ($moduleKey==='users' && !is_super_admin()) { $_SESSION['flash_error']='Hanya Super Admin yang boleh menghapus pengguna.'; header('Location: manage.php?m=users'); exit; }
     db()->prepare("DELETE FROM $table WHERE id = ?")->execute([$delId]);
     header('Location: manage.php?m=' . urlencode($moduleKey)); exit;
 }
@@ -206,7 +195,8 @@ if (isset($_GET['del'])) {
 /* List + edit */
 $list = db()->query("SELECT * FROM $table ORDER BY $order")->fetchAll();
 $editing = null;
-if (isset($_GET['id'])) { $stmt = db()->prepare("SELECT * FROM $table WHERE id=? LIMIT 1"); $stmt->execute([(int)$_GET['id']]); $editing=$stmt->fetch(); }
+if (isset($_GET['id'])) { $stmt = db()->prepare("SELECT * FROM $table WHERE id = ? LIMIT 1"); $stmt->execute([(int)$_GET['id']]); $editing=$stmt->fetch(); }
+
 ?>
 <!doctype html>
 <html lang="id">
@@ -225,6 +215,7 @@ if (isset($_GET['id'])) { $stmt = db()->prepare("SELECT * FROM $table WHERE id=?
       <a class="<?= $moduleKey==='departemen'?'active':'' ?>" href="?m=departemen"><i class="fa-solid fa-building"></i> Kelola Departemen</a>
       <a class="<?= $moduleKey==='divisi'?'active':'' ?>" href="?m=divisi"><i class="fa-solid fa-people-group"></i> Kelola Divisi</a>
       <a class="<?= $moduleKey==='kabinet'?'active':'' ?>" href="?m=kabinet"><i class="fa-solid fa-layer-group"></i> Kelola Kabinet</a>
+      <a class="<?= $moduleKey==='anggota'?'active':'' ?>" href="?m=anggota"><i class="fa-solid fa-user-friends"></i> Kelola Anggota</a>
       <a class="<?= $moduleKey==='foto'?'active':'' ?>" href="?m=foto"><i class="fa-solid fa-image"></i> Kelola Foto</a>
       <a class="<?= $moduleKey==='materi'?'active':'' ?>" href="?m=materi"><i class="fa-solid fa-book"></i> Kelola Materi</a>
       <a class="<?= $moduleKey==='kegiatan'?'active':'' ?>" href="?m=kegiatan"><i class="fa-solid fa-calendar-days"></i> Kelola Kegiatan</a>
@@ -253,15 +244,15 @@ if (isset($_GET['id'])) { $stmt = db()->prepare("SELECT * FROM $table WHERE id=?
         <form method="post" enctype="multipart/form-data">
           <?php if ($editing): ?><input type="hidden" name="id" value="<?= (int)$editing['id'] ?>"><?php endif; ?>
 
-          <?php foreach ($modules[$moduleKey]['fields'] as $col => $meta):
-              $label = $meta['label'] ?? ucfirst($col);
-              $type  = $meta['type'] ?? 'text';
-              $valKey= $meta['target'] ?? $col;
-              $val   = $editing[$valKey] ?? '';
-              $accept= $meta['accept'] ?? null;
-              $required = !empty($meta['required']);
-              $options  = $meta['options'] ?? [];
-              $isSA = is_super_admin();
+          <?php foreach ($mod['fields'] as $col => $meta):
+            $label = $meta['label'] ?? ucfirst($col);
+            $type  = $meta['type'] ?? 'text';
+            $valKey= $meta['target'] ?? $col;
+            $val   = $editing[$valKey] ?? '';
+            $accept= $meta['accept'] ?? null;
+            $required = !empty($meta['required']);
+            $options  = $meta['options'] ?? null;
+            if (!$options && !empty($meta['options_sql'])) $options = fetch_options_sql($meta['options_sql']);
           ?>
           <div class="field">
             <label><?= htmlspecialchars($label) ?><?= $required ? ' *' : '' ?></label>
@@ -279,14 +270,15 @@ if (isset($_GET['id'])) { $stmt = db()->prepare("SELECT * FROM $table WHERE id=?
               <textarea name="<?= $col ?>" rows="3" <?= $required ? 'required' : '' ?>><?= htmlspecialchars($val) ?></textarea>
 
             <?php elseif ($type === 'select'): ?>
-              <select name="<?= $col ?>" <?= $required ? 'required' : '' ?> <?= ($moduleKey==='users' && !$isSA) ? 'disabled' : '' ?>>
-                <?php foreach ($options as $opt): ?>
-                  <option value="<?= htmlspecialchars($opt) ?>" <?= ($val===$opt)?'selected':'' ?>><?= htmlspecialchars(ucfirst($opt)) ?></option>
+              <select name="<?= $col ?>" <?= $required ? 'required' : '' ?>>
+                <option value="">— Pilih —</option>
+                <?php foreach ((array)$options as $opt): 
+                    $ov = is_array($opt) ? ($opt['value'] ?? '') : (string)$opt;
+                    $ol = is_array($opt) ? ($opt['label'] ?? $ov) : ucfirst((string)$opt);
+                ?>
+                  <option value="<?= htmlspecialchars($ov) ?>" <?= ($val!=='' && (string)$val===(string)$ov)?'selected':'' ?>><?= htmlspecialchars($ol) ?></option>
                 <?php endforeach; ?>
               </select>
-              <?php if ($moduleKey==='users' && !$isSA): ?>
-                <div class="hint">Hanya Super Admin yang dapat mengubah peran.</div>
-              <?php endif; ?>
 
             <?php elseif ($type === 'file'):
               $currentUrl = $editing[$meta['target'] ?? ''] ?? '';
@@ -304,7 +296,7 @@ if (isset($_GET['id'])) { $stmt = db()->prepare("SELECT * FROM $table WHERE id=?
               <?php endif; ?>
 
             <?php else: ?>
-              <input name="<?= $col ?>" value<?= '="'.htmlspecialchars($val).'"' ?> <?= $required ? 'required' : '' ?>>
+              <input name="<?= $col ?>" value="<?= htmlspecialchars((string)$val) ?>" <?= $required ? 'required' : '' ?>>
             <?php endif; ?>
           </div>
           <?php endforeach; ?>
@@ -317,25 +309,27 @@ if (isset($_GET['id'])) { $stmt = db()->prepare("SELECT * FROM $table WHERE id=?
         <div class="section-title"><i class="fa-solid fa-list"></i> Data</div>
         <div style="overflow:auto">
           <table class="table">
-            <thead><tr>
-              <th>ID</th>
-              <?php foreach ($modules[$moduleKey]['fields'] as $col => $meta): ?>
-                <th><?= htmlspecialchars($meta['label'] ?? ucfirst($col)) ?></th>
-              <?php endforeach; ?>
-              <th>Aksi</th>
-            </tr></thead>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <?php foreach ($mod['fields'] as $col => $meta): ?>
+                  <th><?= htmlspecialchars($meta['label'] ?? ucfirst($col)) ?></th>
+                <?php endforeach; ?>
+                <th>Aksi</th>
+              </tr>
+            </thead>
             <tbody>
               <?php foreach ($list as $row): ?>
                 <tr>
                   <td><?= (int)$row['id'] ?></td>
-                  <?php foreach ($modules[$moduleKey]['fields'] as $col => $meta):
-                      $type = $meta['type'] ?? 'text';
-                      $showKey = $meta['target'] ?? $col;
-                      $v = $row[$showKey] ?? '';
+                  <?php foreach ($mod['fields'] as $col => $meta):
+                    $type = $meta['type'] ?? 'text';
+                    $showKey = $meta['target'] ?? $col;
+                    $v = $row[$showKey] ?? '';
                   ?>
                     <td>
                       <?php if ($type === 'bool'): ?>
-                        <?= ($row[$col] ?? 0)?'Ya':'Tidak' ?>
+                        <?= ($row[$col] ?? 0) ? 'Ya' : 'Tidak' ?>
                       <?php elseif ($type === 'password'): ?>
                         ••••••
                       <?php elseif ($type === 'file'): ?>
@@ -350,18 +344,8 @@ if (isset($_GET['id'])) { $stmt = db()->prepare("SELECT * FROM $table WHERE id=?
                     </td>
                   <?php endforeach; ?>
                   <td>
-                    <?php
-                      $isSArow = ($moduleKey==='users' && ($row['role'] ?? '')==='super_admin');
-                      $disableForAdmin = ($moduleKey==='users' && !is_super_admin() && $isSArow);
-                    ?>
-                    <?php if (!$disableForAdmin): ?>
-                      <a class="btn btn-primary" href="?m=<?= urlencode($moduleKey) ?>&id=<?= (int)$row['id'] ?>"><i class="fa-solid fa-pen"></i> Edit</a>
-                      <?php if (!($moduleKey==='users' && $isSArow)): ?>
-                        <a class="btn btn-danger" href="?m=<?= urlencode($moduleKey) ?>&del=<?= (int)$row['id'] ?>" onclick="return confirm('Hapus data ini?')"><i class="fa-solid fa-trash"></i> Hapus</a>
-                      <?php endif; ?>
-                    <?php else: ?>
-                      <span class="badge">Super Admin</span>
-                    <?php endif; ?>
+                    <a class="btn btn-primary" href="?m=<?= urlencode($moduleKey) ?>&id=<?= (int)$row['id'] ?>"><i class="fa-solid fa-pen"></i> Edit</a>
+                    <a class="btn btn-danger" href="?m=<?= urlencode($moduleKey) ?>&del=<?= (int)$row['id'] ?>" onclick="return confirm('Hapus data ini?')"><i class="fa-solid fa-trash"></i> Hapus</a>
                   </td>
                 </tr>
               <?php endforeach; ?>
@@ -369,6 +353,7 @@ if (isset($_GET['id'])) { $stmt = db()->prepare("SELECT * FROM $table WHERE id=?
           </table>
         </div>
       </div>
+
     </div>
   </main>
 </div>

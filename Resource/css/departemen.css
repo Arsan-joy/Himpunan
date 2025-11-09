@@ -1,0 +1,244 @@
+/* Style umum untuk halaman departemen (ringkas, tidak mengubah header/nav global) */
+:root{
+  --primary:#2c3e50; 
+  --secondary:#3498db; 
+  --muted:#6b7280;
+  --bg:#fff; 
+  --panel:#ffffff; 
+  --shadow:0 6px 24px rgba(2,6,23,.08); 
+  --radius:14px; --gap:22px;
+}
+*{
+    box-sizing:border-box
+}
+.container{
+    max-width:1200px;
+    margin:0 auto;
+    padding:0 1rem
+}
+h1,h2,h3{
+    color:var(--primary)
+}
+
+/* Header */
+.department-header{
+    padding:3.2rem 0 2rem;background:#f7fafc
+}
+.header-content{
+    display:flex;
+    gap:16px;
+    align-items:center
+}
+.dept-logo{
+    width:84px;
+    height:84px;
+    border-radius:50%;
+    object-fit:cover;
+    border:3px solid #e5e7eb;
+    background:#fff
+}
+.header-content h1{
+    margin:0
+}
+.header-content p{
+    margin:.2rem 0 0;color:var(--muted)
+}
+
+/* Visi Misi */
+.department-mission{
+    padding:2rem 0 1rem
+}
+.mission-content{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:var(--gap)
+}
+.mission-box{
+    background:var(--panel);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:1.2rem
+}
+
+/* Programs */
+.programs-section{
+    padding:1rem 0 0
+}
+.programs-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:var(--gap)
+}
+.program-card{
+    background:#fff;
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:1rem
+}
+.program-icon{
+    color:var(--secondary);
+    font-size:20px;
+    margin-bottom:.4rem
+}
+.program-frequency{
+    display:inline-block;
+    margin-top:.4rem;
+    background:#eef6ff;
+    color:#1e40af;
+    padding:.25rem .55rem;
+    border-radius:999px;
+    font-size:.8rem
+}
+
+/* Team */
+.team-section{
+    padding:2rem 0
+}
+.team-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:var(--gap)
+}
+.team-card{
+    background:#fff;
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    overflow:hidden
+}
+.team-image{
+    position:relative;
+    height:200px;
+    background:#000
+}
+.team-image img{
+    width:100%;
+    height:100%;
+    object-fit:cover
+}
+.team-overlay{
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:rgba(0,0,0,.35);
+    opacity:0;
+    transition:.2s
+}
+.team-card:hover .team-overlay{
+    opacity:1
+}
+.social-links{
+    display:flex;
+    gap:10px
+}
+.social-links a{
+    color:#fff
+}
+.team-info{padding:1rem}
+.team-info .position{color:var(--muted);margin:.2rem 0}
+
+/* Divisi & Anggota */
+.department-divisions{
+    padding:1.6rem 0 3rem
+}
+.section-division{
+    margin-bottom:.8rem
+}
+.division-filter{
+    display:flex;
+    gap:.5rem;
+    flex-wrap:nowrap;
+    overflow-x:auto;
+    scrollbar-width:none;
+    margin-bottom:1rem
+}
+.division-filter::-webkit-scrollbar{
+    display:none
+}
+.filter-btn{
+    background:#fff;
+    border:1px solid #e5e7eb;
+    border-radius:999px;
+    padding:.5rem 1.2rem;
+    font-weight:700;
+    cursor:pointer;
+    white-space:nowrap
+}
+.filter-btn.active,.filter-btn:hover{
+    background:#eaf4ff;
+    border-color:#cfe3ff
+}
+.divisions-container{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:var(--gap)
+}
+.division-card{
+    background:#fff;
+    border-radius:var(--radius);
+    box-shadow:var(--shadow)
+}
+.division-header{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    justify-content:space-between;
+    padding:1rem;
+    border-bottom:1px solid #eef2f7
+}
+.division-title h3{
+    margin:0
+}
+.division-title .member-count{
+    color:var(--muted);
+    font-size:.9rem
+}
+.toggle-btn{
+    background:#fff;
+    border:1px solid #e5e7eb;
+    border-radius:8px;
+    padding:.4rem .6rem;
+    cursor:pointer
+}
+.division-content{
+    padding:1rem
+}
+.division-description{
+    color:#374151
+}
+.staff-section h4{
+    margin:.4rem 0 .6rem
+}
+.staff-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    gap:12px
+}
+.staff-member{
+    display:flex;
+    gap:10px;
+    align-items:center;
+    background:#fafbff;
+    border:1px solid #eef2f7;
+    border-radius:12px;padding:8px 10px
+}
+.staff-member img{
+    width:46px;
+    height:46px;
+    border-radius:50%;
+    object-fit:cover
+}
+.staff-info h6{
+    margin:0
+}
+.staff-info span{
+    color:var(--muted);
+    font-size:.9rem
+}
+
+/* Responsif */
+@media 
+(max-width:600px){
+  .header-content{align-items:flex-start}
+}
