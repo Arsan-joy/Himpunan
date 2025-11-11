@@ -39,7 +39,7 @@ $cssHref = fn($css)=> (preg_match('~^https?://|^/~',$css)?$css:(CSS_URL ?? (BASE
         </div>
       </li>
       <li><a href="<?= BASE_URL ?>pages/gallery.php"><i class="fas fa-images"></i> Galeri</a></li>
-      <li><a href="<?= BASE_URL ?>pages/materi.php"><i class="fas fa-book"></i> Materi</a></li>
+      <li><a href="<?= BASE_URL ?>pages/materi.php"><i class="fas fa-book"></i> MIROTA</a></li>
       <li><a href="<?= BASE_URL ?>pages/calendar.php"><i class="fas fa-calendar"></i> Kalender Akademik</a></li>
     </ul>
   </nav>
