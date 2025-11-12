@@ -12,7 +12,6 @@ $kabinet     = db()->query("SELECT id, CONCAT(name, ' (', IFNULL(period,''), ')'
 $log = []; $summary = ['users_new'=>0,'users_update'=>0,'members_new'=>0,'members_update'=>0,'errors'=>0];
 
 if ($_SERVER['REQUEST_METHOD']==='POST') {
-  // Validate upload
   if (empty($_FILES['csv']) || $_FILES['csv']['error']!==UPLOAD_ERR_OK) {
     $log[] = "Upload CSV gagal.";
   } else {
@@ -33,20 +32,16 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
         $fh = fopen($tmp, 'r');
         if (!$fh) throw new RuntimeException('Tidak bisa membaca file.');
 
-        // CSV Anda pakai delimiter ; dan 2 baris judul pembuka
         $delimiter = ';';
 
-        // Lewati 2 baris pembuka yang bukan header
-        $first = fgetcsv($fh, 0, $delimiter);
-        $second = fgetcsv($fh, 0, $delimiter);
+        // Lewati 2 baris awal non-header (sesuai file contoh)
+        fgetcsv($fh, 0, $delimiter);
+        fgetcsv($fh, 0, $delimiter);
 
-        // Baris header
+        // Header
         $header = fgetcsv($fh, 0, $delimiter);
-        // Normalisasi header
         $map = array_map('strtolower', $header ?? []);
-        // Diharapkan: ["no.","nim","nama","password","username"]
-        $idxNo = array_search('no.', $map, true);
-        $idxNim = array_search('nim', $map, true);
+        $idxNim  = array_search('nim', $map, true);
         $idxNama = array_search('nama', $map, true);
         $idxPass = array_search('password', $map, true);
         $idxUser = array_search('username', $map, true);
@@ -55,18 +50,19 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
           throw new RuntimeException('Header CSV tidak sesuai. Harus mengandung kolom: NIM;Nama;Password;Username');
         }
 
-        // Transaksi optional: biarkan per-batch
         db()->beginTransaction();
 
         while (($row = fgetcsv($fh, 0, $delimiter)) !== false) {
           if (!$row || count($row) < 5) continue;
 
-          $nim = trim((string)$row[$idxNim]);
-          $nama = trim((string)$row[$idxNama]);
-          $plain = (string)$row[$idxPass];
+          $nim      = trim((string)$row[$idxNim]);
+          $nama     = trim((string)$row[$idxNama]);
+          $plain    = (string)$row[$idxPass];
           $username = trim((string)$row[$idxUser]);
 
-          if ($nim==='' || $nama==='' || $username==='') { $summary['errors']++; $log[]="Baris dilewati (data kosong) NIM=$nim Username=$username"; continue; }
+          if ($nim==='' || $nama==='' || $username==='') {
+            $summary['errors']++; $log[]="Baris dilewati (data kosong) NIM=$nim Username=$username"; continue;
+          }
 
           // USERS
           if ($create_users) {
@@ -95,12 +91,21 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
             $mem = $m->fetch();
 
             if ($mem) {
-              db()->prepare("UPDATE members SET name = ?, kabinet_id = COALESCE(?, kabinet_id), department_id = COALESCE(?, department_id), division_id = COALESCE(?, division_id), active = 1 WHERE id = ?")
-                ->execute([$nama, $default_kabinet_id, $default_department_id, $default_division_id, (int)$mem['id']]);
+              db()->prepare("
+                UPDATE members
+                   SET name = ?,
+                       kabinet_id = COALESCE(?, kabinet_id),
+                       department_id = COALESCE(?, department_id),
+                       division_id = COALESCE(?, division_id),
+                       active = 1
+                 WHERE id = ?
+              ")->execute([$nama, $default_kabinet_id, $default_department_id, $default_division_id, (int)$mem['id']]);
               $summary['members_update']++;
             } else {
-              db()->prepare("INSERT INTO members (name, student_id, kabinet_id, department_id, division_id, role, active) VALUES (?,?,?,?,?, ?,1)")
-                ->execute([$nama, $nim, $default_kabinet_id, $default_department_id, $default_division_id, null]);
+              db()->prepare("
+                INSERT INTO members (name, student_id, kabinet_id, department_id, division_id, role, active)
+                VALUES (?,?,?,?,?, ?,1)
+              ")->execute([$nama, $nim, $default_kabinet_id, $default_department_id, $default_division_id, null]);
               $summary['members_new']++;
             }
           }
@@ -235,7 +240,6 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
         </div>
       </div>
     <?php endif; ?>
-
   </main>
 </div>
 </body>
