@@ -126,32 +126,11 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
   <link rel="stylesheet" href="<?= BASE_URL ?>Resource/css/admin.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
-    .content-card{ 
-      background:#fff;
-      border-radius:12px;
-      box-shadow:0 10px 30px rgba(2,6,23,.08);
-      padding:16px;
-      margin-bottom:16px
-    }
-    .grid2{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:12px
-    }
-    @media(max-width:720px){
-      .grid2{grid-template-columns:1fr}
-    }
-    .log{
-      background:#0b1023;
-      color:#d1d5db;
-      border-radius:8px;
-      padding:10px;
-      font-family:ui-monospace, SFMono-Regular, Menlo, monospace;
-      max-height:260px;
-      overflow:auto
-    }
-    .hint{
-      color:#6b7280;font-size:.9rem}
+    .content-card{background:#fff;border-radius:12px;box-shadow:0 10px 30px rgba(2,6,23,.08);padding:16px;margin-bottom:16px}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    @media(max-width:720px){.grid2{grid-template-columns:1fr}}
+    .log{background:#0b1023;color:#d1d5db;border-radius:8px;padding:10px;font-family:ui-monospace, SFMono-Regular, Menlo, monospace;max-height:260px;overflow:auto}
+    .hint{color:#6b7280;font-size:.9rem}
   </style>
 </head>
 <body>

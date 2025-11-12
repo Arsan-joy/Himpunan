@@ -1,56 +1,36 @@
-// Pastikan file ini termuat. Cek di DevTools > Network tidak 404.
 document.addEventListener('DOMContentLoaded', () => {
-  // Counter animation
-  const counters = document.querySelectorAll('.stat-number[data-count]');
-  counters.forEach(el => {
-    const target = parseInt(el.dataset.count || '0', 10);
-    let current = 0;
-    const step = Math.max(1, Math.round(target / 60));
-    const tick = () => {
-      current += step;
-      if (current >= target) {
-        el.textContent = target.toString();
-      } else {
-        el.textContent = current.toString();
-        requestAnimationFrame(tick);
-      }
-    };
-    requestAnimationFrame(tick);
-  });
-
-  // Filter divisions
+  // Filter
   const filterBtns = document.querySelectorAll('.division-filter .filter-btn');
   const cards = document.querySelectorAll('.division-card');
-  filterBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      filterBtns.forEach(b => b.classList.remove('active'));
+  filterBtns.forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      filterBtns.forEach(b=>b.classList.remove('active'));
       btn.classList.add('active');
       const cat = btn.dataset.filter || 'all';
-      cards.forEach(card => {
-        const c = card.dataset.category || 'other';
-        card.style.display = (cat === 'all' || cat === c) ? '' : 'none';
+      cards.forEach(c=>{
+        const cc = c.dataset.category || '';
+        c.style.display = (cat==='all'||cat===cc) ? '' : 'none';
       });
     });
   });
 
-  // Toggle division content (accordion)
-  const toggles = document.querySelectorAll('.toggle-btn');
-  toggles.forEach(t => {
-    t.addEventListener('click', () => {
+  // Toggle (accordion)
+  document.querySelectorAll('.toggle-btn').forEach(t=>{
+    t.addEventListener('click',()=>{
       const id = t.dataset.target;
-      const content = document.getElementById(id);
-      if (!content) return;
-      const open = content.classList.toggle('open');
-      t.classList.toggle('open', open);
-      // Accessibility
+      const el = document.getElementById(id);
+      if(!el) return;
+      const open = el.classList.toggle('open');
       t.setAttribute('aria-expanded', String(open));
-      content.style.maxHeight = open ? content.scrollHeight + 'px' : '0px';
+      el.style.maxHeight = open ? el.scrollHeight+'px' : '0px';
+      t.querySelector('i')?.classList.toggle('fa-chevron-down', !open);
+      t.querySelector('i')?.classList.toggle('fa-chevron-up', open);
     });
   });
 
-  // Pre-expand all by default (seperti behavior pada HTML preview Anda)
-  document.querySelectorAll('.division-content').forEach(c => {
-    c.classList.add('open');
-    c.style.maxHeight = c.scrollHeight + 'px';
+  // Expand all awal
+  document.querySelectorAll('.division-content').forEach(el=>{
+    el.classList.add('open');
+    el.style.maxHeight = el.scrollHeight + 'px';
   });
 });
