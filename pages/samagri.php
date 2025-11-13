@@ -46,6 +46,7 @@ function dept_link(string $slug): string {
             <a href="<?= BASE_URL ?>pages/struktur.php" class="btn-primary">Lihat Struktur Organisasi</a>
         </div>
     </section>
+    
 
     <!-- Organization Overview (konten ringkas) -->
     <section class="org-overview">
@@ -63,6 +64,34 @@ function dept_link(string $slug): string {
                          onerror="this.src='<?= BASE_URL ?>Resource/hmta-group.jpg'">
                 </div>
             </div>
+        </div>
+    </section>
+
+
+    <section class="team-section">
+        <div class="container">
+            <h2><i class="fas fa-user-tie"></i> Pengurus Himpunan</h2>
+        <div class="team-grid">
+        <?php foreach ($pengurus as $p): ?>
+            <div class="team-card" data-aos="zoom-in">
+              <div class="team-image">
+                <img src="<?= htmlspecialchars($p['photo_url'] ?: (BASE_URL.'Resource/default-profile.jpg')) ?>"
+                     alt="<?= htmlspecialchars($p['name']) ?>"
+                     onerror="this.src='<?= BASE_URL ?>Resource/default-profile.jpg'">
+            <div class="team-overlay">
+              <div class="social-links">
+                <?php if (!empty($p['linkedin_url'])): ?><a href="<?= htmlspecialchars($p['linkedin_url']) ?>" target="_blank"><i class="fab fa-linkedin"></i></a><?php endif; ?>
+                <?php if (!empty($p['email'])): ?><a href="mailto:<?= htmlspecialchars($p['email']) ?>"><i class="fas fa-envelope"></i></a><?php endif; ?>
+              </div>
+            </div>
+          </div>
+          <div class="team-info">
+            <h3><?= htmlspecialchars($p['name']) ?></h3>
+            <p class="position"><?= htmlspecialchars($p['role']) ?></p>
+          </div>
+        </div>
+        <?php endforeach; ?>
+        </div>
         </div>
     </section>
 

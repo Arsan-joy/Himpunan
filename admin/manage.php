@@ -43,7 +43,24 @@ $modules = [
           'logo_upload' => ['label'=>'Upload Logo','type'=>'file','accept'=>'image/*','target'=>'logo_url','subdir'=>'kabinet','allowed'=>['jpg','jpeg','png','webp','svg'],'maxMB'=>10],
       ],
   ],
-  // Leader Departemen (Kepala & Sekretaris)
+  // PENGURUS HIMPUNAN (inti organisasi)
+  'pengurus' => [
+      'title' => 'Pengurus Himpunan','table' => 'organization_leaders','order' => 'COALESCE(sort_order, id) ASC',
+      'fields' => [
+          'name' => ['label'=>'Nama','required'=>true],
+          'role' => ['label'=>'Jabatan','type'=>'select','required'=>true,'options'=>[
+              'Kepala Himpunan',
+              'Sekretaris Umum 1','Sekretaris Umum 2',
+              'Bendahara Umum 1','Bendahara Umum 2',
+              'BPO','Ketua Senat'
+          ]],
+          'photo_file' => ['label'=>'Foto','type'=>'file','accept'=>'image/*','target'=>'photo_url','subdir'=>'org','allowed'=>['jpg','jpeg','png','webp'],'maxMB'=>5],
+          'linkedin_url' => ['label'=>'LinkedIn URL'],
+          'email' => ['label'=>'Email'],
+          'sort_order' => ['label'=>'Urutan Tampil'],
+      ],
+  ],
+  // Leader Departemen (Kepala & Sekretaris Departemen)
   'leaders' => [
       'title' => 'Leader Departemen','table' => 'leaders','order' => 'COALESCE(sort_order, id) ASC',
       'fields' => [
@@ -235,11 +252,12 @@ if (isset($_GET['id'])) { $stmt = db()->prepare("SELECT * FROM $table WHERE id =
     <div class="brand"><div class="brand-logo"><i class="fa-solid fa-check"></i></div><div><h1>HMTA Admin</h1><div style="opacity:.8;font-size:12px">Control Panel</div></div></div>
     <nav class="nav">
       <a href="<?= BASE_URL ?>admin/"><i class="fa-solid fa-house"></i> Dashboard</a>
+      <a class="<?= $moduleKey==='pengurus'?'active':'' ?>" href="?m=pengurus"><i class="fa-solid fa-user-tie"></i> Kelola Pengurus</a>
+      <a class="<?= $moduleKey==='leaders'?'active':'' ?>" href="?m=leaders"><i class="fa-solid fa-users-gear"></i> Kelola Leader</a>
+      <a class="<?= $moduleKey==='programs'?'active':'' ?>" href="?m=programs"><i class="fa-solid fa-rocket"></i> Kelola Program</a>
       <a class="<?= $moduleKey==='departemen'?'active':'' ?>" href="?m=departemen"><i class="fa-solid fa-building"></i> Kelola Departemen</a>
       <a class="<?= $moduleKey==='divisi'?'active':'' ?>" href="?m=divisi"><i class="fa-solid fa-people-group"></i> Kelola Divisi</a>
       <a class="<?= $moduleKey==='kabinet'?'active':'' ?>" href="?m=kabinet"><i class="fa-solid fa-layer-group"></i> Kelola Kabinet</a>
-      <a class="<?= $moduleKey==='leaders'?'active':'' ?>" href="?m=leaders"><i class="fa-solid fa-user-tie"></i> Kelola Leader</a>
-      <a class="<?= $moduleKey==='programs'?'active':'' ?>" href="?m=programs"><i class="fa-solid fa-rocket"></i> Kelola Program</a>
       <a class="<?= $moduleKey==='anggota'?'active':'' ?>" href="?m=anggota"><i class="fa-solid fa-user-friends"></i> Kelola Anggota</a>
       <a class="<?= $moduleKey==='foto'?'active':'' ?>" href="?m=foto"><i class="fa-solid fa-image"></i> Kelola Foto</a>
       <a class="<?= $moduleKey==='materi'?'active':'' ?>" href="?m=materi"><i class="fa-solid fa-book"></i> Kelola Materi</a>
