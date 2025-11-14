@@ -4,7 +4,7 @@ require_login(); // materi hanya untuk user login
 
 $page_title     = 'Materi Pembelajaran';
 $additional_css = ['materi.css'];
-$additional_js  = ['materi.js'];
+$additional_js  = ['materi.js', 'index.js'];
 
 include __DIR__ . '/../includes/header.php';
 

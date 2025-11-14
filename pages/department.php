@@ -24,7 +24,7 @@ $programs  = $dept_id ? get_programs($dept_id) : [];
 $page_title     = $dept ? ('Departemen ' . $dept['name']) : 'Departemen HMTA';
 /* Pakai internal.css (seragam dengan medkom.php) */
 $additional_css = ['internal.css'];
-$additional_js  = ['department.js','medkom-init.js'];
+$additional_js  = ['department.js','medkom-init.js','index.js'];
 
 include __DIR__ . '/../includes/header.php';
 

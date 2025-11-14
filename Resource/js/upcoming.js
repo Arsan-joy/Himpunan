@@ -23,6 +23,24 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Fokus: dropdown Event pada mobile (hamburger ditangani global di index.js)
+document.addEventListener('DOMContentLoaded', function() {
+    const dropdownTriggers = document.querySelectorAll('.dropdown > a');
+
+    dropdownTriggers.forEach(trigger => {
+        trigger.addEventListener('click', function(e) {
+            if (window.innerWidth < 992) {
+                e.preventDefault();
+                const parent = this.parentElement;
+                parent.classList.toggle('open');
+                // tutup dropdown lain
+                document.querySelectorAll('.dropdown').forEach(d => {
+                    if (d !== parent) d.classList.remove('open');
+                });
+            }
+        });
+    });
+});
 
     // --- Fungsionalitas untuk Dropdown Klik di Mobile ---
     const dropdowns = document.querySelectorAll('.dropdown > a');

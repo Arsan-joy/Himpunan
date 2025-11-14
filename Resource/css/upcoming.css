@@ -24,11 +24,10 @@ body {
     overflow-x: hidden;
 }
 
-
 /* Container utama untuk halaman event */
 .upcoming-events-page {
     padding: 4rem 1rem;
-    background-color: var(--bg-light, #f5f5f5); /* Menggunakan warna dari variabel root */
+    background-color: var(--bg-light, #f5f5f5);
 }
 
 /* Penataan judul halaman */
@@ -49,33 +48,30 @@ body {
     margin: 0.5rem auto 2.5rem;
 }
 
-
-/* Grid untuk menampung semua kartu event */
+/* Grid semua kartu event */
 .events-grid {
     display: grid;
-    /* Membuat kolom responsif: akan mencoba memuat kartu dengan lebar 350px */
     grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: 2rem; /* Jarak antar kartu */
+    gap: 2rem;
     max-width: var(--container-width, 1200px);
     margin: 0 auto;
 }
 
-/* Style untuk setiap kartu event */
+/* Kartu event */
 .event-card {
     background-color: #fff;
     border-radius: 8px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     display: flex;
-    overflow: hidden; /* Memastikan konten di dalamnya tidak keluar dari border-radius */
+    overflow: hidden;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
-
 .event-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
 }
 
-/* Bagian tanggal di sebelah kiri kartu */
+/* Bagian tanggal */
 .event-date {
     background-color: var(--primary-color, #2c3e50);
     color: var(--text-light, #ecf0f1);
@@ -85,35 +81,31 @@ body {
     align-items: center;
     padding: 1.5rem;
     text-align: center;
-    flex-shrink: 0; /* Mencegah bagian ini menyusut */
+    flex-shrink: 0;
 }
-
 .event-date .day {
     font-size: 2.5rem;
     font-weight: 700;
     line-height: 1;
 }
-
 .event-date .month {
     font-size: 1rem;
     text-transform: uppercase;
     font-weight: 500;
 }
 
-/* Bagian detail event di sebelah kanan kartu */
+/* Detail event */
 .event-details {
     padding: 1.5rem;
     display: flex;
     flex-direction: column;
     width: 100%;
 }
-
 .event-details h3 {
     color: var(--primary-color, #2c3e50);
     margin-bottom: 1rem;
     font-size: 1.2rem;
 }
-
 .event-details p {
     color: #555;
     margin-bottom: 0.5rem;
@@ -121,14 +113,13 @@ body {
     align-items: center;
     font-size: 0.9rem;
 }
-
 .event-details p i {
     color: var(--secondary-color, #3498db);
     margin-right: 10px;
-    width: 16px; /* Memberi lebar tetap agar teks sejajar */
+    width: 16px;
 }
 
-/* Tombol "Detail" */
+/* Tombol Detail */
 .btn-detail {
     background-color: transparent;
     border: 2px solid var(--secondary-color, #3498db);
@@ -138,30 +129,28 @@ body {
     text-decoration: none;
     text-align: center;
     font-weight: 600;
-    margin-top: auto; /* Mendorong tombol ke bagian bawah kartu */
-    align-self: flex-start; /* Membuat tombol tidak merentang penuh */
+    margin-top: auto;
+    align-self: flex-start;
     transition: all 0.3s ease;
 }
-
 .btn-detail:hover {
     background-color: var(--secondary-color, #3498db);
     color: #fff;
 }
 
-/* Penyesuaian untuk container */
+/* Penyesuaian container */
 .container {
     max-width: var(--container-width, 1200px);
     margin: 0 auto;
     padding: 0 1rem;
 }
 
-/* Footer */
+/* Footer (biarkan tetap) */
 footer {
     background-color: #2c3e50;
     color: white;
     padding: 4rem 1rem 2rem;
 }
-
 .footer-content {
     max-width: 1200px;
     margin: 0 auto;
@@ -170,187 +159,52 @@ footer {
     justify-content: space-between;
     gap: 20px;
 }
-
-.footer-section {
-    flex: 1;
-    min-width: 250px;
-    margin-bottom: 2rem;
-    padding: 0 1rem;
+.footer-section { 
+    flex: 1; 
+    min-width: 250px; 
+    margin-bottom: 2rem; 
+    padding: 0 1rem; 
+}
+.footer-section h3 { 
+    margin-bottom: 1.5rem; 
+    font-size: 1.3rem; 
+    position: relative; 
+    padding-bottom: 0.8rem; 
+}
+.footer-section h3:after { 
+    content:''; 
+    position:absolute; left:0; bottom:0; width:50px; height:3px; background:#3498db; 
+}
+.footer-section p { 
+    margin-bottom: 1rem; color:#ecf0f1; 
+}
+.footer-section p i { 
+    margin-right:10px; color:#3498db; 
+}
+.footer-section address { 
+    font-style: normal; 
+}
+.footer-section address a { 
+    color: var(--text-light); text-decoration:none; transition: color var(--transition); 
+}
+.footer-section address a:hover { 
+    color: var(--secondary-color); 
+}
+.social-icons { 
+    display:flex; gap:15px; margin-top:1.5rem; 
+}
+.social-icons a { 
+    display:flex; align-items:center; justify-content:center; color:white; background:#34495e; width:40px; height:40px; border-radius:50%; font-size:1.2rem; text-decoration:none; transition: background-color .3s, transform .3s; 
+}
+.social-icons a:hover { 
+    background:#3498db; transform: translateY(-5px); 
+}
+.copyright { 
+    margin-top:3rem; border-top:1px solid rgba(255,255,255,.1); padding-top:1.5rem; text-align:center; width:100%; color:#bdc3c7; 
 }
 
-.footer-section h3 {
-    margin-bottom: 1.5rem;
-    font-size: 1.3rem;
-    position: relative;
-    padding-bottom: 0.8rem;
-}
-
-.footer-section h3:after {
-    content: '';
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    width: 50px;
-    height: 3px;
-    background-color: #3498db;
-}
-
-.footer-section p {
-    margin-bottom: 1rem;
-    color: #ecf0f1;
-}
-
-.footer-section p i {
-    margin-right: 10px;
-    color: #3498db;
-}
-
-.footer-section address {
-    font-style: normal;
-}
-
-.footer-section address a {
-    color: var(--text-light);
-    text-decoration: none;
-    transition: color var(--transition);
-}
-
-.footer-section address a:hover {
-    color: var(--secondary-color);
-}
-
-.social-icons {
-    display: flex;
-    gap: 15px;
-    margin-top: 1.5rem;
-}
-
-.social-icons a {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    background-color: #34495e;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    font-size: 1.2rem;
-    text-decoration: none;
-    transition: background-color 0.3s, transform 0.3s;
-}
-
-.social-icons a:hover {
-    background-color: #3498db;
-    transform: translateY(-5px);
-}
-
-.copyright {
-    margin-top: 3rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    padding-top: 1.5rem;
-    text-align: center;
-    width: 100%;
-    color: #bdc3c7;
-}
-
-* Mencegah body di-scroll saat menu mobile terbuka */
-body.no-scroll {
-    overflow: hidden;
-}
-
-/* Mengubah ikon chevron saat dropdown terbuka */
-.dropdown.open > a > .fa-chevron-down {
-    transform: rotate(180deg);
-    transition: transform 0.3s ease;
-}
-
-/* Responsif untuk layar kecil (misal: di bawah 992px) */
-@media (max-width: 991px) {
-    /* Tampilkan tombol menu mobile */
-    .mobile-menu-btn {
-        display: block; /* Tombol hamburger muncul */
-        font-size: 1.8rem;
-    }
-
-    /* Sembunyikan tombol Sign In di header, bisa dipindahkan ke dalam menu */
-    .btn-signin {
-        display: none; 
-    }
-
-    /* Atur posisi navigasi utama di luar layar */
-    nav {
-        position: fixed;
-        top: 0;
-        left: 0;
-        height: 100vh;
-        width: 280px; /* Lebar menu mobile */
-        background-color: var(--primary-color, #2c3e50);
-        padding-top: 60px;
-        transform: translateX(-100%); /* Sembunyikan ke kiri */
-        transition: transform 0.4s ease-in-out;
-        z-index: 1001; /* Di atas overlay */
-    }
-
-    /* Kelas 'active' yang ditambahkan oleh JS untuk menampilkan menu */
-    nav.active {
-        transform: translateX(0);
-    }
-    
-    /* Atur ulang flexbox untuk menu mobile */
-    nav ul {
-        flex-direction: column;
-        align-items: flex-start;
-        padding: 2rem;
-    }
-
-    nav ul li {
-        width: 100%;
-        margin: 0;
-    }
-
-    nav ul li a {
-        padding: 1rem 0;
-        width: 100%;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    
-    /* Sembunyikan dropdown content secara default di mobile */
-    .dropdown-content {
-        display: none;
-        position: static; /* Hapus positioning absolut di mobile */
-        background-color: transparent;
-        box-shadow: none;
-        padding-left: 1rem; /* Beri indentasi agar terlihat seperti submenu */
-    }
-    
-    /* Tampilkan dropdown content ketika parent memiliki kelas 'open' dari JS */
-    .dropdown.open .dropdown-content {
-        display: block;
-    }
-    
-    .dropdown-content a {
-        color: var(--text-light, #ecf0f1);
-        opacity: 0.8;
-        padding: 10px 15px;
-    }
-
-    /* Styling untuk overlay gelap di background */
-    .mobile-menu-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.6);
-        z-index: 1000;
-        opacity: 0;
-        visibility: hidden;
-        transition: opacity 0.4s ease, visibility 0.4s ease;
-    }
-
-    /* Kelas 'active' dari JS untuk menampilkan overlay */
-    .mobile-menu-overlay.active {
-        opacity: 1;
-        visibility: visible;
-    }
-}
+/* PENTING:
+   - Hapus aturan yang menyembunyikan tombol .btn-signin
+   - Hapus styling NAV/OFFCANVAS di sini agar tidak bentrok dengan header global.
+   - Fungsionalitas hamburger ditangani di Resource/js/index.js dan style global.
+*/

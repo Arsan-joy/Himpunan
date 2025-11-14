@@ -4,7 +4,7 @@ require_once __DIR__ . '/../includes/functions.php';
 $page_title     = 'Kalender Akademik';
 $additional_css = ['stylecalender.css'];
 // Tambahkan versi untuk bust cache bila browser menyimpan JS lama
-$additional_js  = ['calendar.js?v=3'];
+$additional_js  = ['calendar.js','index.js'];
 
 include __DIR__ . '/../includes/header.php';
 

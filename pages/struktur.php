@@ -3,7 +3,7 @@ require_once __DIR__ . '/../includes/functions.php';
 
 $page_title     = 'Struktur Organisasi';
 $additional_css = ['struktur.css'];
-$additional_js  = ['struktur.js'];
+$additional_js  = ['struktur.js', 'index.js']; // tambahkan jika ada JS khusus
 
 include __DIR__ . '/../includes/header.php';
 

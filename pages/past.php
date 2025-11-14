@@ -3,7 +3,7 @@ require_once __DIR__ . '/../includes/functions.php';
 
 $page_title     = 'Kegiatan Terdahulu';
 $additional_css = ['stylepast.css'];     // Resource/css/stylepast.css
-$additional_js  = ['past-events.js'];    // Resource/js/past-events.js (opsional)
+$additional_js  = ['past-events.js', 'index.js'];    // Resource/js/past-events.js (opsional)
 
 include __DIR__ . '/../includes/header.php';
 

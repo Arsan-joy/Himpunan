@@ -3,7 +3,7 @@ require_once __DIR__ . '/../includes/functions.php';
 
 $page_title     = 'Upcoming Events';
 $additional_css = ['upcoming.css'];
-$additional_js  = ['upcoming.js'];
+$additional_js  = ['upcoming.js', 'index.js'];
 
 include __DIR__ . '/../includes/header.php';
 

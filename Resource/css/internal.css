@@ -1424,3 +1424,10 @@ textarea:focus-visible {
 @media (prefers-color-scheme: dark) {
     /* Dark mode styles can be added here */
 }
+
+#mainNav { 
+    display:none;
+ }  
+.mobile-menu-btn { 
+    display:none; 
+}

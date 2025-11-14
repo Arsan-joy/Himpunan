@@ -3,7 +3,7 @@ require_once __DIR__ . '/../includes/functions.php';
 
 $page_title     = 'Annual Activities';
 $additional_css = ['styleannual.css']; // pastikan ada di Resource/css/styleannual.css
-$additional_js  = ['annual.js'];       // pastikan ada di Resource/js/annual.js
+$additional_js  = ['annual.js', 'index.js'];       // pastikan ada di Resource/js/annual.js
 
 include __DIR__ . '/../includes/header.php';
 ?>

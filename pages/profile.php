@@ -3,7 +3,7 @@ require_once __DIR__ . '/../includes/functions.php';
 
 $page_title     = 'Profile HMTA ITERA';
 $additional_css = ['styleprofile.css',]; // pastikan file ada di Resource/css/styleprofile.css
-$additional_js  = ['profile.js'];       // pastikan file ada di Resource/js/profile.js
+$additional_js  = ['profile.js', 'index.js'];       // pastikan file ada di Resource/js/profile.js
 
 include __DIR__ . '/../includes/header.php';
 ?>

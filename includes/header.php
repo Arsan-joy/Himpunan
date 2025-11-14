@@ -21,6 +21,8 @@ $cssHref = fn($css)=> (preg_match('~^https?://|^/~',$css)?$css:(CSS_URL ?? (BASE
 <?php foreach ($additional_css as $css): ?><link rel="stylesheet" href="<?= $cssHref((string)$css) ?>"><?php endforeach; ?>
 <link rel="icon" href="<?= (IMG_URL ?? (BASE_URL.'Resource/')) ?>IMG_1381.png" type="image/png">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<!-- Pastikan hamburger JS selalu termuat -->
+<script defer src="<?= BASE_URL ?>Resource/js/index.js"></script>
 </head>
 <body>
 <header>
@@ -43,7 +45,9 @@ $cssHref = fn($css)=> (preg_match('~^https?://|^/~',$css)?$css:(CSS_URL ?? (BASE
       <li><a href="<?= BASE_URL ?>pages/calendar.php"><i class="fas fa-calendar"></i> Kalender Akademik</a></li>
     </ul>
   </nav>
-
+<?php // DEBUG sementara
+// echo '<!-- is_logged_in='. (is_logged_in()?'YES':'NO') .' -->';
+?>
   <?php if (is_logged_in()): ?>
     <div style="display:flex; gap:8px; align-items:center;">
       <button class="btn-signin" onclick="location.href='<?= BASE_URL ?>admin/logout.php'"><i class="fas fa-sign-out-alt"></i> Logout</button>
