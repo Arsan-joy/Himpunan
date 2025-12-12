@@ -123,7 +123,7 @@ $modules = [
       'title' => 'Materi','table' => 'materials','order' => 'id DESC',
       'fields' => [
           'title' => ['label'=>'Judul','required'=>true],
-          'file_upload' => ['label'=>'Upload File (PDF/DOC/PPT)','type'=>'file','accept'=>'.pdf,.doc,.docx,.ppt,.pptx','target'=>'file_url','subdir'=>'materials','allowed'=>['pdf','doc','docx','ppt','pptx'],'maxMB'=>128,'required'=>true],
+          'file_upload' => ['label'=>'Upload File (PDF/DOC/PPT)','type'=>'file','accept'=>'.pdf,.doc,.docx,.ppt,.pptx','target'=>'file_url','subdir'=>'materials','allowed'=>['pdf','doc','docx','ppt','pptx'],'maxMB'=>50],
           'is_public' => ['label'=>'Publik?','type'=>'bool'],
       ],
   ],
@@ -247,6 +247,9 @@ $list = db()->query("SELECT * FROM $table ORDER BY $order")->fetchAll();
 $editing = null;
 if (isset($_GET['id'])) { $stmt = db()->prepare("SELECT * FROM $table WHERE id = ? LIMIT 1"); $stmt->execute([(int)$_GET['id']]); $editing=$stmt->fetch(); }
 
+// Ambil status maintenance untuk indikator/link cepat
+$maintenance = function_exists('get_maintenance_status') ? get_maintenance_status() : ['enabled'=>false,'updated_by'=>'','updated_at'=>''];
+$isMaint = !empty($maintenance['enabled']);
 ?>
 <!doctype html>
 <html lang="id">
@@ -275,6 +278,7 @@ if (isset($_GET['id'])) { $stmt = db()->prepare("SELECT * FROM $table WHERE id =
       <?php if (is_super_admin()): ?>
       <a class="<?= $moduleKey==='users'?'active':'' ?>" href="?m=users"><i class="fa-solid fa-user-shield"></i> Kelola Pengguna</a>
       <a href="tools/import_members.php"><i class="fa-solid fa-file-import"></i> Impor Anggota</a>
+      <a href="maintenance.php"><i class="fa-solid fa-screwdriver-wrench"></i> Maintenance Mode</a>
       <?php endif; ?>
       <a href="logout.php"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
     </nav>
@@ -283,7 +287,16 @@ if (isset($_GET['id'])) { $stmt = db()->prepare("SELECT * FROM $table WHERE id =
   <main class="main">
     <div class="topbar">
       <div class="title"><h2><i class="fa-solid fa-gear"></i> Kelola <?= htmlspecialchars($title) ?></h2></div>
-      <div class="pill"><div class="avatar"><i class="fa-solid fa-user"></i></div><div><div style="font-weight:800"><?= htmlspecialchars($_SESSION['user']['username']) ?></div><div style="font-size:12px;opacity:.8"><?= is_super_admin()?'Super Admin':'Admin' ?></div></div></div>
+      <div class="pill">
+        <div class="avatar"><i class="fa-solid fa-user"></i></div>
+        <div>
+          <div style="font-weight:800"><?= htmlspecialchars($_SESSION['user']['username']) ?></div>
+          <div style="font-size:12px;opacity:.8">Status: <?= $isMaint ? 'Maintenance Aktif' : 'Normal' ?></div>
+        </div>
+        <?php if (is_super_admin()): ?>
+          <a class="btn btn-secondary" href="maintenance.php" style="margin-left:12px"><i class="fa-solid fa-screwdriver-wrench"></i> Pengaturan Maintenance</a>
+        <?php endif; ?>
+      </div>
     </div>
 
     <?php if (!empty($_SESSION['flash_error'])): ?>
@@ -407,7 +420,6 @@ if (isset($_GET['id'])) { $stmt = db()->prepare("SELECT * FROM $table WHERE id =
           </table>
         </div>
       </div>
-
     </div>
   </main>
 </div>

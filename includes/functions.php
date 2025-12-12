@@ -88,3 +88,111 @@ function get_kabinet_options(): array {
         'label' => $r['name'] . ($r['period'] ? " ({$r['period']})" : "")
     ], $rows);
 }
+
+/* ============================================================
+   MAINTENANCE (GLOBAL & PARSIAL)
+   ============================================================ */
+if (!defined('MAINTENANCE_CONFIG')) {
+    define('MAINTENANCE_CONFIG', dirname(__DIR__) . '/config/maintenance.json');
+}
+
+/**
+ * Normalisasi path halaman agar seragam (mis. '/pages/annual.php' atau '/pages/annual/minerfesto.php')
+ */
+function sanitize_page_path(string $path): string {
+    $p = parse_url($path, PHP_URL_PATH) ?: $path;
+    // Jika BASE_URL di awal, buang
+    if (defined('BASE_URL') && BASE_URL !== '/' && str_starts_with($p, BASE_URL)) {
+        $p = substr($p, strlen(BASE_URL));
+    }
+    // Paksa diawali slash
+    if ($p === '' || $p[0] !== '/') $p = '/' . ltrim($p, '/');
+    // Buang trailing slash (kecuali root)
+    if (strlen($p) > 1) $p = rtrim($p, '/');
+    return $p;
+}
+
+/**
+ * Ambil status maintenance dari file JSON.
+ * Schema:
+ * {
+ *   "enabled": false,                // maintenance global
+ *   "pages": ["/pages/annual.php"],  // daftar halaman/wildcard untuk maintenance parsial
+ *   "updated_by": "",
+ *   "updated_at": ""
+ * }
+ */
+function get_maintenance_status(): array {
+    $default = ['enabled' => false, 'pages' => [], 'updated_by' => '', 'updated_at' => ''];
+
+    if (!file_exists(MAINTENANCE_CONFIG)) {
+        @mkdir(dirname(MAINTENANCE_CONFIG), 0775, true);
+        file_put_contents(MAINTENANCE_CONFIG, json_encode($default, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+        return $default;
+    }
+
+    $raw = @file_get_contents(MAINTENANCE_CONFIG);
+    $data = json_decode((string)$raw, true);
+    if (!is_array($data)) $data = [];
+
+    $data = array_merge($default, $data);
+    $data['enabled'] = (bool)($data['enabled'] ?? false);
+
+    // Pastikan pages berupa array string yang tersanitasi unik
+    $pages = is_array($data['pages'] ?? null) ? $data['pages'] : [];
+    $pages = array_values(array_unique(array_map(
+        fn($p) => sanitize_page_path((string)$p),
+        array_filter($pages, fn($p) => is_string($p) && $p !== '')
+    )));
+    $data['pages'] = $pages;
+
+    return $data;
+}
+
+/**
+ * Simpan status maintenance (global + parsial).
+ *
+ * @param bool   $enabledGlobal  Aktifkan maintenance global?
+ * @param array  $pages          Daftar path halaman/wildcard untuk maintenance parsial
+ * @param string $updated_by     Nama pengubah
+ * @return bool
+ */
+function set_maintenance_status(bool $enabledGlobal, array $pages = [], string $updated_by = ''): bool {
+    $pages = array_values(array_unique(array_map('sanitize_page_path', $pages)));
+    $payload = [
+        'enabled'    => $enabledGlobal,
+        'pages'      => $pages,
+        'updated_by' => $updated_by,
+        'updated_at' => date('c'),
+    ];
+    @mkdir(dirname(MAINTENANCE_CONFIG), 0775, true);
+    return (bool)file_put_contents(MAINTENANCE_CONFIG, json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+}
+
+/**
+ * Cek apakah maintenance aktif untuk path tertentu (atau current request).
+ * - True jika global maintenance aktif
+ * - True jika path cocok salah satu 'pages' (mendukung wildcard '*', mis. '/pages/annual/*')
+ */
+function is_maintenance_active(?string $requestPath = null): bool {
+    $status = get_maintenance_status();
+    if (!empty($status['enabled'])) return true;
+
+    $pages = $status['pages'] ?? [];
+    if (!$pages) return false;
+
+    $path = sanitize_page_path($requestPath ?? (parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/'));
+
+    foreach ($pages as $pattern) {
+        if (str_contains($pattern, '*')) {
+            // Ubah wildcard '*' menjadi regex
+            $quoted = preg_quote($pattern, '/');
+            $quoted = str_replace('\*', '.*', $quoted);
+            $regex  = '/^' . $quoted . '$/i';
+            if (preg_match($regex, $path)) return true;
+        } else {
+            if (sanitize_page_path($pattern) === $path) return true;
+        }
+    }
+    return false;
+}

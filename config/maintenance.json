@@ -1,0 +1,9 @@
+{
+    "enabled": false,
+    "pages": [
+        "/pages/annual.php",
+        "/pages/annual/minerfesto.php"
+    ],
+    "updated_by": "superadmin",
+    "updated_at": "2025-12-12T08:04:17+01:00"
+}

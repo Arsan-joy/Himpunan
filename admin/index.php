@@ -14,6 +14,17 @@ $counts = [
   'Anggota'    => count_members(true),
   'Pengguna'   => (int)db()->query("SELECT COUNT(*) c FROM users")->fetch()['c'],
 ];
+
+$status = get_maintenance_status();
+$isMaintGlobal = !empty($status['enabled']);
+$pagesCount    = count($status['pages'] ?? []);
+$statusText    = $isMaintGlobal ? 'Maintenance Global' : ($pagesCount > 0 ? "Maintenance Parsial ($pagesCount halaman)" : 'Normal');
+
+// Toggle cepat maintenance global (opsional)
+if (is_super_admin() && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['toggle_maintenance'])) {
+    set_maintenance_status(!$isMaintGlobal, $status['pages'] ?? [], $_SESSION['user']['username'] ?? 'admin');
+    header('Location: index.php'); exit;
+}
 ?>
 <!doctype html>
 <html lang="id">
@@ -45,6 +56,7 @@ $counts = [
       <?php if (is_super_admin()): ?>
         <a href="tools/import_members.php"><i class="fa-solid fa-file-import"></i> Impor Anggota</a>
         <a href="manage.php?m=users"><i class="fa-solid fa-user-shield"></i> Kelola Pengguna</a>
+        <a href="maintenance.php"><i class="fa-solid fa-screwdriver-wrench"></i> Maintenance Mode</a>
       <?php endif; ?>
       <a href="<?= BASE_URL ?>" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> Lihat Website</a>
       <a href="logout.php"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
@@ -53,8 +65,27 @@ $counts = [
 
   <main class="main">
     <div class="topbar">
-      <div class="title"><h2><i class="fa-solid fa-chart-line"></i> Dashboard</h2></div>
-      <div class="pill"><div class="avatar"><i class="fa-solid fa-user"></i></div><div><div style="font-weight:800"><?= htmlspecialchars($_SESSION['user']['username']) ?></div><div style="font-size:12px;opacity:.8"><?= is_super_admin()?'Super Admin':'Admin' ?></div></div></div>
+      <div class="title">
+        <h2><i class="fa-solid fa-chart-line"></i> Dashboard</h2>
+      </div>
+      <div class="pill">
+        <div class="avatar"><i class="fa-solid fa-user"></i></div>
+        <div>
+          <div style="font-weight:800"><?= htmlspecialchars($_SESSION['user']['username']) ?></div>
+          <div style="font-size:12px;opacity:.8">Status: <?= htmlspecialchars($statusText) ?></div>
+          <?php if (!empty($status['updated_at'])): ?>
+            <div style="font-size:12px;opacity:.6">Terakhir diubah: <?= htmlspecialchars($status['updated_at']) ?><?= !empty($status['updated_by']) ? ' oleh '.htmlspecialchars($status['updated_by']) : '' ?></div>
+          <?php endif; ?>
+        </div>
+        <?php if (is_super_admin()): ?>
+          <form method="post" style="margin-left:12px">
+            <input type="hidden" name="toggle_maintenance" value="1">
+            <button class="btn btn-secondary" type="submit">
+              <i class="fa-solid fa-screwdriver-wrench"></i> <?= $isMaintGlobal ? 'Nonaktifkan' : 'Aktifkan' ?> Global
+            </button>
+          </form>
+        <?php endif; ?>
+      </div>
     </div>
 
     <div class="grid">

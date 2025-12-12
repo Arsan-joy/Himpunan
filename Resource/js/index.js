@@ -163,3 +163,21 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 });
+
+
+// Tambahan kecil: saat maintenance aktif, cegah interaksi dasar
+document.addEventListener('DOMContentLoaded', function() {
+  const overlay = document.querySelector('.maintenance-overlay.active');
+  if (overlay) {
+    // Nonaktifkan klik di bawah overlay
+    document.addEventListener('click', function(e) {
+      if (!overlay.contains(e.target)) {
+        e.stopPropagation();
+        e.preventDefault();
+      }
+    }, true);
+    // Nonaktifkan scroll
+    document.body.classList.add('maintenance-no-scroll');
+  }
+
+});
