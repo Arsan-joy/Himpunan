@@ -1,0 +1,9 @@
+# Nonaktifkan eksekusi PHP
+php_flag engine off
+
+# Tolak akses ke file PHP yang mungkin terupload
+<FilesMatch "\.(php|php3|php4|php5|phtml|pl|py|jsp|asp|sh|cgi)$">
+    Deny from all
+</FilesMatch>
+
+Options -Indexes

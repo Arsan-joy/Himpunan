@@ -22,12 +22,22 @@ $maintenance = function_exists('get_maintenance_status') ? get_maintenance_statu
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="<?= htmlspecialchars($site_desc) ?>">
 <title><?= htmlspecialchars($page_title ?: 'Halaman') ?> | <?= htmlspecialchars($site_name) ?></title>
-<link rel="stylesheet" href="<?= (CSS_URL ?? (BASE_URL.'Resource/css/')) ?>style.css">
+<?php
+// Cache busting: gunakan hash dari file jika ada, fallback ke filemtime
+$_cssFile = defined('ROOT_PATH') ? ROOT_PATH . '/Resource/css/style.css' : (dirname(__DIR__) . '/Resource/css/style.css');
+$_jsFile  = defined('ROOT_PATH') ? ROOT_PATH . '/Resource/js/index.js'   : (dirname(__DIR__) . '/Resource/js/index.js');
+$_cssVer  = file_exists($_cssFile) ? substr(md5_file($_cssFile), 0, 8) : '1';
+$_jsVer   = file_exists($_jsFile)  ? substr(md5_file($_jsFile),  0, 8) : '1';
+?>
+<!-- Preconnect untuk CDN Font Awesome -->
+<link rel="preconnect" href="https://cdnjs.cloudflare.com">
+<link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+<link rel="stylesheet" href="<?= (CSS_URL ?? (BASE_URL.'Resource/css/')) ?>style.css?v=<?= $_cssVer ?>">
 <?php foreach ($additional_css as $css): ?><link rel="stylesheet" href="<?= $cssHref((string)$css) ?>"><?php endforeach; ?>
 <link rel="icon" href="<?= (IMG_URL ?? (BASE_URL.'Resource/')) ?>IMG_1381.png" type="image/png">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<!-- Pastikan hamburger JS selalu termuat -->
-<script defer src="<?= BASE_URL ?>Resource/js/index.js"></script>
+<!-- JS utama — defer agar tidak blokir rendering, dimuat SATU kali di sini -->
+<script defer src="<?= BASE_URL ?>Resource/js/index.js?v=<?= $_jsVer ?>"></script>
 
 <style>
   .maintenance-overlay {

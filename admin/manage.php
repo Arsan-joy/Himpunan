@@ -1,5 +1,7 @@
 <?php
 require_once __DIR__ . '/../includes/functions.php';
+require_once __DIR__ . '/../includes/csrf.php';
+require_once __DIR__ . '/../includes/logger.php';
 require_admin();
 
 // Batasi akses "users" hanya super admin
@@ -14,10 +16,37 @@ function fetch_options_sql(string $sql, string $valueCol = 'id', string $labelCo
     ], $rows);
 }
 
+/**
+ * Validasi ORDER BY clause terhadap whitelist kolom yang diizinkan.
+ * Mencegah SQL injection via ORDER BY.
+ */
+function validate_order_by(string $order, array $whitelist, string $default = 'id DESC'): string {
+    // Cek apakah order ada di whitelist secara langsung
+    if (in_array($order, $whitelist, true)) {
+        return $order;
+    }
+
+    // Cek format "column direction"
+    $parts = explode(' ', trim($order), 2);
+    $col   = $parts[0] ?? '';
+    $dir   = strtoupper($parts[1] ?? 'ASC');
+
+    if (in_array($col, $whitelist, true) && in_array($dir, ['ASC', 'DESC'], true)) {
+        return $col . ' ' . $dir;
+    }
+
+    // Fallback ke default dan log anomali
+    if ($order !== $default) {
+        error_log('[manage] ORDER BY tidak valid, fallback ke default: ' . $order);
+    }
+    return $default;
+}
+
 /* Modul konfigurasi */
 $modules = [
   'departemen' => [
       'title' => 'Departemen','table' => 'departments','order' => 'id DESC',
+      'allowed_orders' => ['id', 'name', 'slug'],
       'fields' => [
           'name' => ['label'=>'Nama','required'=>true],
           'slug' => ['label'=>'Slug','required'=>true],
@@ -36,6 +65,7 @@ $modules = [
   ],
   'divisi' => [
       'title' => 'Divisi','table' => 'divisions','order' => 'id DESC',
+      'allowed_orders' => ['id', 'name', 'department_id'],
       'fields' => [
           'department_id' => ['label'=>'Departemen','type'=>'select','required'=>true,'options_sql'=>"SELECT id, name FROM departments ORDER BY name ASC"],
           'name' => ['label'=>'Nama','required'=>true],
@@ -46,6 +76,7 @@ $modules = [
   ],
   'kabinet' => [
       'title' => 'Kabinet','table' => 'kabinet','order' => 'id DESC',
+      'allowed_orders' => ['id', 'name', 'period'],
       'fields' => [
           'name' => ['label'=>'Nama Kabinet','required'=>true],
           'period' => ['label'=>'Periode (mis. 2024-2025)','required'=>true],
@@ -56,6 +87,7 @@ $modules = [
   // PENGURUS HIMPUNAN (inti organisasi)
   'pengurus' => [
       'title' => 'Pengurus Himpunan','table' => 'organization_leaders','order' => 'COALESCE(sort_order, id) ASC',
+      'allowed_orders' => ['id', 'name', 'sort_order'],
       'fields' => [
           'name' => ['label'=>'Nama','required'=>true],
           'role' => ['label'=>'Jabatan','type'=>'select','required'=>true,'options'=>[
@@ -73,6 +105,7 @@ $modules = [
   // Leader Departemen (Kepala & Sekretaris Departemen)
   'leaders' => [
       'title' => 'Leader Departemen','table' => 'leaders','order' => 'COALESCE(sort_order, id) ASC',
+      'allowed_orders' => ['id', 'name', 'sort_order', 'department_id'],
       'fields' => [
           'department_id' => ['label'=>'Departemen','type'=>'select','required'=>true,'options_sql'=>"SELECT id, name FROM departments ORDER BY name ASC"],
           'name' => ['label'=>'Nama','required'=>true],
@@ -86,6 +119,7 @@ $modules = [
   // Program Kerja Departemen
   'programs' => [
       'title' => 'Program Kerja','table' => 'programs','order' => 'COALESCE(sort_order, id) ASC',
+      'allowed_orders' => ['id', 'name', 'sort_order', 'department_id'],
       'fields' => [
           'department_id' => ['label'=>'Departemen','type'=>'select','required'=>true,'options_sql'=>"SELECT id, name FROM departments ORDER BY name ASC"],
           'name' => ['label'=>'Nama Program','required'=>true],
@@ -97,6 +131,7 @@ $modules = [
   // Anggota Divisi (superadmin juga bisa mengakses)
   'anggota' => [
       'title' => 'Anggota','table' => 'members','order' => 'id DESC',
+      'allowed_orders' => ['id', 'name', 'student_id', 'active', 'joined_at'],
       'fields' => [
           'name' => ['label'=>'Nama Lengkap','required'=>true],
           'student_id' => ['label'=>'NIM/NPM'],
@@ -113,6 +148,7 @@ $modules = [
   ],
   'foto' => [
       'title' => 'Foto','table' => 'photos','order' => 'id DESC',
+      'allowed_orders' => ['id', 'album'],
       'fields' => [
           'album' => ['label'=>'Album','required'=>true],
           'photo_file' => ['label'=>'Upload Gambar','type'=>'file','accept'=>'image/*','target'=>'url','subdir'=>'photos','allowed'=>['jpg','jpeg','png','webp'],'maxMB'=>20,'required'=>true],
@@ -121,6 +157,7 @@ $modules = [
   ],
   'materi' => [
       'title' => 'Materi','table' => 'materials','order' => 'id DESC',
+      'allowed_orders' => ['id', 'title'],
       'fields' => [
           'title' => ['label'=>'Judul','required'=>true],
           'file_upload' => ['label'=>'Upload File (PDF/DOC/PPT)','type'=>'file','accept'=>'.pdf,.doc,.docx,.ppt,.pptx','target'=>'file_url','subdir'=>'materials','allowed'=>['pdf','doc','docx','ppt','pptx'],'maxMB'=>50],
@@ -129,6 +166,7 @@ $modules = [
   ],
   'kegiatan' => [
       'title' => 'Kegiatan','table' => 'events','order' => 'start_date DESC',
+      'allowed_orders' => ['id', 'title', 'start_date', 'end_date', 'type'],
       'fields' => [
           'title' => ['label'=>'Judul','required'=>true],
           'description' => ['label'=>'Deskripsi','type'=>'textarea'],
@@ -141,6 +179,7 @@ $modules = [
   ],
   'users' => [
       'title' => 'Pengguna','table' => 'users','order' => 'id DESC',
+      'allowed_orders' => ['id', 'username', 'role', 'active'],
       'fields' => [
           'username' => ['label'=>'Username','required'=>true],
           'password' => ['label'=>'Password (kosong = tidak ganti)','type'=>'password'],
@@ -161,10 +200,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $moduleKey = $_GET['m'] ?? 'departemen';
 if (!isset($modules[$moduleKey])) { http_response_code(404); echo "Modul tidak ditemukan"; exit; }
 $mod = $modules[$moduleKey];
-$table = $mod['table']; $order = $mod['order'] ?? 'id DESC'; $title = $mod['title'] ?? ucfirst($moduleKey);
+$table = $mod['table'];
+$allowedOrders = $mod['allowed_orders'] ?? ['id'];
+$order = validate_order_by($mod['order'] ?? 'id DESC', $allowedOrders);
+$title = $mod['title'] ?? ucfirst($moduleKey);
 
 /* Create/Update */
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Verifikasi CSRF token
+    if (!csrf_verify()) {
+        http_response_code(403);
+        log_security('csrf_violation', ['page' => 'manage', 'module' => $moduleKey]);
+        die('Permintaan tidak valid (403).');
+    }
+    csrf_regenerate();
+
     $id = isset($_POST['id']) && $_POST['id'] !== '' ? (int)$_POST['id'] : null;
 
     // Validasi required
@@ -309,6 +359,7 @@ $isMaint = !empty($maintenance['enabled']);
       <div class="content-card form">
         <div class="section-title"><i class="fa-solid fa-plus"></i> <?= $editing?'Edit':'Tambah' ?> Data</div>
         <form method="post" enctype="multipart/form-data">
+          <?= csrf_field() ?>
           <?php if ($editing): ?><input type="hidden" name="id" value="<?= (int)$editing['id'] ?>"><?php endif; ?>
 
           <?php foreach ($mod['fields'] as $col => $meta):

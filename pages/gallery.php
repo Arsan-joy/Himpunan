@@ -51,6 +51,7 @@ function slugify_simple($s) {
                  data-description="<?= htmlspecialchars($p['album'] ?: '-') ?>">
               <div class="gallery-image">
                 <img src="<?= htmlspecialchars($p['url']) ?>" alt="<?= htmlspecialchars($p['caption'] ?: 'Foto') ?>"
+                     loading="lazy" width="400" height="300"
                      onerror="this.src='https://via.placeholder.com/400x300?text=HMTA'">
                 <div class="overlay">
                   <div class="overlay-content">

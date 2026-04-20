@@ -47,10 +47,7 @@ $jsSrc = function(string $js): string {
     </div>
 </footer>
 
-<!-- JS utama -->
-<script src="<?= (defined('JS_URL') ? JS_URL : (BASE_URL . 'Resource/js/')) ?>index.js"></script>
-
-<!-- JS tambahan per halaman -->
+<!-- JS tambahan per halaman (index.js sudah dimuat dengan defer di header.php) -->
 <?php foreach ($additional_js as $js): ?>
     <script src="<?= $jsSrc((string)$js) ?>"></script>
 <?php endforeach; ?>

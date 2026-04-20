@@ -1,4 +1,13 @@
 <?php
+// Proteksi: hanya bisa diakses di environment development
+// Di production, file ini mengembalikan 404
+require_once __DIR__ . '/includes/functions.php';
+
+if (!defined('APP_ENV') || APP_ENV !== 'development') {
+    http_response_code(404);
+    exit('Not Found');
+}
+
 ini_set('display_errors',1); ini_set('display_startup_errors',1); error_reporting(E_ALL);
 
 echo "OK 0: awal<br>";

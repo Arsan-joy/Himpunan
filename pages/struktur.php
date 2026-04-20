@@ -76,6 +76,7 @@ if ($activeIndex !== null) {
                         <div class="kabinet-badge">Kabinet Aktif</div>
                         <div class="kabinet-image">
                             <img src="<?= htmlspecialchars($activeCabinet['logo_url'] ?: (BASE_URL . 'Resource/img/banner1.png')) ?>"
+                                 loading="lazy" width="400" height="300"
                                  onerror="this.src='<?= BASE_URL; ?>Resource/img/banner1.png'"
                                  alt="<?= htmlspecialchars($activeCabinet['name']) ?>">
                             <div class="kabinet-overlay">
@@ -111,6 +112,7 @@ if ($activeIndex !== null) {
                         <div class="kabinet-card" data-year="<?= htmlspecialchars(preg_replace('~[^0-9-]~','', (string)$row['period'])) ?>" data-status="past">
                             <div class="kabinet-image">
                                 <img src="<?= htmlspecialchars($row['logo_url'] ?: (BASE_URL . 'Resource/img/banner1.png')) ?>"
+                                     loading="lazy" width="400" height="300"
                                      onerror="this.src='<?= BASE_URL; ?>Resource/img/banner1.png'"
                                      alt="<?= htmlspecialchars($row['name']) ?>">
                                 <div class="kabinet-overlay">

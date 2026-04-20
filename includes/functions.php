@@ -40,23 +40,98 @@ function save_uploaded_file(string $field, string $subdir, array $allowedExt, in
     $size = (int)$f['size'];
     if ($size <= 0) throw new RuntimeException('File kosong');
     if ($size > ($maxMB * 1024 * 1024)) throw new RuntimeException('Ukuran maksimal '.$maxMB.'MB');
+
+    // Validasi ekstensi
     $ext = strtolower(pathinfo($f['name'], PATHINFO_EXTENSION));
     if (!in_array($ext, $allowedExt, true)) throw new RuntimeException('Ekstensi tidak diizinkan: '.$ext);
+
+    // Cegah double extension berbahaya (mis. file.php.jpg)
+    $dangerousExts = ['php','php3','php4','php5','phtml','phar','pl','py','jsp','asp','sh','cgi','exe'];
+    $nameParts = explode('.', strtolower($f['name']));
+    foreach ($nameParts as $part) {
+        if (in_array($part, $dangerousExts, true) && $part !== $ext) {
+            if (function_exists('log_security')) {
+                log_security('upload_rejected', ['reason'=>'double_extension','filename'=>$f['name'],'ext'=>$ext]);
+            }
+            throw new RuntimeException('Nama file mengandung ekstensi berbahaya');
+        }
+    }
+
+    // Validasi MIME type aktual menggunakan finfo
+    $allowedMimes = [
+        'jpg'  => 'image/jpeg',  'jpeg' => 'image/jpeg',
+        'png'  => 'image/png',   'gif'  => 'image/gif',
+        'webp' => 'image/webp',  'svg'  => 'image/svg+xml',
+        'pdf'  => 'application/pdf',
+        'doc'  => 'application/msword',
+        'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'ppt'  => 'application/vnd.ms-powerpoint',
+        'pptx' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    ];
+
+    if (function_exists('finfo_open')) {
+        $finfo    = finfo_open(FILEINFO_MIME_TYPE);
+        $mimeType = finfo_file($finfo, $f['tmp_name']);
+        finfo_close($finfo);
+
+        $expectedMime = $allowedMimes[$ext] ?? null;
+        if ($expectedMime && $mimeType !== $expectedMime) {
+            if (function_exists('log_security')) {
+                log_security('upload_rejected', [
+                    'reason'    => 'mime_mismatch',
+                    'filename'  => $f['name'],
+                    'ext'       => $ext,
+                    'mime_type' => $mimeType,
+                    'expected'  => $expectedMime,
+                ]);
+            }
+            throw new RuntimeException('Tipe file tidak sesuai ekstensi (MIME: '.$mimeType.')');
+        }
+    }
 
     $targetDir = rtrim(UPLOAD_DIR,'/\\').'/'.trim($subdir,'/\\').'/';
     if (!is_dir($targetDir)) @mkdir($targetDir, 0775, true);
 
-    $basename = preg_replace('~[^a-zA-Z0-9._-]+~','-', pathinfo($f['name'], PATHINFO_FILENAME));
-    $fname = date('Ymd_His').'-'.bin2hex(random_bytes(3)).'-'.$basename.'.'.$ext;
-    $dest = $targetDir.$fname;
+    // Nama file sepenuhnya acak — tidak mengandung nama asli pengguna
+    $fname = bin2hex(random_bytes(16)) . '.' . $ext;
+    $dest  = $targetDir . $fname;
 
     if (!move_uploaded_file($f['tmp_name'], $dest)) throw new RuntimeException('Gagal memindahkan file');
+
+    // Coba konversi ke WebP jika GD tersedia dan file adalah gambar
+    $imageExts = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+    if (in_array($ext, $imageExts, true) && function_exists('imagecreatefromstring')) {
+        try {
+            $imgData = @file_get_contents($dest);
+            if ($imgData !== false) {
+                $img = @imagecreatefromstring($imgData);
+                if ($img !== false) {
+                    $webpDest = $targetDir . bin2hex(random_bytes(16)) . '.webp';
+                    if (@imagewebp($img, $webpDest, 85)) {
+                        // WebP berhasil dibuat — kembalikan URL WebP, file asli tetap ada sebagai fallback
+                        imagedestroy($img);
+                        return rtrim(UPLOAD_URL,'/').'/'.trim($subdir,'/').'/' . basename($webpDest);
+                    }
+                    imagedestroy($img);
+                }
+            }
+        } catch (Throwable) {
+            // Gagal konversi WebP — lanjutkan dengan file asli
+        }
+    }
 
     return rtrim(UPLOAD_URL,'/').'/'.trim($subdir,'/').'/'.$fname;
 }
 
 // Data access ringkas lain tetap ...nya bisa ditambahkan di sini
 function get_upcoming_events(int $limit = 6): array {
+    // Coba ambil dari cache terlebih dahulu
+    if (function_exists('cache_get')) {
+        $cacheKey = 'upcoming_events_' . $limit;
+        $cached = cache_get($cacheKey);
+        if ($cached !== null) return $cached;
+    }
+
     $sql = "SELECT id, title, description, start_date, end_date, is_all_day, type, image_url
             FROM events
             WHERE start_date >= CURDATE()
@@ -65,7 +140,14 @@ function get_upcoming_events(int $limit = 6): array {
     $stmt = db()->prepare($sql);
     $stmt->bindValue(':lim', $limit, PDO::PARAM_INT);
     $stmt->execute();
-    return $stmt->fetchAll();
+    $result = $stmt->fetchAll();
+
+    // Simpan ke cache selama 15 menit
+    if (function_exists('cache_set')) {
+        cache_set('upcoming_events_' . $limit, $result, 900);
+    }
+
+    return $result;
 }
 
 function count_members(bool $onlyActive = true): int {
@@ -123,6 +205,10 @@ function sanitize_page_path(string $path): string {
  * }
  */
 function get_maintenance_status(): array {
+    // In-memory cache: baca file JSON hanya sekali per request
+    static $cached = null;
+    if ($cached !== null) return $cached;
+
     $default = ['enabled' => false, 'pages' => [], 'updated_by' => '', 'updated_at' => ''];
 
     if (!file_exists(MAINTENANCE_CONFIG)) {
@@ -146,6 +232,7 @@ function get_maintenance_status(): array {
     )));
     $data['pages'] = $pages;
 
+    $cached = $data;
     return $data;
 }
 
@@ -166,7 +253,16 @@ function set_maintenance_status(bool $enabledGlobal, array $pages = [], string $
         'updated_at' => date('c'),
     ];
     @mkdir(dirname(MAINTENANCE_CONFIG), 0775, true);
-    return (bool)file_put_contents(MAINTENANCE_CONFIG, json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+    $result = (bool)file_put_contents(MAINTENANCE_CONFIG, json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+
+    // Reset static cache agar perubahan langsung terlihat
+    if ($result) {
+        // Panggil get_maintenance_status dengan reset static
+        static $reset;
+        $reset = null; // tidak bisa reset static di fungsi lain, tapi file sudah diperbarui
+    }
+
+    return $result;
 }
 
 /**

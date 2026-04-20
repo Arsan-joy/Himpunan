@@ -1,5 +1,7 @@
 <?php
 require_once __DIR__ . '/../includes/functions.php';
+require_once __DIR__ . '/../includes/csrf.php';
+require_once __DIR__ . '/../includes/logger.php';
 
 // Pastikan session aktif hanya jika belum
 if (session_status() !== PHP_SESSION_ACTIVE) {
@@ -28,6 +30,14 @@ $availablePages = [
 ];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Verifikasi CSRF token
+    if (!csrf_verify()) {
+        http_response_code(403);
+        log_security('csrf_violation', ['page' => 'maintenance']);
+        die('Permintaan tidak valid (403).');
+    }
+    csrf_regenerate();
+
     $enableGlobal = isset($_POST['enabled']) && $_POST['enabled'] === '1';
     $pages = array_map('sanitize_page_path', (array)($_POST['pages'] ?? []));
     $custom = trim((string)($_POST['custom_page'] ?? ''));
@@ -84,6 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 
     <form method="post">
+      <?= csrf_field() ?>
       <div class="row">
         <span>Aktifkan Maintenance Global</span>
         <label class="switch">
