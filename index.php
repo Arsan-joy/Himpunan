@@ -12,6 +12,7 @@ $upcoming_events = get_upcoming_events(9);
 ?>
 <!-- Banner Slideshow -->
 <div class="banner-container">
+    <!-- Banner pertama: LCP image — eager load + fetchpriority high -->
     <div class="banner-slide active" style="background-image: url('Resource/img/banner1.png')">
         <div class="banner-content">
             <h2>Selamat Datang di HMTA ITERA</h2>
@@ -19,6 +20,7 @@ $upcoming_events = get_upcoming_events(9);
             <a href="pages/profile.php" class="btn">Tentang Kami</a>
         </div>
     </div>
+    <!-- Banner 2 & 3: lazy load karena tidak terlihat saat halaman pertama dimuat -->
     <div class="banner-slide" style="background-image: url('Resource/img/banner2.png')">
         <div class="banner-content">
             <h2>Kabinet Samagri 2024-2025</h2>

@@ -26,6 +26,7 @@ include __DIR__ . '/../includes/header.php';
         <div class="program-card" id="minerfesto">
           <div class="program-image">
             <img src="<?php echo BASE_URL; ?>Resource/img/minerfesto.jpg" alt="Minerfesto HMTA ITERA"
+                 width="600" height="400" loading="lazy"
                  onerror="this.src='<?php echo BASE_URL; ?>Resource/default.jpg'">
           </div>
           <div class="program-content">
@@ -54,6 +55,7 @@ include __DIR__ . '/../includes/header.php';
         <div class="program-card" id="lustrum">
           <div class="program-image">
             <img src="<?php echo BASE_URL; ?>Resource/lustrum.jpg" alt="Lustrum HMTA ITERA"
+                 width="600" height="400" loading="lazy"
                  onerror="this.src='<?php echo BASE_URL; ?>Resource/default.jpg'">
           </div>
           <div class="program-content">
@@ -124,6 +126,7 @@ include __DIR__ . '/../includes/header.php';
             <p>"Minerfesto memberikan saya kesempatan untuk mengembangkan keterampilan teknis dan membangun jaringan profesional yang luas di industri pertambangan."</p>
             <div class="testimonial-author">
               <img src="<?php echo BASE_URL; ?>Resource/testimonial1.jpg" alt="Testimonial Author"
+                   width="60" height="60" loading="lazy"
                    onerror="this.src='<?php echo BASE_URL; ?>Resource/default-profile.jpg'">
               <div>
                 <h4>Andi Pratama</h4>
@@ -137,6 +140,7 @@ include __DIR__ . '/../includes/header.php';
             <p>"Acara Lustrum HMTA ITERA memperlihatkan bagaimana organisasi ini terus berkembang dan memberikan dampak positif bagi mahasiswa dan industri pertambangan Indonesia."</p>
             <div class="testimonial-author">
               <img src="<?php echo BASE_URL; ?>Resource/testimonial2.jpg" alt="Testimonial Author"
+                   width="60" height="60" loading="lazy"
                    onerror="this.src='<?php echo BASE_URL; ?>Resource/default-profile.jpg'">
               <div>
                 <h4>Dina Safitri</h4>
@@ -150,6 +154,7 @@ include __DIR__ . '/../includes/header.php';
             <p>"Kompetisi di Minerfesto memberikan tantangan nyata yang mempersiapkan saya untuk menghadapi dunia kerja di sektor pertambangan."</p>
             <div class="testimonial-author">
               <img src="<?php echo BASE_URL; ?>Resource/testimonial3.jpg" alt="Testimonial Author"
+                   width="60" height="60" loading="lazy"
                    onerror="this.src='<?php echo BASE_URL; ?>Resource/default-profile.jpg'">
               <div>
                 <h4>Budi Santoso</h4>

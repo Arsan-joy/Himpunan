@@ -58,6 +58,7 @@ function dept_link(string $slug): string { return BASE_URL . 'pages/department.p
                 <div class="overview-image">
                     <img src="<?= h($activeCabinet['logo_url'] ?? (BASE_URL . 'Resource/hmta-group.jpg')) ?>"
                          alt="<?= h($activeCabinet['name'] ?? 'Kabinet HMTA') ?>"
+                         width="480" height="360" loading="lazy"
                          onerror="this.src='<?= BASE_URL ?>Resource/hmta-group.jpg'">
                 </div>
             </div>
@@ -75,6 +76,7 @@ function dept_link(string $slug): string { return BASE_URL . 'pages/department.p
                   <div class="team-image">
                     <img src="<?= htmlspecialchars($p['photo_url'] ?: (BASE_URL.'Resource/default-profile.jpg')) ?>"
                          alt="<?= htmlspecialchars($p['name']) ?>"
+                         width="200" height="200" loading="lazy"
                          onerror="this.src='<?= BASE_URL ?>Resource/default-profile.jpg'">
                     <div class="team-overlay">
                       <div class="social-links">
@@ -113,6 +115,7 @@ function dept_link(string $slug): string { return BASE_URL . 'pages/department.p
                                 <img class="logo-kabinet"
                                      src="<?= h($deptLogo) ?>"
                                      alt="<?= h($d['name']) ?>"
+                                     width="120" height="120" loading="lazy"
                                      onerror="this.src='<?= BASE_URL ?>Resource/default-dept.png'">
                                 <h4><?= h($d['name']) ?></h4>
                             </a>

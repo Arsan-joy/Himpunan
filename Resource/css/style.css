@@ -1,3 +1,9 @@
+/* font-display: swap — cegah invisible text saat font loading (Font display issue) */
+@font-face {
+    font-family: 'Segoe UI';
+    font-display: swap;
+}
+
 :root {
     --primary-color: #2c3e50;
     --secondary-color: #3498db;
@@ -856,8 +862,9 @@ footer {
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
-  gap: .4rem;
-  margin: 2.5rem 0 1rem;
+  gap: .5rem;
+  margin: 2.5rem 0 3rem; /* margin bawah 3rem agar tidak mepet ke footer */
+  padding: 0 1rem;
 }
 
 /* Tombol dasar */
@@ -865,7 +872,7 @@ footer {
   display: inline-flex;
   align-items: center;
   gap: .3rem;
-  padding: .45rem .85rem;
+  padding: .5rem 1rem;
   border-radius: 8px;
   font-size: .9rem;
   font-weight: 600;
@@ -876,6 +883,8 @@ footer {
   transition: background .15s, color .15s, border-color .15s;
   cursor: pointer;
   user-select: none;
+  min-width: 2.5rem;
+  justify-content: center;
 }
 
 .page-btn:hover:not(.disabled):not(.active) {
@@ -901,13 +910,15 @@ footer {
 
 /* Ellipsis */
 .page-ellipsis {
-  padding: .45rem .3rem;
+  padding: .5rem .4rem;
   color: #9ca3af;
   font-size: .9rem;
+  line-height: 1;
 }
 
 /* Prev / Next sedikit lebih lebar */
 .page-prev,
 .page-next {
-  padding: .45rem 1rem;
+  padding: .5rem 1.1rem;
+  gap: .4rem;
 }

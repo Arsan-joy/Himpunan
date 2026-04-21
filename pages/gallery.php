@@ -6,7 +6,7 @@ $additional_css = ['stylegallery.css'];
 $additional_js  = ['gallery.js'];
 
 // ── Pagination config ────────────────────────────────────────────────────────
-const GALLERY_PER_PAGE = 20;
+const GALLERY_PER_PAGE = 10;
 
 // Ambil nomor halaman dari query string; pastikan integer positif
 $currentPage = max(1, (int)($_GET['page'] ?? 1));
@@ -82,13 +82,13 @@ include __DIR__ . '/../includes/header.php';
   <section class="gallery-filter">
     <div class="container">
       <div class="filter-buttons">
-        <!-- "Semua" reset filter album dan kembali ke halaman 1 -->
-        <a href="?" class="filter-btn <?= $filterAlbum === '' ? 'active' : '' ?>">Semua</a>
+        <!-- Filter menggunakan button + data-filter (style DADS) -->
+        <!-- JS gallery.js menangani show/hide berdasarkan data-category pada item -->
+        <button class="filter-btn active" data-filter="all">Semua</button>
         <?php foreach ($albums as $al): ?>
-          <a href="<?= pagination_url(1, $al) ?>"
-             class="filter-btn <?= $filterAlbum === $al ? 'active' : '' ?>">
+          <button class="filter-btn" data-filter="<?= slugify_simple($al) ?>">
             <?= htmlspecialchars($al) ?>
-          </a>
+          </button>
         <?php endforeach; ?>
       </div>
       <div class="search-box">
@@ -98,7 +98,7 @@ include __DIR__ . '/../includes/header.php';
     </div>
   </section>
 
-  <section class="gallery-grid">
+  <section class="gallery-grid" style="padding-bottom: 3rem;">
     <div class="container">
       <!-- Info jumlah item -->
       <?php if ($totalItems > 0): ?>

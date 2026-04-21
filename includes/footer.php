@@ -3,13 +3,13 @@
 if (!isset($additional_js) || !is_array($additional_js)) $additional_js = [];
 
 // Fallback konstanta kontak/sosmed agar tidak fatal bila belum didefinisikan
-$contact_address = defined('CONTACT_ADDRESS') ? CONTACT_ADDRESS : 'Jl. Contoh No. 1, Lampung';
-$contact_email   = defined('CONTACT_EMAIL')   ? CONTACT_EMAIL   : 'contact@example.com';
-$contact_phone   = defined('CONTACT_PHONE')   ? CONTACT_PHONE   : '0812-0000-0000';
-$linkedin_url    = defined('LINKEDIN_URL')    ? LINKEDIN_URL    : '#';
-$instagram_url   = defined('INSTAGRAM_URL')   ? INSTAGRAM_URL   : '#';
-$youtube_url     = defined('YOUTUBE_URL')     ? YOUTUBE_URL     : '#';
-$tiktok_url      = defined('TIKTOK_URL')      ? TIKTOK_URL      : '#';
+$contact_address = defined('CONTACT_ADDRESS') ? CONTACT_ADDRESS : 'Jalan Terusan Ryacudu, Way Hui, Kecamatan Jati Agung, Lampung Selatan 35365';
+$contact_email   = defined('CONTACT_EMAIL')   ? CONTACT_EMAIL   : 'hmta.balakosa.itera.com';
+$contact_phone   = defined('CONTACT_PHONE')   ? CONTACT_PHONE   : '0851-3611-7417';
+$linkedin_url    = defined('LINKEDIN_URL')    ? LINKEDIN_URL    : 'https://id.linkedin.com/company/himpunan-mahasiswa-teknik-pertambagan-itera-hmta-itera';
+$instagram_url   = defined('INSTAGRAM_URL')   ? INSTAGRAM_URL   : 'https://www.instagram.com/hmta_itera/';
+$youtube_url     = defined('YOUTUBE_URL')     ? YOUTUBE_URL     : 'https://m.youtube.com/@hmtaitera';
+$tiktok_url      = defined('TIKTOK_URL')      ? TIKTOK_URL      : 'https://www.tiktok.com/@hmta.balakosa.itera';
 $site_name       = defined('SITE_NAME')       ? SITE_NAME       : 'HMTA ITERA';
 
 // Helper path JS
@@ -47,9 +47,15 @@ $jsSrc = function(string $js): string {
     </div>
 </footer>
 
+<!-- index.js sudah dimuat dengan defer di header.php — tidak perlu dimuat ulang di sini -->
+
 <!-- JS tambahan per halaman (index.js sudah dimuat dengan defer di header.php) -->
-<?php foreach ($additional_js as $js): ?>
-    <script src="<?= $jsSrc((string)$js) ?>"></script>
+<?php
+// Filter: jangan muat ulang index.js karena sudah ada di header dengan defer
+$jsToLoad = array_filter($additional_js, fn($js) => !str_contains($js, 'index.js'));
+foreach ($jsToLoad as $js):
+?>
+    <script src="<?= $jsSrc((string)$js) ?>" defer></script>
 <?php endforeach; ?>
 </body>
 </html>

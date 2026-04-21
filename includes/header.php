@@ -30,16 +30,33 @@ $_cssVer  = file_exists($_cssFile) ? substr(md5_file($_cssFile), 0, 8) : '1';
 $_jsVer   = file_exists($_jsFile)  ? substr(md5_file($_jsFile),  0, 8) : '1';
 ?>
 <!-- Preconnect untuk CDN Font Awesome -->
-<link rel="preconnect" href="https://cdnjs.cloudflare.com">
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+<!-- Preload LCP image (banner pertama) -->
+<link rel="preload" as="image" href="<?= (IMG_URL ?? (BASE_URL.'Resource/img/')) ?>banner1.png" fetchpriority="high">
 <link rel="stylesheet" href="<?= (CSS_URL ?? (BASE_URL.'Resource/css/')) ?>style.css?v=<?= $_cssVer ?>">
 <?php foreach ($additional_css as $css): ?><link rel="stylesheet" href="<?= $cssHref((string)$css) ?>"><?php endforeach; ?>
 <link rel="icon" href="<?= (IMG_URL ?? (BASE_URL.'Resource/')) ?>IMG_1381.png" type="image/png">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<!-- Font Awesome: media=print trick agar tidak blokir render, lalu swap ke all -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+      media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"></noscript>
 <!-- JS utama — defer agar tidak blokir rendering, dimuat SATU kali di sini -->
 <script defer src="<?= BASE_URL ?>Resource/js/index.js?v=<?= $_jsVer ?>"></script>
 
 <style>
+  /* ── Critical CSS inline: render above-the-fold tanpa blokir ── */
+  /* Hanya style yang dibutuhkan sebelum JS/CSS eksternal selesai dimuat */
+  :root{--primary-color:#2c3e50;--secondary-color:#3498db;--accent-color:#e74c3c}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;color:#333;line-height:1.6;overflow-x:hidden;min-height:100vh;display:flex;flex-direction:column}
+  main{flex:1}
+  header{background-color:var(--primary-color);color:#fff;padding:.8rem 2rem;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;box-shadow:0 2px 10px rgba(0,0,0,.2);width:100%;min-height:80px}
+  .logo{display:flex;align-items:center;text-decoration:none;flex-shrink:0}
+  .logo img{height:60px;width:auto;object-fit:contain}
+  .mobile-menu-btn{display:none;background:none;border:none;font-size:1.5rem;color:#fff;cursor:pointer;padding:.5rem}
+  @media(max-width:768px){.mobile-menu-btn{display:block;z-index:1100}}
+
   .maintenance-overlay {
     position: fixed; inset: 0; background: rgba(20,27,37,0.92); color: #ecf0f1;
     display: none; align-items: center; justify-content: center; z-index: 9999;
@@ -70,7 +87,7 @@ $_jsVer   = file_exists($_jsFile)  ? substr(md5_file($_jsFile),  0, 8) : '1';
 </head>
 <body class="<?= $is_maintenance ? 'maintenance-no-scroll' : '' ?>">
 <header>
-  <a href="<?= BASE_URL ?>" class="logo"><img src="<?= (IMG_URL ?? (BASE_URL.'Resource/')) ?>IMG_1381.png" alt="Logo HMTA"></a>
+  <a href="<?= BASE_URL ?>" class="logo"><img src="<?= (IMG_URL ?? (BASE_URL.'Resource/')) ?>IMG_1381.png" alt="Logo HMTA" width="60" height="60" fetchpriority="high"></a>
   <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="menu"><i class="fas fa-bars"></i></button>
   <nav id="mainNav">
     <ul>

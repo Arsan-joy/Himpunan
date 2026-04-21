@@ -439,6 +439,30 @@ nav ul li a.active {
 .gallery-item:nth-child(7) { animation-delay: 0.6s; }
 .gallery-item:nth-child(8) { animation-delay: 0.7s; }
 
+/* Memberikan jarak antar tombol pagination */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px; /* Ini akan memberikan jarak otomatis antar elemen di dalamnya */
+    margin-top: 30px;
+    margin-bottom: 20px;
+}
+
+/* Memberikan padding agar tombol tidak terlihat mencekik teks */
+.page-btn {
+    padding: 8px 16px;
+    text-decoration: none;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    color: #333;
+}
+
+/* Memberikan jarak khusus jika Anda tidak menggunakan flex gap */
+.page-btn, .page-ellipsis {
+    margin: 0 5px;
+}
+
 /* Footer */
 footer {
     background-color: #2c3e50;

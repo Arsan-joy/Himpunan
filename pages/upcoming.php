@@ -8,13 +8,18 @@ $additional_js  = ['upcoming.js', 'index.js'];
 include __DIR__ . '/../includes/header.php';
 
 // Ambil event mendatang dari DB
-$stmt = db()->query("
-    SELECT id, title, description, start_date, end_date, is_all_day, type, image_url
-    FROM events
-    WHERE start_date >= CURDATE()
-    ORDER BY start_date ASC, id ASC
-");
-$upcoming_events = $stmt->fetchAll();
+try {
+    $stmt = db()->query("
+        SELECT id, title, description, start_date, end_date, is_all_day, type, image_url
+        FROM events
+        WHERE start_date >= CURDATE()
+        ORDER BY start_date ASC, id ASC
+    ");
+    $upcoming_events = $stmt->fetchAll();
+} catch (PDOException $e) {
+    error_log('[upcoming.php] ' . $e->getMessage());
+    $upcoming_events = [];
+}
 ?>
 <main>
     <section class="upcoming-events-page">

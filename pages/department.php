@@ -42,6 +42,7 @@ if (!function_exists('ph')) {
     <div class="container">
       <div class="header-content">
         <img src="<?= BASE_URL ?>Resource/img/banner1.png" alt="Logo Departemen" class="dept-logo"
+             width="120" height="120" loading="lazy"
              onerror="this.src='<?= ph(120,120,$dept['name']??'DEPT') ?>'">
         <h1><?= h($dept['name'] ?? 'Departemen HMTA') ?></h1>
         <p><?= h($dept['description'] ?? 'Deskripsi departemen belum tersedia.') ?></p>
@@ -60,6 +61,7 @@ if (!function_exists('ph')) {
               <div class="team-image">
                 <img src="<?= h($ld['photo_url'] ?: (BASE_URL.'Resource/default-profile.jpg')) ?>"
                      alt="<?= h($ld['name']) ?>"
+                     width="200" height="200" loading="lazy"
                      onerror="this.src='<?= BASE_URL ?>Resource/default-profile.jpg'">
                 <div class="team-overlay">
                   <div class="social-links">
@@ -140,6 +142,7 @@ if (!function_exists('ph')) {
                         <div class="staff-member">
                           <img src="<?= h($m['photo_url'] ?: (BASE_URL.'Resource/default-profile.jpg')) ?>"
                                alt="<?= h($m['name']) ?>"
+                               width="80" height="80" loading="lazy"
                                onerror="this.src='<?= BASE_URL ?>Resource/default-profile.jpg'">
                           <div class="staff-info">
                             <h6><?= h($m['name']) ?></h6>

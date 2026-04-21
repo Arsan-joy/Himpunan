@@ -8,14 +8,18 @@ $additional_js  = ['past-events.js', 'index.js'];    // Resource/js/past-events.
 include __DIR__ . '/../includes/header.php';
 
 // Ambil event lampau dari DB
-// Pakai COALESCE(end_date, start_date) < hari ini
-$stmt = db()->query("
-    SELECT id, title, description, start_date, end_date, is_all_day, type, image_url
-    FROM events
-    WHERE COALESCE(end_date, start_date) < CURDATE()
-    ORDER BY start_date DESC, id DESC
-");
-$past_events = $stmt->fetchAll();
+try {
+    $stmt = db()->query("
+        SELECT id, title, description, start_date, end_date, is_all_day, type, image_url
+        FROM events
+        WHERE COALESCE(end_date, start_date) < CURDATE()
+        ORDER BY start_date DESC, id DESC
+    ");
+    $past_events = $stmt->fetchAll();
+} catch (PDOException $e) {
+    error_log('[past.php] ' . $e->getMessage());
+    $past_events = [];
+}
 
 // Mapping type DB -> kategori filter yang dipakai tombol (agar JS existing tetap cocok)
 function map_type_to_filter(string $type): string {
@@ -54,7 +58,9 @@ function map_type_to_filter(string $type): string {
                         $title = trim((string)($ev['title'] ?? 'Kegiatan'));
                     ?>
                     <div class="event-card" data-category="<?= htmlspecialchars($cat) ?>">
-                        <img src="<?= htmlspecialchars($img) ?>" alt="<?= htmlspecialchars($title) ?>" onerror="this.src='https://via.placeholder.com/400x250?text=HMTA'">
+                        <img src="<?= htmlspecialchars($img) ?>" alt="<?= htmlspecialchars($title) ?>"
+                             width="400" height="250" loading="lazy"
+                             onerror="this.src='https://via.placeholder.com/400x250?text=HMTA'">
                         <div class="card-content">
                             <h3><?= htmlspecialchars($title) ?></h3>
                             <?php if ($desc !== ''): ?>

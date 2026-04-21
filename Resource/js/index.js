@@ -127,7 +127,7 @@ document.addEventListener('DOMContentLoaded', function() {
         initEventSlider();
     }
 
-    // Counter animation (jika ada di halaman)
+    // Counter animation — hanya berjalan saat elemen masuk viewport (IntersectionObserver)
     const counters = document.querySelectorAll('.counter');
     const statCards = document.querySelectorAll('.stat-card');
     if (counters.length > 0) {
@@ -145,10 +145,29 @@ document.addEventListener('DOMContentLoaded', function() {
             };
             updateCount();
         }
-        counters.forEach(counter => {
-            const target = +counter.getAttribute('data-target');
-            animateCounter(counter, target);
-        });
+
+        // Gunakan IntersectionObserver agar counter hanya jalan saat terlihat
+        if ('IntersectionObserver' in window) {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const counter = entry.target;
+                        const target = +counter.getAttribute('data-target');
+                        animateCounter(counter, target);
+                        observer.unobserve(counter); // jalankan sekali saja
+                    }
+                });
+            }, { threshold: 0.3 });
+
+            counters.forEach(counter => observer.observe(counter));
+        } else {
+            // Fallback untuk browser lama
+            counters.forEach(counter => {
+                const target = +counter.getAttribute('data-target');
+                animateCounter(counter, target);
+            });
+        }
+
         if (statCards.length > 0) {
             statCards.forEach(card => {
                 card.addEventListener('mouseenter', function() {
@@ -162,22 +181,15 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     }
-});
-
-
-// Tambahan kecil: saat maintenance aktif, cegah interaksi dasar
-document.addEventListener('DOMContentLoaded', function() {
-  const overlay = document.querySelector('.maintenance-overlay.active');
-  if (overlay) {
-    // Nonaktifkan klik di bawah overlay
-    document.addEventListener('click', function(e) {
-      if (!overlay.contains(e.target)) {
-        e.stopPropagation();
-        e.preventDefault();
-      }
-    }, true);
-    // Nonaktifkan scroll
-    document.body.classList.add('maintenance-no-scroll');
-  }
-
+    // Maintenance overlay: cegah interaksi di bawah overlay
+    const maintenanceOverlay = document.querySelector('.maintenance-overlay.active');
+    if (maintenanceOverlay) {
+        document.addEventListener('click', function(e) {
+            if (!maintenanceOverlay.contains(e.target)) {
+                e.stopPropagation();
+                e.preventDefault();
+            }
+        }, true);
+        document.body.classList.add('maintenance-no-scroll');
+    }
 });

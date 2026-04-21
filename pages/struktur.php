@@ -156,24 +156,34 @@ if ($activeIndex !== null) {
     <section class="struktur-stats-section">
         <div class="container">
             <div class="stats-grid">
+                <?php
+                // Query stats dengan try-catch agar tidak crash jika tabel belum ada
+                try {
+                    $statKabinet = (int)db()->query('SELECT COUNT(*) c FROM kabinet')->fetch()['c'];
+                    $statEvents  = (int)db()->query('SELECT COUNT(*) c FROM events')->fetch()['c'];
+                    $statMembers = (int)db()->query('SELECT COUNT(*) c FROM members')->fetch()['c'];
+                } catch (Throwable $e) {
+                    $statKabinet = $statEvents = $statMembers = 0;
+                }
+                ?>
                 <div class="stat-card">
                     <div class="stat-icon"><i class="fas fa-users"></i></div>
                     <div class="stat-content">
-                        <div class="stat-number" data-target="<?= (int)db()->query('SELECT COUNT(*) c FROM kabinet')->fetch()['c'] ?>">0</div>
+                        <div class="stat-number" data-target="<?= $statKabinet ?>">0</div>
                         <div class="stat-label">Kabinet Terbentuk</div>
                     </div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-icon"><i class="fas fa-calendar-alt"></i></div>
                     <div class="stat-content">
-                        <div class="stat-number" data-target="<?= (int)db()->query('SELECT COUNT(*) c FROM events')->fetch()['c'] ?>">0</div>
+                        <div class="stat-number" data-target="<?= $statEvents ?>">0</div>
                         <div class="stat-label">Total Kegiatan</div>
                     </div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-icon"><i class="fas fa-award"></i></div>
                     <div class="stat-content">
-                        <div class="stat-number" data-target="<?= (int)db()->query('SELECT COUNT(*) c FROM members')->fetch()['c'] ?>">0</div>
+                        <div class="stat-number" data-target="<?= $statMembers ?>">0</div>
                         <div class="stat-label">Total Anggota</div>
                     </div>
                 </div>

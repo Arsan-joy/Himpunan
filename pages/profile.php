@@ -21,7 +21,8 @@ include __DIR__ . '/../includes/header.php';
             <h2>Filosofi Logo HMTA ITERA</h2>
             <div class="filosofi">
                 <!-- Ganti path gambar ke assets/img -->
-                <img src="<?php echo IMG_URL; ?>IMG_1381.png" alt="Logo HMTA ITERA">
+                <img src="<?php echo IMG_URL; ?>IMG_1381.png" alt="Logo HMTA ITERA"
+                     width="300" height="300" loading="lazy">
             <div class="philosophy-content">
                 <ol>
                     <li><strong>Roda Gerigi:</strong> Organisasi teknik (engineering).</li>
@@ -35,18 +36,21 @@ include __DIR__ . '/../includes/header.php';
     </section>
 
     <!-- Video Profil -->
+<!--
     <section class="video-profile">
         <div class="container">
             <h2>Video Profil HMTA ITERA</h2>
             <div class="video-wrapper">
                 <div class="video-card loading" id="videoCard">
                     <!-- Lazy load: source menggunakan data-src, preload=none -->
+<!--                    
                     <video id="profileVideo" class="profile-video lazy-video" poster="<?php echo IMG_URL; ?>IMG_1381.png" preload="none" playsinline webkit-playsinline tabindex="0" aria-label="Video profil HMTA ITERA">
                         <source data-src="/Resource/videos/profile.mp4" type="video/mp4">
                         Video tidak didukung di peramban Anda. Unduh video <a href="/Resource/videos/profile.mp4">di sini</a>.
                     </video>
 
                     <!-- Loading indicator -->
+<!--
                     <div class="video-loader" id="videoLoader" aria-hidden="true">
                         <div class="spinner" role="status" aria-hidden="true"></div>
                     </div>
@@ -63,6 +67,7 @@ include __DIR__ . '/../includes/header.php';
             </div>
         </div>
     </section>
+-->
 </main>
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>

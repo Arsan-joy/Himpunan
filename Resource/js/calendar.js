@@ -55,8 +55,6 @@ document.addEventListener('DOMContentLoaded', function () {
         endDate: parseLocalDate(e.end_date || e.start_date),
     })).filter(e => !isNaN(e.startDate.getTime()));
 
-    console.log('Parsed academicEvents:', academicEvents.length, academicEvents);
-
     // ── Helper: cek apakah sebuah tanggal jatuh dalam rentang event ──────────
     // FIX UTAMA: sebelumnya hanya membandingkan ev.date === dThis (hanya start_date).
     // Sekarang: event muncul di kotak jika startDate <= dThis <= endDate.

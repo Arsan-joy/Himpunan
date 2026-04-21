@@ -69,6 +69,5 @@ try {
 <!-- Suntik data event dari DB ke JS (sebelum footer memuat calendar.js) -->
 <script>
 window.CALENDAR_EVENTS = <?= json_encode($events, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
-console.log('CALENDAR_EVENTS length:', Array.isArray(window.CALENDAR_EVENTS) ? window.CALENDAR_EVENTS.length : 0);
 </script>
 <?php include __DIR__ . '/../includes/footer.php'; ?>
