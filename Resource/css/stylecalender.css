@@ -414,3 +414,25 @@ footer {
         margin-bottom: 0.5rem;
     }
 }
+
+/* ============================================================
+   HIGHLIGHT ANIMATION — untuk deep-link scroll
+   ============================================================ */
+.event-item.highlight {
+    animation: highlightPulse 1.5s ease-in-out;
+}
+
+@keyframes highlightPulse {
+    0%, 100% { background: transparent; }
+    50%      { background: rgba(99, 102, 241, 0.15); }
+}
+
+/* ============================================================
+   EVENT RANGE — tampilkan rentang tanggal untuk multi-day event
+   ============================================================ */
+.event-range {
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin-top: 0.25rem;
+    font-weight: 600;
+}

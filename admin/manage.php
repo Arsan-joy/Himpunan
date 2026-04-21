@@ -155,12 +155,24 @@ $modules = [
           'caption' => ['label'=>'Caption'],
       ],
   ],
+  /* ====== MATERI: Tambahkan kategori ====== */
   'materi' => [
       'title' => 'Materi','table' => 'materials','order' => 'id DESC',
-      'allowed_orders' => ['id', 'title'],
       'fields' => [
           'title' => ['label'=>'Judul','required'=>true],
-          'file_upload' => ['label'=>'Upload File (PDF/DOC/PPT)','type'=>'file','accept'=>'.pdf,.doc,.docx,.ppt,.pptx','target'=>'file_url','subdir'=>'materials','allowed'=>['pdf','doc','docx','ppt','pptx'],'maxMB'=>50],
+          // Tambahkan field select kategori
+          'category' => [
+              'label' => 'Kategori',
+              'type'  => 'select',
+              'options' => [
+                  ['value'=>'kuliah',      'label'=>'Materi Kuliah'],
+                  ['value'=>'praktikum',   'label'=>'Materi Praktikum'],
+                  ['value'=>'laporan_kp',  'label'=>'Laporan KP'],
+                  ['value'=>'laporan_ta',  'label'=>'Laporan TA'],
+              ],
+              'required' => true
+          ],
+          'file_upload' => ['label'=>'Upload File (PDF/DOC/PPT)','type'=>'file','accept'=>'.pdf,.doc,.docx,.ppt,.pptx','target'=>'file_url','subdir'=>'materials','allowed'=>['pdf','doc','docx','ppt','pptx'],'maxMB'=>50,'required'=>true],
           'is_public' => ['label'=>'Publik?','type'=>'bool'],
       ],
   ],
@@ -269,15 +281,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($id) {
         if ($cols) {
-            $sets = implode(',', array_map(fn($c)=>"$c = ?", $cols));
-            $stmt = db()->prepare("UPDATE $table SET $sets WHERE id = ?");
-            $vals[] = $id; $stmt->execute($vals);
+            try {
+                $sets = implode(',', array_map(fn($c) => "$c = ?", $cols));
+                $stmt = db()->prepare("UPDATE $table SET $sets WHERE id = ?");
+                $vals[] = $id;
+                $stmt->execute($vals);
+            } catch (PDOException $e) {
+                error_log('[manage.php UPDATE] ' . $e->getMessage());
+                $_SESSION['flash_error'] = 'Gagal menyimpan perubahan. Silakan coba lagi.';
+                header('Location: manage.php?m=' . urlencode($moduleKey) . '&id=' . $id);
+                exit;
+            }
         }
     } else {
         if ($cols) {
-            $colStr = implode(',', $cols); $qStr = implode(',', array_fill(0, count($cols), '?'));
-            $stmt = db()->prepare("INSERT INTO $table ($colStr) VALUES ($qStr)");
-            $stmt->execute($vals);
+            try {
+                $colStr = implode(',', $cols);
+                $qStr   = implode(',', array_fill(0, count($cols), '?'));
+                $stmt   = db()->prepare("INSERT INTO $table ($colStr) VALUES ($qStr)");
+                $stmt->execute($vals);
+            } catch (PDOException $e) {
+                error_log('[manage.php INSERT] ' . $e->getMessage());
+                $_SESSION['flash_error'] = 'Gagal menambahkan data. Silakan coba lagi.';
+                header('Location: manage.php?m=' . urlencode($moduleKey));
+                exit;
+            }
         }
     }
 
@@ -287,9 +315,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 /* Delete */
 if (isset($_GET['del'])) {
     $delId = (int)$_GET['del'];
-    if ($moduleKey==='users' && !is_super_admin()) { $_SESSION['flash_error']='Hanya Super Admin yang boleh menghapus pengguna.'; header('Location: manage.php?m=users'); exit; }
-    db()->prepare("DELETE FROM $table WHERE id = ?")->execute([$delId]);
-    header('Location: manage.php?m=' . urlencode($moduleKey)); exit;
+    if ($moduleKey === 'users' && !is_super_admin()) {
+        $_SESSION['flash_error'] = 'Hanya Super Admin yang boleh menghapus pengguna.';
+        header('Location: manage.php?m=users');
+        exit;
+    }
+    try {
+        db()->prepare("DELETE FROM $table WHERE id = ?")->execute([$delId]);
+    } catch (PDOException $e) {
+        error_log('[manage.php DELETE] ' . $e->getMessage());
+        $_SESSION['flash_error'] = 'Gagal menghapus data. Silakan coba lagi.';
+    }
+    header('Location: manage.php?m=' . urlencode($moduleKey));
+    exit;
 }
 
 /* List + edit */

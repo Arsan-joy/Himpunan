@@ -51,7 +51,15 @@ if ($appEnv === 'development' || $appDebug) {
 // ============================================================
 // URL & Path Constants
 // ============================================================
-if (!defined('BASE_URL')) define('BASE_URL', 'http://localhost/root/');
+// BASE_URL dihitung dinamis dari SERVER vars — tidak hardcode localhost
+if (!defined('BASE_URL')) {
+    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    $host     = $_SERVER['HTTP_HOST'] ?? 'localhost';
+    $docRoot  = str_replace('\\', '/', realpath($_SERVER['DOCUMENT_ROOT'] ?? __DIR__));
+    $rootDir  = str_replace('\\', '/', realpath(__DIR__ . '/..'));
+    $basePath = rtrim(str_replace($docRoot, '', $rootDir), '/') . '/';
+    define('BASE_URL', $protocol . '://' . $host . $basePath);
+}
 if (!defined('CSS_URL'))  define('CSS_URL',  BASE_URL . 'Resource/css/');
 if (!defined('JS_URL'))   define('JS_URL',   BASE_URL . 'Resource/js/');
 if (!defined('IMG_URL'))  define('IMG_URL',  BASE_URL . 'Resource/img/');

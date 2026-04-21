@@ -6,25 +6,41 @@ $page_title     = 'Materi Pembelajaran';
 $additional_css = ['materi.css'];
 $additional_js  = ['materi.js', 'index.js'];
 
-include __DIR__ . '/../includes/header.php';
+// ── Pagination config ────────────────────────────────────────────────────────
+const MATERI_PER_PAGE = 20;
 
-// Ambil materi dari DB (via Dashboard -> Kelola Materi)
-$materials = db()->query("
-    SELECT id, title, file_url, is_public, created_at
-    FROM materials
-    ORDER BY id DESC
-")->fetchAll();
+$currentPage = max(1, (int)($_GET['page'] ?? 1));
 
-// Helper icon berdasarkan ekstensi
+// ── Query: total item ────────────────────────────────────────────────────────
+$totalItems = (int)db()->query("SELECT COUNT(*) FROM materials")->fetchColumn();
+$totalPages = (int)ceil($totalItems / MATERI_PER_PAGE);
+
+// Pastikan currentPage tidak melebihi totalPages
+$currentPage = min($currentPage, max(1, $totalPages));
+$offset      = ($currentPage - 1) * MATERI_PER_PAGE;
+
+// ── Query: ambil hanya item untuk halaman ini ────────────────────────────────
+$stmt = db()->prepare(
+    "SELECT id, title, file_url, is_public, created_at
+     FROM materials
+     ORDER BY id DESC
+     LIMIT ? OFFSET ?"
+);
+$stmt->execute([MATERI_PER_PAGE, $offset]);
+$materials = $stmt->fetchAll();
+
+// ── Helper: icon berdasarkan ekstensi file ───────────────────────────────────
 function ext_icon($url) {
     $e = strtolower(pathinfo(parse_url($url, PHP_URL_PATH) ?? '', PATHINFO_EXTENSION));
     return match($e) {
-        'pdf' => 'fa-file-pdf',
+        'pdf'        => 'fa-file-pdf',
         'doc','docx' => 'fa-file-word',
         'ppt','pptx' => 'fa-file-powerpoint',
-        default => 'fa-file'
+        default      => 'fa-file'
     };
 }
+
+include __DIR__ . '/../includes/header.php';
 ?>
 <main class="materials-main">
   <div class="container">
@@ -32,6 +48,14 @@ function ext_icon($url) {
       <h1><i class="fas fa-book"></i> Materi Pembelajaran</h1>
       <p>Dokumen yang diunggah melalui Dashboard Admin</p>
     </section>
+
+    <!-- Info jumlah item -->
+    <?php if ($totalItems > 0): ?>
+      <p style="color:#6b7280;margin-bottom:1rem;font-size:.9rem">
+        Menampilkan <?= $offset + 1 ?>–<?= min($offset + MATERI_PER_PAGE, $totalItems) ?>
+        dari <?= $totalItems ?> materi
+      </p>
+    <?php endif; ?>
 
     <section class="materials-grid">
       <?php if ($materials): ?>
@@ -62,6 +86,62 @@ function ext_icon($url) {
         </div>
       <?php endif; ?>
     </section>
+
+    <!-- ── Pagination ──────────────────────────────────────────────────────── -->
+    <?php if ($totalPages > 1): ?>
+      <nav class="pagination" aria-label="Navigasi halaman materi">
+
+        <!-- Tombol Previous -->
+        <?php if ($currentPage > 1): ?>
+          <a href="?page=<?= $currentPage - 1 ?>" class="page-btn page-prev" aria-label="Halaman sebelumnya">
+            <i class="fas fa-chevron-left"></i> Prev
+          </a>
+        <?php else: ?>
+          <span class="page-btn page-prev disabled" aria-disabled="true">
+            <i class="fas fa-chevron-left"></i> Prev
+          </span>
+        <?php endif; ?>
+
+        <!-- Nomor halaman dengan ellipsis -->
+        <?php
+        $range = 2;
+        $start = max(1, $currentPage - $range);
+        $end   = min($totalPages, $currentPage + $range);
+        ?>
+
+        <?php if ($start > 1): ?>
+          <a href="?page=1" class="page-btn">1</a>
+          <?php if ($start > 2): ?><span class="page-ellipsis">…</span><?php endif; ?>
+        <?php endif; ?>
+
+        <?php for ($p = $start; $p <= $end; $p++): ?>
+          <?php if ($p === $currentPage): ?>
+            <span class="page-btn active" aria-current="page"><?= $p ?></span>
+          <?php else: ?>
+            <a href="?page=<?= $p ?>" class="page-btn"><?= $p ?></a>
+          <?php endif; ?>
+        <?php endfor; ?>
+
+        <?php if ($end < $totalPages): ?>
+          <?php if ($end < $totalPages - 1): ?><span class="page-ellipsis">…</span><?php endif; ?>
+          <a href="?page=<?= $totalPages ?>" class="page-btn"><?= $totalPages ?></a>
+        <?php endif; ?>
+
+        <!-- Tombol Next -->
+        <?php if ($currentPage < $totalPages): ?>
+          <a href="?page=<?= $currentPage + 1 ?>" class="page-btn page-next" aria-label="Halaman berikutnya">
+            Next <i class="fas fa-chevron-right"></i>
+          </a>
+        <?php else: ?>
+          <span class="page-btn page-next disabled" aria-disabled="true">
+            Next <i class="fas fa-chevron-right"></i>
+          </span>
+        <?php endif; ?>
+
+      </nav>
+    <?php endif; ?>
+    <!-- ── End Pagination ─────────────────────────────────────────────────── -->
+
   </div>
 </main>
 

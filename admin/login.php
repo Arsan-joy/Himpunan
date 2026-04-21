@@ -90,7 +90,7 @@ h1{margin:0 0 8px;font-size:22px;color:#0b3a7c}
 .field{display:flex;flex-direction:column;margin-bottom:12px}
 label{font-size:13px;color:#334155;margin-bottom:6px}
 input{padding:12px;border:1px solid #e2e8f0;border-radius:10px}
-.btn{width:100%;padding:12px 14px;border:0;border-radius:12px;background:linear-gradient(135deg,#60a5fa,#2563eb);color:#fff;font-weight:800;cursor:pointer}
+.btn{width:100%;padding:12px 14px;border:0;border-radius:12px;background:linear-gradient(135deg,#60a5fa,#2563eb);color:#fff;font-weight:800;cursor:pointer;align-items:center}
 .error{background:#fff1f2;border:1px solid #fecdd3;color:#be123c;border-radius:10px;padding:10px;margin-bottom:10px}
 .switch{margin-top:10px;text-align:center}
 .switch a{color:#2563eb;text-decoration:none;font-weight:700}

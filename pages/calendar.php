@@ -3,17 +3,33 @@ require_once __DIR__ . '/../includes/functions.php';
 
 $page_title     = 'Kalender Akademik';
 $additional_css = ['stylecalender.css'];
-// Tambahkan versi untuk bust cache bila browser menyimpan JS lama
-$additional_js  = ['calendar.js','index.js'];
+$additional_js  = ['calendar.js', 'index.js'];
 
 include __DIR__ . '/../includes/header.php';
 
-// Ambil event dari DB (diisi lewat Dashboard -> Kelola Kegiatan)
-$events = db()->query("
-    SELECT id, title, description, start_date, end_date, is_all_day, type, image_url
-    FROM events
-    ORDER BY start_date ASC, id ASC
-")->fetchAll();
+// Ambil semua event dari DB.
+// FIX: pastikan end_date ikut diambil — sebelumnya sudah ada di SELECT,
+// tapi perlu dipastikan NULL di-handle dengan fallback ke start_date.
+try {
+    $events = db()->query("
+        SELECT
+            id,
+            title,
+            description,
+            start_date,
+            -- FIX: jika end_date NULL (event satu hari), gunakan start_date
+            -- agar JS tidak perlu menangani null secara terpisah
+            COALESCE(end_date, start_date) AS end_date,
+            is_all_day,
+            type,
+            image_url
+        FROM events
+        ORDER BY start_date ASC, id ASC
+    ")->fetchAll();
+} catch (PDOException $e) {
+    error_log('[calendar.php] ' . $e->getMessage());
+    $events = [];
+}
 ?>
 <main class="calendar-container" style="padding-top: 8px">
     <div class="calendar-header">

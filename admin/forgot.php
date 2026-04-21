@@ -11,18 +11,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($username === '') {
         $error = 'Masukkan username.';
     } else {
-        $stmt = db()->prepare("SELECT id, role, active FROM users WHERE username=? LIMIT 1");
-        $stmt->execute([$username]);
-        $u = $stmt->fetch();
-        if (!$u || !$u['active']) {
-            $error = 'User tidak ditemukan / tidak aktif.';
-        } elseif (!in_array($u['role'], ['admin','super_admin'], true)) {
-            $error = 'Gunakan halaman Lupa Password User untuk akun non-admin.';
-        } else {
-            // Buat token 30 menit
-            $token = pr_create_token_for_user((int)$u['id'], 30);
-            $resetLink = BASE_URL . 'admin/reset.php?token=' . urlencode($token);
-            $info = 'Link reset (berlaku 10 menit): ' . $resetLink;
+        try {
+            $stmt = db()->prepare("SELECT id, role, active FROM users WHERE username=? LIMIT 1");
+            $stmt->execute([$username]);
+            $u = $stmt->fetch();
+
+            if (!$u || !$u['active']) {
+                $error = 'User tidak ditemukan / tidak aktif.';
+            } elseif (!in_array($u['role'], ['admin','super_admin'], true)) {
+                $error = 'Gunakan halaman Lupa Password User untuk akun non-admin.';
+            } else {
+                $token     = pr_create_token_for_user((int)$u['id'], 30);
+                $resetLink = BASE_URL . 'admin/reset.php?token=' . urlencode($token);
+                $info      = 'Link reset (berlaku 30 menit): ' . $resetLink;
+            }
+        } catch (RuntimeException $e) {
+            $error = $e->getMessage();
+        } catch (PDOException $e) {
+            error_log('[forgot.php] ' . $e->getMessage());
+            $error = 'Terjadi kesalahan sistem. Silakan coba lagi.';
         }
     }
 }
