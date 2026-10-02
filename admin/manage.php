@@ -47,16 +47,67 @@ function validate_order_by(string $order, array $whitelist, string $default = 'i
  * - 1 file: judul tetap persis seperti input user
  * - >1 file: "Judul - nama-file-asli-tanpa-ext"
  */
-function build_material_title(string $sharedTitle, string $originalFilename, int $index, int $totalFiles): string {
+function utf8_substr_safe(string $value, int $maxChars): string {
+    if ($maxChars <= 0) return '';
+    if (function_exists('mb_substr')) return (string)mb_substr($value, 0, $maxChars, 'UTF-8');
+    return (string)substr($value, 0, $maxChars);
+}
+
+function utf8_strtolower_safe(string $value): string {
+    if (function_exists('mb_strtolower')) return (string)mb_strtolower($value, 'UTF-8');
+    return strtolower($value);
+}
+
+function build_material_title(string $sharedTitle, string $originalFilename, int $index, int $totalFiles, int $maxLen = 200): string {
     $title = trim($sharedTitle);
-    if ($totalFiles <= 1) return $title;
+    if ($title === '') $title = 'Materi';
+    if ($totalFiles <= 1) return utf8_substr_safe($title, $maxLen);
 
     $base = pathinfo($originalFilename, PATHINFO_FILENAME);
     $base = preg_replace('/[^\p{L}\p{N}\-_ ]+/u', ' ', (string)$base);
     $base = preg_replace('/\s+/u', ' ', trim((string)$base));
     if ($base === '') $base = 'file-' . $index;
 
-    return $title . ' - ' . $base;
+    return utf8_substr_safe($title . ' - ' . $base, $maxLen);
+}
+
+/**
+ * Bangun daftar judul materi agar unik, tidak kosong, dan sesuai batas panjang kolom DB.
+ *
+ * @param array<int, array{original_name?:string}> $uploadedFiles
+ * @return array<int, string>
+ */
+function build_material_titles(string $sharedTitle, array $uploadedFiles, int $maxLen = 200): array {
+    $totalFiles = count($uploadedFiles);
+    if ($totalFiles <= 0) return [];
+
+    $titles = [];
+    $used = [];
+    foreach ($uploadedFiles as $idx => $up) {
+        $candidate = build_material_title(
+            $sharedTitle,
+            (string)($up['original_name'] ?? ''),
+            $idx + 1,
+            $totalFiles,
+            $maxLen
+        );
+        if (trim($candidate) === '') $candidate = 'Materi ' . ($idx + 1);
+
+        $baseTitle = $candidate;
+        $suffixNum = 2;
+        $key = utf8_strtolower_safe($candidate);
+        while (isset($used[$key])) {
+            $suffix = ' (' . $suffixNum . ')';
+            $baseMax = $maxLen - strlen($suffix);
+            if ($baseMax < 1) $baseMax = 1;
+            $candidate = utf8_substr_safe($baseTitle, $baseMax) . $suffix;
+            $key = utf8_strtolower_safe($candidate);
+            $suffixNum++;
+        }
+        $used[$key] = true;
+        $titles[] = $candidate;
+    }
+    return $titles;
 }
 
 /* Modul konfigurasi */
@@ -221,9 +272,15 @@ $modules = [
 /* Guard over-limit POST */
 function ini_to_bytes(string $val): int { $val=trim($val); $u=strtolower(substr($val,-1)); $n=(int)$val; return $u==='g'?$n*1024*1024*1024:($u==='m'?$n*1024*1024:($u==='k'?$n*1024:(int)$val)); }
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $cl = (int)$_SERVER['CONTENT_LENGTH'] ?? 0;
+    $cl = isset($_SERVER['CONTENT_LENGTH']) ? (int)$_SERVER['CONTENT_LENGTH'] : 0;
     $postMax = ini_to_bytes(ini_get('post_max_size'));
-    if ($cl>0 && $postMax>0 && $cl>$postMax) { $_SESSION['flash_error']='Ukuran unggahan melebihi post_max_size.'; header('Location: manage.php?m='.urlencode($_GET['m'] ?? 'departemen')); exit; }
+    $isOverflow = ($cl > 0 && $postMax > 0 && $cl > $postMax);
+    $isDroppedRequestBody = ($cl > 0 && empty($_POST) && empty($_FILES));
+    if ($isOverflow || ($isDroppedRequestBody && $postMax > 0 && $cl >= $postMax)) {
+        $_SESSION['flash_error'] = 'Ukuran total upload melebihi batas server. Kecilkan ukuran/jumlah file lalu coba lagi.';
+        header('Location: manage.php?m=' . urlencode($_GET['m'] ?? 'departemen'));
+        exit;
+    }
 }
 
 $moduleKey = $_GET['m'] ?? 'departemen';
@@ -254,13 +311,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($type==='file') {
                 $uploadedFiles = get_uploaded_files($col);
                 $hasFile = false;
+                $hasUploadError = false;
                 foreach ($uploadedFiles as $f) {
-                    if (($f['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE) {
+                    $uploadError = (int)($f['error'] ?? UPLOAD_ERR_NO_FILE);
+                    if ($uploadError === UPLOAD_ERR_NO_FILE) {
+                        continue;
+                    }
+                    if ($uploadError !== UPLOAD_ERR_OK) {
+                        $errors[] = ($meta['label'] ?? $col) . ': ' . upload_error_message($uploadError);
+                        $hasUploadError = true;
+                        $hasFile = false;
+                        break;
+                    }
+                    if ($uploadError === UPLOAD_ERR_OK) {
                         $hasFile = true;
                         break;
                     }
                 }
-                if (!$id && !$hasFile) $errors[] = ($meta['label'] ?? $col).' wajib diunggah.';
+                if (!$id && !$hasFile && !$hasUploadError) $errors[] = ($meta['label'] ?? $col).' wajib diunggah.';
             } else {
                 $val = trim((string)($_POST[$col] ?? ''));
                 if ($val==='') $errors[] = ($meta['label'] ?? $col).' wajib diisi.';
@@ -301,13 +369,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $sharedTitle = trim((string)($_POST['title'] ?? ''));
         $category    = (string)($_POST['category'] ?? '');
         $isPublic    = isset($_POST['is_public']) ? 1 : 0;
-        $totalFiles  = count($uploadedFiles);
+        $materialTitles = build_material_titles($sharedTitle, $uploadedFiles, 200);
 
         try {
             db()->beginTransaction();
             $stmt = db()->prepare("INSERT INTO $table (title, category, file_url, is_public) VALUES (?, ?, ?, ?)");
             foreach ($uploadedFiles as $idx => $up) {
-                $derivedTitle = build_material_title($sharedTitle, (string)($up['original_name'] ?? ''), $idx + 1, $totalFiles);
+                $derivedTitle = $materialTitles[$idx] ?? build_material_title($sharedTitle, (string)($up['original_name'] ?? ''), $idx + 1, count($uploadedFiles), 200);
                 $stmt->execute([$derivedTitle, $category, (string)($up['url'] ?? ''), $isPublic]);
             }
             db()->commit();
