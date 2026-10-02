@@ -123,6 +123,106 @@ function save_uploaded_file(string $field, string $subdir, array $allowedExt, in
     return rtrim(UPLOAD_URL,'/').'/'.trim($subdir,'/').'/'.$fname;
 }
 
+/**
+ * Normalisasi struktur $_FILES untuk mendukung single/multiple upload.
+ * Mengembalikan list file dengan shape tunggal:
+ * ['name','type','tmp_name','error','size']
+ */
+function get_uploaded_files(string $field): array {
+    if (empty($_FILES[$field])) return [];
+    $f = $_FILES[$field];
+
+    if (!is_array($f['name'] ?? null)) {
+        return [[
+            'name'     => (string)($f['name'] ?? ''),
+            'type'     => (string)($f['type'] ?? ''),
+            'tmp_name' => (string)($f['tmp_name'] ?? ''),
+            'error'    => (int)($f['error'] ?? UPLOAD_ERR_NO_FILE),
+            'size'     => (int)($f['size'] ?? 0),
+        ]];
+    }
+
+    $names = (array)($f['name'] ?? []);
+    $types = (array)($f['type'] ?? []);
+    $tmps  = (array)($f['tmp_name'] ?? []);
+    $errs  = (array)($f['error'] ?? []);
+    $sizes = (array)($f['size'] ?? []);
+    $count = max(count($names), count($types), count($tmps), count($errs), count($sizes));
+
+    $out = [];
+    for ($i = 0; $i < $count; $i++) {
+        $out[] = [
+            'name'     => (string)($names[$i] ?? ''),
+            'type'     => (string)($types[$i] ?? ''),
+            'tmp_name' => (string)($tmps[$i] ?? ''),
+            'error'    => (int)($errs[$i] ?? UPLOAD_ERR_NO_FILE),
+            'size'     => (int)($sizes[$i] ?? 0),
+        ];
+    }
+    return $out;
+}
+
+/**
+ * Hapus file upload berdasarkan URL internal uploads dengan guard path traversal.
+ */
+function delete_uploaded_file_by_url(string $url): void {
+    $uploadBaseUrl = rtrim((string)UPLOAD_URL, '/') . '/';
+    if (!str_starts_with($url, $uploadBaseUrl)) return;
+
+    $relative = ltrim(substr($url, strlen($uploadBaseUrl)), '/');
+    if ($relative === '') return;
+
+    $uploadBasePath = realpath((string)UPLOAD_DIR);
+    if ($uploadBasePath === false) return;
+
+    $relativePath = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $relative);
+    $fullPath = $uploadBasePath . DIRECTORY_SEPARATOR . $relativePath;
+    $parentDir = realpath(dirname($fullPath));
+    if ($parentDir === false || !str_starts_with($parentDir, $uploadBasePath)) return;
+    if (is_file($fullPath)) @unlink($fullPath);
+}
+
+/**
+ * Simpan banyak file dari satu field input dengan validasi per-file.
+ * Atomic upload: jika satu gagal, file yang sudah tersimpan akan dibersihkan.
+ *
+ * @return array<int, array{url:string, original_name:string}>
+ */
+function save_uploaded_files(string $field, string $subdir, array $allowedExt, int $maxMB = 50): array {
+    if (empty($_FILES[$field])) return [];
+    $normalized = get_uploaded_files($field);
+    if (!$normalized) return [];
+
+    $original = $_FILES[$field];
+    $uploaded = [];
+
+    try {
+        foreach ($normalized as $file) {
+            if (($file['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
+                continue;
+            }
+
+            $_FILES[$field] = $file;
+            $url = save_uploaded_file($field, $subdir, $allowedExt, $maxMB);
+            if ($url) {
+                $uploaded[] = [
+                    'url' => $url,
+                    'original_name' => (string)($file['name'] ?? ''),
+                ];
+            }
+        }
+    } catch (Throwable $e) {
+        foreach ($uploaded as $row) {
+            delete_uploaded_file_by_url((string)($row['url'] ?? ''));
+        }
+        throw $e;
+    } finally {
+        $_FILES[$field] = $original;
+    }
+
+    return $uploaded;
+}
+
 // Data access ringkas lain tetap ...nya bisa ditambahkan di sini
 function get_upcoming_events(int $limit = 6): array {
     // Coba ambil dari cache terlebih dahulu
