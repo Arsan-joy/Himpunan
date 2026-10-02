@@ -1634,3 +1634,78 @@ textarea:focus-visible {
 .mobile-menu-btn { 
     display:none; 
 }
+/* ============================================================
+   HMTA COMPATIBILITY LAYER (2026 refresh)
+   - Shared tokens unify accessibility and interaction behavior without
+     changing page-specific component structure or selectors.
+   - Breakpoints: <=768px mobile, 769-1024px tablet, >=1025px desktop.
+   - Cascade decision: header/mobile-nav visibility remains controlled by
+     global style.css + JS state (#mainNav.active) for compatibility.
+   ============================================================ */
+:root {
+    --hmta-focus-ring: #1d4ed8;
+    --hmta-focus-shadow: 0 0 0 3px rgba(29, 78, 216, 0.28);
+    --hmta-readable-text: #1f2937;
+    --hmta-transition-fast: 180ms ease;
+}
+
+body {
+    color: var(--text-color, var(--hmta-readable-text));
+    -webkit-text-size-adjust: 100%;
+}
+
+:where(a, button, input, select, textarea, .btn, .mobile-menu-btn, [role="button"]):focus-visible {
+    outline: 2px solid var(--hmta-focus-ring);
+    outline-offset: 2px;
+    box-shadow: var(--hmta-focus-shadow);
+}
+
+:where(.btn, .mobile-menu-btn, button, [type="button"], [type="submit"], [type="reset"], .pagination a) {
+    min-height: 44px;
+}
+
+:where(a, button, .btn, .mobile-menu-btn, .pagination a) {
+    transition: color var(--hmta-transition-fast),
+                background-color var(--hmta-transition-fast),
+                border-color var(--hmta-transition-fast),
+                box-shadow var(--hmta-transition-fast),
+                transform var(--hmta-transition-fast);
+}
+
+header #mainNav {
+    display: flex;
+}
+
+@media (max-width: 768px) {
+    /* Keep mobile menu controls visible for JS-driven offcanvas behavior. */
+    .mobile-menu-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    header #mainNav {
+        display: none;
+    }
+
+    header #mainNav.active {
+        display: flex;
+    }
+}
+
+@media (max-width: 1024px) {
+    body {
+        line-height: 1.65;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
