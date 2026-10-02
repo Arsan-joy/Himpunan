@@ -32,11 +32,35 @@ function format_date_id(string $ymd): string {
     return ltrim($d,'0').' '.$b[(int)$m-1].' '.$y;
 }
 
+function upload_error_message(int $errorCode): string {
+    switch ($errorCode) {
+        case UPLOAD_ERR_INI_SIZE:
+        case UPLOAD_ERR_FORM_SIZE:
+            return 'Ukuran file melebihi batas yang diizinkan.';
+        case UPLOAD_ERR_PARTIAL:
+            return 'Upload terputus (parsial). Silakan coba lagi.';
+        case UPLOAD_ERR_NO_TMP_DIR:
+            return 'Server upload sedang bermasalah. Silakan coba lagi nanti.';
+        case UPLOAD_ERR_CANT_WRITE:
+            return 'Server gagal menyimpan file upload. Silakan coba lagi.';
+        case UPLOAD_ERR_EXTENSION:
+            return 'Upload dibatalkan oleh ekstensi server.';
+        case UPLOAD_ERR_NO_FILE:
+            return 'Tidak ada file yang dipilih.';
+        case UPLOAD_ERR_OK:
+            return '';
+        default:
+            return 'Upload gagal. Silakan coba lagi.';
+    }
+}
+
 // Upload helper
 function save_uploaded_file(string $field, string $subdir, array $allowedExt, int $maxMB = 50): ?string {
-    if (empty($_FILES[$field]) || $_FILES[$field]['error'] === UPLOAD_ERR_NO_FILE) return null;
+    if (empty($_FILES[$field])) return null;
     $f = $_FILES[$field];
-    if ($f['error'] !== UPLOAD_ERR_OK) throw new RuntimeException('Upload gagal (kode '.$f['error'].')');
+    $uploadError = (int)($f['error'] ?? UPLOAD_ERR_NO_FILE);
+    if ($uploadError === UPLOAD_ERR_NO_FILE) return null;
+    if ($uploadError !== UPLOAD_ERR_OK) throw new RuntimeException(upload_error_message($uploadError));
     $size = (int)$f['size'];
     if ($size <= 0) throw new RuntimeException('File kosong');
     if ($size > ($maxMB * 1024 * 1024)) throw new RuntimeException('Ukuran maksimal '.$maxMB.'MB');
