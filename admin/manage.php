@@ -42,6 +42,23 @@ function validate_order_by(string $order, array $whitelist, string $default = 'i
     return $default;
 }
 
+/**
+ * Judul materi turunan untuk mode multi-upload.
+ * - 1 file: judul tetap persis seperti input user
+ * - >1 file: "Judul - nama-file-asli-tanpa-ext"
+ */
+function build_material_title(string $sharedTitle, string $originalFilename, int $index, int $totalFiles): string {
+    $title = trim($sharedTitle);
+    if ($totalFiles <= 1) return $title;
+
+    $base = pathinfo($originalFilename, PATHINFO_FILENAME);
+    $base = preg_replace('/[^\p{L}\p{N}\-_ ]+/u', ' ', (string)$base);
+    $base = preg_replace('/\s+/u', ' ', trim((string)$base));
+    if ($base === '') $base = 'file-' . $index;
+
+    return $title . ' - ' . $base;
+}
+
 /* Modul konfigurasi */
 $modules = [
   'departemen' => [
@@ -172,7 +189,7 @@ $modules = [
               ],
               'required' => true
           ],
-          'file_upload' => ['label'=>'Upload File (PDF/DOC/PPT)','type'=>'file','accept'=>'.pdf,.doc,.docx,.ppt,.pptx','target'=>'file_url','subdir'=>'materials','allowed'=>['pdf','doc','docx','ppt','pptx'],'maxMB'=>50,'required'=>true],
+          'file_upload' => ['label'=>'Upload File PDF','type'=>'file','accept'=>'.pdf','target'=>'file_url','subdir'=>'materials','allowed'=>['pdf'],'maxMB'=>50,'required'=>true],
           'is_public' => ['label'=>'Publik?','type'=>'bool'],
       ],
   ],
@@ -235,7 +252,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!empty($meta['required'])) {
             $type = $meta['type'] ?? 'text';
             if ($type==='file') {
-                if (!$id && (empty($_FILES[$col]) || $_FILES[$col]['error']===UPLOAD_ERR_NO_FILE)) $errors[] = ($meta['label'] ?? $col).' wajib diunggah.';
+                $uploadedFiles = get_uploaded_files($col);
+                $hasFile = false;
+                foreach ($uploadedFiles as $f) {
+                    if (($f['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE) {
+                        $hasFile = true;
+                        break;
+                    }
+                }
+                if (!$id && !$hasFile) $errors[] = ($meta['label'] ?? $col).' wajib diunggah.';
             } else {
                 $val = trim((string)($_POST[$col] ?? ''));
                 if ($val==='') $errors[] = ($meta['label'] ?? $col).' wajib diisi.';
@@ -244,6 +269,62 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     if ($moduleKey==='users' && !is_super_admin() && isset($_POST['role'])) $errors[]='Hanya Super Admin yang boleh mengubah peran pengguna.';
     if ($errors){ $_SESSION['flash_error']=implode(' ', $errors); header('Location: manage.php?m='.urlencode($moduleKey).($id?'&id='.$id:'')); exit; }
+
+    // CREATE khusus materi: dukung multi-file upload (atomic insert + rollback file saat gagal)
+    if ($moduleKey === 'materi' && !$id) {
+        $fileMeta = $mod['fields']['file_upload'] ?? null;
+        if (!$fileMeta) {
+            $_SESSION['flash_error'] = 'Konfigurasi upload materi tidak ditemukan.';
+            header('Location: manage.php?m=' . urlencode($moduleKey));
+            exit;
+        }
+
+        try {
+            $uploadedFiles = save_uploaded_files(
+                'file_upload',
+                (string)($fileMeta['subdir'] ?? 'uploads'),
+                (array)($fileMeta['allowed'] ?? []),
+                (int)($fileMeta['maxMB'] ?? 50)
+            );
+        } catch (Throwable $e) {
+            $_SESSION['flash_error'] = 'Upload gagal: ' . $e->getMessage();
+            header('Location: manage.php?m=' . urlencode($moduleKey));
+            exit;
+        }
+
+        if (!$uploadedFiles) {
+            $_SESSION['flash_error'] = 'Tidak ada file yang berhasil diunggah.';
+            header('Location: manage.php?m=' . urlencode($moduleKey));
+            exit;
+        }
+
+        $sharedTitle = trim((string)($_POST['title'] ?? ''));
+        $category    = (string)($_POST['category'] ?? '');
+        $isPublic    = isset($_POST['is_public']) ? 1 : 0;
+        $totalFiles  = count($uploadedFiles);
+
+        try {
+            db()->beginTransaction();
+            $stmt = db()->prepare("INSERT INTO $table (title, category, file_url, is_public) VALUES (?, ?, ?, ?)");
+            foreach ($uploadedFiles as $idx => $up) {
+                $derivedTitle = build_material_title($sharedTitle, (string)($up['original_name'] ?? ''), $idx + 1, $totalFiles);
+                $stmt->execute([$derivedTitle, $category, (string)($up['url'] ?? ''), $isPublic]);
+            }
+            db()->commit();
+        } catch (Throwable $e) {
+            if (db()->inTransaction()) db()->rollBack();
+            foreach ($uploadedFiles as $up) {
+                delete_uploaded_file_by_url((string)($up['url'] ?? ''));
+            }
+            error_log('[manage.php MATERI BULK INSERT] ' . $e->getMessage());
+            $_SESSION['flash_error'] = 'Gagal menambahkan data materi. Semua perubahan dibatalkan.';
+            header('Location: manage.php?m=' . urlencode($moduleKey));
+            exit;
+        }
+
+        header('Location: manage.php?m=' . urlencode($moduleKey));
+        exit;
+    }
 
     $cols=[]; $vals=[]; $fileAssignments=[];
 
@@ -438,8 +519,16 @@ $isMaint = !empty($maintenance['enabled']);
 
             <?php elseif ($type === 'file'):
               $currentUrl = $editing[$meta['target'] ?? ''] ?? '';
+              $isMateriUploadField = ($moduleKey === 'materi' && $col === 'file_upload');
+              $isMultiMateriCreate = ($isMateriUploadField && !$editing);
+              $fileInputName = $isMultiMateriCreate ? ($col . '[]') : $col;
             ?>
-              <input type="file" name="<?= $col ?>" <?= $accept ? 'accept="'.htmlspecialchars($accept).'"' : '' ?> <?= $required && !$editing ? 'required' : '' ?>>
+              <input type="file" name="<?= htmlspecialchars($fileInputName) ?>" <?= $accept ? 'accept="'.htmlspecialchars($accept).'"' : '' ?> <?= $isMultiMateriCreate ? 'multiple' : '' ?> <?= $required && !$editing ? 'required' : '' ?>>
+              <?php if ($isMateriUploadField && !$editing): ?>
+                <div class="hint">Bisa pilih beberapa file PDF sekaligus. Kategori &amp; status publik akan disamakan untuk semua file. Jika lebih dari satu file, judul disimpan sebagai "Judul - nama file".</div>
+              <?php elseif ($isMateriUploadField && $editing): ?>
+                <div class="hint">Mode edit mendukung penggantian satu file PDF untuk materi ini.</div>
+              <?php endif; ?>
               <?php if ($currentUrl): ?>
                 <div class="preview">
                   <?php if ($currentUrl && preg_match('~\.(jpg|jpeg|png|webp|gif|svg)$~i', $currentUrl)): ?>
