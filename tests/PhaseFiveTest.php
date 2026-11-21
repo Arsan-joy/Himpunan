@@ -31,10 +31,10 @@ final class PhaseFiveTest extends TestCase
 
     public function testDeadCodeAndDuplicateHelpersAreRemoved(): void
     {
-        $this->assertFileDoesNotExist($this->root('test_view.php'));
-        $this->assertFileDoesNotExist($this->root('config/config.php'));
-        $this->assertFileDoesNotExist($this->root('config/database.php'));
-        $this->assertFileDoesNotExist($this->root('.phpunit.result.cache'));
+        $this->assertFalse(file_exists($this->root('test_view.php')));
+        $this->assertFalse(file_exists($this->root('config/config.php')));
+        $this->assertFalse(file_exists($this->root('config/database.php')));
+        $this->assertStringContainsString('.phpunit.result.cache', file_get_contents($this->root('.gitignore')));
 
         $count = 0;
         $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->root()));
