@@ -4,7 +4,6 @@ require_once __DIR__ . '/../../includes/csrf.php';
 require_once __DIR__ . '/../../includes/logger.php';
 require_super_admin();
 
-function h($s){ return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
 
 // Dropdown data
 $departments = db()->query("SELECT id, name FROM departments ORDER BY name ASC")->fetchAll();
@@ -156,19 +155,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
 </head>
 <body>
 <div class="admin-wrap">
-  <aside class="sidebar">
-    <div class="brand"><div class="brand-logo"><i class="fa-solid fa-file-import"></i></div><div><h1>HMTA Admin</h1><div style="opacity:.8;font-size:12px">Impor Anggota</div></div></div>
-    <nav class="nav">
-      <a href="<?= BASE_URL ?>admin/"><i class="fa-solid fa-house"></i> Dashboard</a>
-      <a href="<?= BASE_URL ?>admin/manage.php?m=departemen"><i class="fa-solid fa-building"></i> Kelola Departemen</a>
-      <a href="<?= BASE_URL ?>admin/manage.php?m=divisi"><i class="fa-solid fa-people-group"></i> Kelola Divisi</a>
-      <a href="<?= BASE_URL ?>admin/manage.php?m=leaders"><i class="fa-solid fa-user-tie"></i> Kelola Leader</a>
-      <a href="<?= BASE_URL ?>admin/manage.php?m=programs"><i class="fa-solid fa-rocket"></i> Kelola Program</a>
-      <a class="active" href="#"><i class="fa-solid fa-file-import"></i> Impor Anggota</a>
-      <a href="<?= BASE_URL ?>admin/manage.php?m=anggota"><i class="fa-solid fa-user-friends"></i> Kelola Anggota</a>
-      <a href="<?= BASE_URL ?>admin/logout.php"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
-    </nav>
-  </aside>
+  <?php $activeSidebar = 'import'; include dirname(__DIR__, 2) . '/includes/admin_sidebar.php'; ?>
 
   <main class="main">
     <div class="topbar">

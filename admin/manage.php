@@ -525,8 +525,37 @@ if (isset($_GET['del'])) {
     exit;
 }
 
-/* List + edit */
-$list = db()->query("SELECT * FROM $table ORDER BY $order")->fetchAll();
+/* List + pencarian + pagination */
+$perPage = 50;
+$search = trim((string)($_GET['q'] ?? ''));
+$currentPage = max(1, (int)($_GET['page'] ?? 1));
+$searchColumns = [];
+foreach ($mod['fields'] as $col => $meta) {
+    $type = $meta['type'] ?? 'text';
+    if (!in_array($type, ['file', 'password', 'bool'], true)) {
+        $searchColumns[] = $meta['target'] ?? $col;
+    }
+}
+$searchColumns = array_values(array_unique(array_filter($searchColumns)));
+$whereParts = [];
+$params = [];
+if ($search !== '' && $searchColumns) {
+    foreach ($searchColumns as $col) {
+        $whereParts[] = "`$col` LIKE ?";
+        $params[] = '%' . $search . '%';
+    }
+}
+$whereSql = $whereParts ? ' WHERE ' . implode(' OR ', $whereParts) : '';
+$countStmt = db()->prepare("SELECT COUNT(*) FROM $table$whereSql");
+$countStmt->execute($params);
+$totalItems = (int)$countStmt->fetchColumn();
+$totalPages = max(1, (int)ceil($totalItems / $perPage));
+$currentPage = min($currentPage, $totalPages);
+$offset = ($currentPage - 1) * $perPage;
+$listStmt = db()->prepare("SELECT * FROM $table$whereSql ORDER BY $order LIMIT ? OFFSET ?");
+$listParams = array_merge($params, [$perPage, $offset]);
+$listStmt->execute($listParams);
+$list = $listStmt->fetchAll();
 $editing = null;
 if (isset($_GET['id'])) { $stmt = db()->prepare("SELECT * FROM $table WHERE id = ? LIMIT 1"); $stmt->execute([(int)$_GET['id']]); $editing=$stmt->fetch(); }
 
@@ -544,29 +573,7 @@ $isMaint = !empty($maintenance['enabled']);
 </head>
 <body>
 <div class="admin-wrap">
-  <aside class="sidebar">
-    <div class="brand"><div class="brand-logo"><i class="fa-solid fa-check"></i></div><div><h1>HMTA Admin</h1><div style="opacity:.8;font-size:12px">Control Panel</div></div></div>
-    <nav class="nav">
-      <a href="<?= BASE_URL ?>admin/"><i class="fa-solid fa-house"></i> Dashboard</a>
-      <a class="<?= $moduleKey==='pengurus'?'active':'' ?>" href="?m=pengurus"><i class="fa-solid fa-user-tie"></i> Kelola Pengurus</a>
-      <a class="<?= $moduleKey==='leaders'?'active':'' ?>" href="?m=leaders"><i class="fa-solid fa-users-gear"></i> Kelola Leader</a>
-      <a class="<?= $moduleKey==='programs'?'active':'' ?>" href="?m=programs"><i class="fa-solid fa-rocket"></i> Kelola Program</a>
-      <a class="<?= $moduleKey==='departemen'?'active':'' ?>" href="?m=departemen"><i class="fa-solid fa-building"></i> Kelola Departemen</a>
-      <a class="<?= $moduleKey==='divisi'?'active':'' ?>" href="?m=divisi"><i class="fa-solid fa-people-group"></i> Kelola Divisi</a>
-      <a class="<?= $moduleKey==='kabinet'?'active':'' ?>" href="?m=kabinet"><i class="fa-solid fa-layer-group"></i> Kelola Kabinet</a>
-      <a class="<?= $moduleKey==='anggota'?'active':'' ?>" href="?m=anggota"><i class="fa-solid fa-user-friends"></i> Kelola Anggota</a>
-      <a class="<?= $moduleKey==='foto'?'active':'' ?>" href="?m=foto"><i class="fa-solid fa-image"></i> Kelola Foto</a>
-      <a class="<?= $moduleKey==='materi'?'active':'' ?>" href="?m=materi"><i class="fa-solid fa-book"></i> Kelola Materi</a>
-      <a class="<?= $moduleKey==='kegiatan'?'active':'' ?>" href="?m=kegiatan"><i class="fa-solid fa-calendar-days"></i> Kelola Kegiatan</a>
-      <a class="<?= $moduleKey==='pengaturan'?'active':'' ?>" href="?m=pengaturan"><i class="fa-solid fa-sliders"></i> Kelola Konten</a>
-      <?php if (is_super_admin()): ?>
-      <a class="<?= $moduleKey==='users'?'active':'' ?>" href="?m=users"><i class="fa-solid fa-user-shield"></i> Kelola Pengguna</a>
-      <a href="tools/import_members.php"><i class="fa-solid fa-file-import"></i> Impor Anggota</a>
-      <a href="maintenance.php"><i class="fa-solid fa-screwdriver-wrench"></i> Maintenance Mode</a>
-      <?php endif; ?>
-      <a href="logout.php"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
-    </nav>
-  </aside>
+  <?php $activeModule = $moduleKey; include dirname(__DIR__) . '/includes/admin_sidebar.php'; ?>
 
   <main class="main">
     <div class="topbar">
@@ -667,6 +674,15 @@ $isMaint = !empty($maintenance['enabled']);
 
       <div class="content-card">
         <div class="section-title"><i class="fa-solid fa-list"></i> Data</div>
+        <form method="get" style="display:flex;gap:8px;margin-bottom:12px">
+          <input type="hidden" name="m" value="<?= h($moduleKey) ?>">
+          <input type="search" name="q" value="<?= h($search) ?>" placeholder="Cari data..." style="max-width:320px">
+          <button class="btn btn-primary" type="submit"><i class="fa-solid fa-magnifying-glass"></i> Cari</button>
+          <?php if ($search !== ''): ?><a class="btn" href="?m=<?= urlencode($moduleKey) ?>">Reset</a><?php endif; ?>
+        </form>
+        <?php if ($totalItems > 0): ?>
+        <div class="hint" style="margin-bottom:8px">Menampilkan <?= $offset + 1 ?>–<?= min($offset + $perPage, $totalItems) ?> dari <?= $totalItems ?> data</div>
+        <?php endif; ?>
         <div style="overflow:auto">
           <table class="table">
             <thead>
@@ -732,6 +748,16 @@ $isMaint = !empty($maintenance['enabled']);
             </tbody>
           </table>
         </div>
+        <?php if ($totalPages > 1): ?>
+        <nav style="display:flex;gap:6px;margin-top:12px;flex-wrap:wrap" aria-label="Pagination">
+          <?php for ($p = 1; $p <= $totalPages; $p++):
+            $params = ['m' => $moduleKey, 'page' => $p];
+            if ($search !== '') $params['q'] = $search;
+          ?>
+            <a class="btn <?= $p === $currentPage ? 'btn-primary' : '' ?>" href="?<?= http_build_query($params) ?>"><?= $p ?></a>
+          <?php endfor; ?>
+        </nav>
+        <?php endif; ?>
       </div>
     </div>
   </main>

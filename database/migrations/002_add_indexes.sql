@@ -7,7 +7,8 @@
 -- ============================================================
 ALTER TABLE events
     ADD INDEX IF NOT EXISTS idx_start_date   (start_date),
-    ADD INDEX IF NOT EXISTS idx_active_start (active, start_date);
+    ADD INDEX IF NOT EXISTS idx_event_type    (type),
+    ADD INDEX IF NOT EXISTS idx_event_dates   (start_date, end_date);
 
 -- ============================================================
 -- Tabel members

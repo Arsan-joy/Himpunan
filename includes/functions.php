@@ -9,6 +9,10 @@ if (!is_dir(UPLOAD_DIR)) @mkdir(UPLOAD_DIR, 0775, true);
 
 function getBaseUrl(): string { return BASE_URL; }
 
+function h($value): string {
+    return htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8');
+}
+
 function is_logged_in(): bool { return !empty($_SESSION['user']); }
 function is_admin(): bool {
     return !empty($_SESSION['user']) && in_array(($_SESSION['user']['role'] ?? ''), ['admin','super_admin'], true);

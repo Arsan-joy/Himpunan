@@ -28,13 +28,13 @@ $deptTitleName   = $dept ? preg_replace('/^Departemen\s+/iu', '', (string)$dept[
 $page_title      = $deptTitleName !== '' ? ('Departemen ' . $deptTitleName) : 'Departemen HMTA';
 $deptDisplayName = $deptTitleName !== '' ? $deptTitleName : ($dept['name'] ?? 'Departemen HMTA');
 $additional_css = ['internal.css']; // style khusus
-$additional_js  = ['department.js','medkom-init.js']; // JANGAN tambah index.js (sudah dari header)
+$additional_js = ['department.js'];
+if ($slug === 'medkominfo') {
+    $additional_js[] = 'medkom-init.js';
+}
 
 include __DIR__ . '/../includes/header.php';
 
-if (!function_exists('h')) {
-    function h($s){ return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
-}
 if (!function_exists('ph')) {
     function ph($w=600,$h=400,$t='HMTA'){ return "https://via.placeholder.com/{$w}x{$h}?text=".rawurlencode($t); }
 }
