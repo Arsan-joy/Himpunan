@@ -11,16 +11,8 @@ include __DIR__ . '/../includes/header.php';
 // Ambil Kabinet dari DB
 $kabinetRows = db()->query("SELECT id, name, period, description, logo_url FROM kabinet ORDER BY id DESC")->fetchAll();
 
-// Tentukan kabinet aktif
-$currentYear = (int)date('Y');
-$activeCabinet = null;
-foreach ($kabinetRows as $row) {
-    $period = strtolower((string)($row['period'] ?? ''));
-    if ($period !== '' && strpos($period, (string)$currentYear) !== false) {
-        $activeCabinet = $row; break;
-    }
-}
-if (!$activeCabinet && !empty($kabinetRows)) $activeCabinet = $kabinetRows[0];
+// Tentukan kabinet aktif dengan logika bersama
+$activeCabinet = get_active_kabinet($kabinetRows);
 
 // Ambil daftar departemen dari DB (SEKARANG termasuk logo_url)
 $departments = db()->query("SELECT id, name, slug, description, logo_url FROM departments ORDER BY name ASC")->fetchAll();
