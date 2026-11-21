@@ -37,6 +37,14 @@ class SecurityHardeningTest extends TestCase
         $this->assertStringContainsString('materi_download.php', $materi);
         $this->assertStringContainsString('is_public', $materi);
         $this->assertStringContainsString("require_login();", $download);
-        $this->assertStringContainsString("!is_admin()", $download);
+        $this->assertStringContainsString('is_public', $download);
+        $this->assertStringNotContainsString('!is_admin()', $download);
+    }
+
+    public function testLoggedInUsersSeePrivateMaterials(): void
+    {
+        $materi = file_get_contents(__DIR__ . '/../pages/materi.php');
+        $this->assertStringContainsString('require_login();', $materi);
+        $this->assertStringNotContainsString('is_public = 1', $materi);
     }
 }

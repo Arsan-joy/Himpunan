@@ -18,11 +18,6 @@ if (!$material) {
     exit('Materi tidak ditemukan.');
 }
 
-if ((int)($material['is_public'] ?? 0) !== 1 && !is_admin()) {
-    http_response_code(403);
-    exit('Materi bersifat privat.');
-}
-
 $uploadBaseUrl = rtrim((string)UPLOAD_URL, '/') . '/';
 $fileUrl = (string)$material['file_url'];
 if (!str_starts_with($fileUrl, $uploadBaseUrl)) {
