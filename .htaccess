@@ -1,5 +1,11 @@
 Options -Indexes
 
+# Canonical HTTPS, non-www redirects
+RewriteEngine On
+RewriteCond %{HTTP_HOST} ^www\.hmtaitera\.com$ [NC,OR]
+RewriteCond %{HTTPS} !=on
+RewriteRule ^ https://hmtaitera.com%{REQUEST_URI} [R=301,L]
+
 # ============================================================
 # SECURITY: Deny dotfiles (.env, .gitignore, dll.)
 # ============================================================
@@ -85,9 +91,9 @@ Options -Indexes
         Header unset Pragma
     </FilesMatch>
 
-    # HTML/PHP: 1 jam, revalidate
+    # HTML/PHP publik: 60 detik, revalidate
     <FilesMatch "\.php$">
-        Header set Cache-Control "public, max-age=3600, must-revalidate"
+        Header set Cache-Control "public, max-age=60, must-revalidate"
     </FilesMatch>
 
     # Admin: no-store

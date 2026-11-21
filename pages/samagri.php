@@ -56,10 +56,10 @@ function dept_link(string $slug): string { return BASE_URL . 'pages/department.p
                     <a href="<?= BASE_URL ?>pages/profile.php" class="btn-secondary">Selengkapnya</a>
                 </div>
                 <div class="overview-image">
-                    <img src="<?= h($activeCabinet['logo_url'] ?? (BASE_URL . 'Resource/hmta-group.jpg')) ?>"
+                    <img src="<?= h($activeCabinet['logo_url'] ?? (BASE_URL . 'Resource/img/banner1.webp')) ?>"
                          alt="<?= h($activeCabinet['name'] ?? 'Kabinet HMTA') ?>"
                          width="480" height="360" loading="lazy"
-                         onerror="this.src='<?= BASE_URL ?>Resource/hmta-group.jpg'">
+                         onerror="this.src='<?= BASE_URL ?>Resource/img/banner1.webp'">
                 </div>
             </div>
         </div>
@@ -109,14 +109,14 @@ function dept_link(string $slug): string { return BASE_URL . 'pages/department.p
                     <?php if (!empty($departments)): ?>
                         <?php foreach ($departments as $d): ?>
                             <?php
-                              $deptLogo = !empty($d['logo_url']) ? $d['logo_url'] : (BASE_URL . 'Resource/default-dept.png');
+                              $deptLogo = !empty($d['logo_url']) ? $d['logo_url'] : (BASE_URL . 'Resource/img/banner1.webp');
                             ?>
                             <a href="<?= dept_link($d['slug']) ?>" class="department-card" title="Lihat <?= h($d['name']) ?>">
                                 <img class="logo-kabinet"
                                      src="<?= h($deptLogo) ?>"
                                      alt="<?= h($d['name']) ?>"
                                      width="120" height="120" loading="lazy"
-                                     onerror="this.src='<?= BASE_URL ?>Resource/default-dept.png'">
+                                     onerror="this.src='<?= BASE_URL ?>Resource/img/banner1.webp'">
                                 <h4><?= h($d['name']) ?></h4>
                             </a>
                         <?php endforeach; ?>

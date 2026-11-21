@@ -53,8 +53,13 @@ if ($appEnv === 'development' || $appDebug) {
 // ============================================================
 // BASE_URL dihitung dinamis dari SERVER vars — tidak hardcode localhost
 if (!defined('BASE_URL')) {
-    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
     $host     = $_SERVER['HTTP_HOST'] ?? 'localhost';
+    $host     = strtolower(preg_replace('/:\d+$/', '', $host));
+    $isLocal  = in_array($host, ['localhost', '127.0.0.1', '::1'], true);
+    $protocol = $isLocal
+        ? ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http')
+        : 'https';
+    if (!$isLocal) $host = preg_replace('/^www\./', '', $host);
     $docRoot  = str_replace('\\', '/', realpath($_SERVER['DOCUMENT_ROOT'] ?? __DIR__));
     $rootDir  = str_replace('\\', '/', realpath(__DIR__ . '/..'));
     $basePath = rtrim(str_replace($docRoot, '', $rootDir), '/') . '/';

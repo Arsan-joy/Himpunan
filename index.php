@@ -13,7 +13,10 @@ $upcoming_events = get_upcoming_events(9);
 <!-- Banner Slideshow -->
 <div class="banner-container">
     <!-- Banner pertama: LCP image — eager load + fetchpriority high -->
-    <div class="banner-slide active" style="background-image: url('Resource/img/banner1.png')">
+    <div class="banner-slide active">
+        <img src="Resource/img/banner1.webp"
+             srcset="Resource/img/banner1-480.webp 480w, Resource/img/banner1-768.webp 768w, Resource/img/banner1-1280.webp 1280w"
+             sizes="100vw" alt="Banner HMTA ITERA" width="1280" height="564" fetchpriority="high">
         <div class="banner-content">
             <h2>Selamat Datang di HMTA ITERA</h2>
             <p>Himpunan Mahasiswa Teknik Pertambangan Institut Teknologi Sumatera</p>
@@ -21,14 +24,20 @@ $upcoming_events = get_upcoming_events(9);
         </div>
     </div>
     <!-- Banner 2 & 3: lazy load karena tidak terlihat saat halaman pertama dimuat -->
-    <div class="banner-slide" style="background-image: url('Resource/img/banner2.png')">
+    <div class="banner-slide">
+        <img src="Resource/img/banner2.webp"
+             srcset="Resource/img/banner2-480.webp 480w, Resource/img/banner2-768.webp 768w, Resource/img/banner2-1280.webp 1280w"
+             sizes="100vw" alt="Kabinet HMTA ITERA" width="1280" height="564" loading="lazy">
         <div class="banner-content">
             <h2>Kabinet Samagri 2024-2025</h2>
             <p>Bersinergi dalam Keberagaman untuk Membangun Prestasi</p>
             <a href="pages/samagri.php" class="btn">Lihat Struktur</a>
         </div>
     </div>
-    <div class="banner-slide" style="background-image: url('Resource/img/banner3.png')">
+    <div class="banner-slide">
+        <img src="Resource/img/banner3.webp"
+             srcset="Resource/img/banner3-480.webp 480w, Resource/img/banner3-768.webp 768w, Resource/img/banner3-1280.webp 1280w"
+             sizes="100vw" alt="Bergabung dengan HMTA ITERA" width="1280" height="564" loading="lazy">
         <div class="banner-content">
             <h2>Bergabunglah dengan Kami</h2>
             <p>Wujudkan potensi terbaikmu bersama HMTA ITERA</p>
