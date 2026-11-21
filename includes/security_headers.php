@@ -16,7 +16,7 @@ function send_security_headers(bool $isAdmin = false): void {
     header_remove('X-Powered-By');
 
     // Cegah clickjacking
-    header('X-Frame-Options: DENY');
+    header('X-Frame-Options: SAMEORIGIN');
 
     // Cegah MIME type sniffing
     header('X-Content-Type-Options: nosniff');
@@ -41,7 +41,7 @@ function send_security_headers(bool $isAdmin = false): void {
         "font-src 'self' https://cdnjs.cloudflare.com",
         "img-src 'self' data: blob: https:",
         "connect-src 'self'",
-        "frame-ancestors 'none'",
+        "frame-ancestors 'self'",
         "base-uri 'self'",
         "form-action 'self'",
     ]);

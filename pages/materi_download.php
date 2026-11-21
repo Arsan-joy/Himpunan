@@ -56,7 +56,6 @@ if ($finfo) {
 }
 
 header('X-Content-Type-Options: nosniff');
-header('Content-Security-Policy: default-src \'none\'; sandbox');
 header('Cache-Control: private, no-store');
 header('Content-Length: ' . (string)filesize($fullPath));
 header('Content-Type: ' . $mime);
