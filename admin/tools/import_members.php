@@ -1,6 +1,8 @@
 <?php
 require_once __DIR__ . '/../../includes/functions.php';
-require_admin();
+require_once __DIR__ . '/../../includes/csrf.php';
+require_once __DIR__ . '/../../includes/logger.php';
+require_super_admin();
 
 function h($s){ return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
 
@@ -12,8 +14,21 @@ $kabinet     = db()->query("SELECT id, CONCAT(name, ' (', IFNULL(period,''), ')'
 $log = []; $summary = ['users_new'=>0,'users_update'=>0,'members_new'=>0,'members_update'=>0,'errors'=>0];
 
 if ($_SERVER['REQUEST_METHOD']==='POST') {
+  if (!csrf_verify()) {
+    http_response_code(403);
+    log_security('csrf_violation', ['page' => 'import_members']);
+    die('Permintaan tidak valid (403).');
+  }
+  csrf_regenerate();
+
   if (empty($_FILES['csv']) || $_FILES['csv']['error']!==UPLOAD_ERR_OK) {
     $log[] = "Upload CSV gagal.";
+  } elseif ((int)$_FILES['csv']['size'] > 2 * 1024 * 1024) {
+    $log[] = "Ukuran CSV maksimal 2 MB.";
+  } elseif (!is_uploaded_file($_FILES['csv']['tmp_name'])) {
+    $log[] = "File CSV harus diunggah melalui form.";
+  } elseif (strtolower(pathinfo((string)$_FILES['csv']['name'], PATHINFO_EXTENSION)) !== 'csv') {
+    $log[] = "Ekstensi file harus .csv.";
   } else {
     $tmp = $_FILES['csv']['tmp_name'];
 
@@ -119,6 +134,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
         $summary['errors']++;
         $log[] = "Error: ".$e->getMessage();
       }
+      @unlink($tmp);
     }
   }
 }
@@ -162,6 +178,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
 
     <div class="content-card">
       <form method="post" enctype="multipart/form-data">
+        <?= csrf_field() ?>
         <div class="field">
           <label>File CSV (delimiter ;)</label>
           <input type="file" name="csv" accept=".csv" required>

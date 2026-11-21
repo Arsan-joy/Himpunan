@@ -126,7 +126,7 @@ $modules = [
               'accept'  => 'image/*',
               'target'  => 'logo_url',         // disimpan ke kolom logo_url
               'subdir'  => 'departments',      // uploads/departments/
-              'allowed' => ['jpg','jpeg','png','webp','svg'],
+              'allowed' => ['jpg','jpeg','png','webp'],
               'maxMB'   => 5
           ],
       ],
@@ -149,7 +149,7 @@ $modules = [
           'name' => ['label'=>'Nama Kabinet','required'=>true],
           'period' => ['label'=>'Periode (mis. 2024-2025)','required'=>true],
           'description' => ['label'=>'Deskripsi','type'=>'textarea'],
-          'logo_upload' => ['label'=>'Upload Logo','type'=>'file','accept'=>'image/*','target'=>'logo_url','subdir'=>'kabinet','allowed'=>['jpg','jpeg','png','webp','svg'],'maxMB'=>10],
+          'logo_upload' => ['label'=>'Upload Logo','type'=>'file','accept'=>'image/*','target'=>'logo_url','subdir'=>'kabinet','allowed'=>['jpg','jpeg','png','webp'],'maxMB'=>10],
       ],
   ],
   // PENGURUS HIMPUNAN (inti organisasi)
@@ -263,7 +263,7 @@ $modules = [
       'fields' => [
           'username' => ['label'=>'Username','required'=>true],
           'password' => ['label'=>'Password (kosong = tidak ganti)','type'=>'password'],
-          'role' => ['label'=>'Role','type'=>'select','options'=>['user','admin'],'required'=>true],
+          'role' => ['label'=>'Role','type'=>'select','options'=>['user','admin','super_admin'],'required'=>true],
           'active' => ['label'=>'Aktif?','type'=>'bool'],
       ],
   ],
@@ -303,6 +303,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $id = isset($_POST['id']) && $_POST['id'] !== '' ? (int)$_POST['id'] : null;
 
+    // Hapus hanya melalui aksi POST bertoken.
+    if (($_POST['action'] ?? '') === 'delete') {
+        $delId = $id;
+        if ($moduleKey === 'users' && $delId === (int)($_SESSION['user']['id'] ?? 0)) {
+            $_SESSION['flash_error'] = 'Tidak dapat menghapus akun sendiri.';
+        } else {
+            $protected = false;
+            if ($moduleKey === 'users') {
+                $stmt = db()->prepare("SELECT role FROM users WHERE id = ? LIMIT 1");
+                $stmt->execute([$delId]);
+                if ((string)$stmt->fetchColumn() === 'super_admin') {
+                    $count = (int)db()->query("SELECT COUNT(*) FROM users WHERE role='super_admin'")->fetchColumn();
+                    if ($count <= 1) {
+                        $protected = true;
+                        $_SESSION['flash_error'] = 'Satu-satunya superadmin tidak boleh dihapus.';
+                    }
+                }
+            }
+            if (!$protected) {
+                try {
+                    db()->prepare("DELETE FROM $table WHERE id = ?")->execute([$delId]);
+                } catch (PDOException $e) {
+                    error_log('[manage.php DELETE] ' . $e->getMessage());
+                    $_SESSION['flash_error'] = 'Gagal menghapus data. Silakan coba lagi.';
+                }
+            }
+        }
+        header('Location: manage.php?m=' . urlencode($moduleKey)); exit;
+    }
+
     // Validasi required
     $errors=[];
     foreach ($mod['fields'] as $col => $meta) {
@@ -336,6 +366,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
     if ($moduleKey==='users' && !is_super_admin() && isset($_POST['role'])) $errors[]='Hanya Super Admin yang boleh mengubah peran pengguna.';
+    if ($moduleKey === 'users' && $id) {
+        $submittedRole = (string)($_POST['role'] ?? '');
+        if (!in_array($submittedRole, ['user','admin','super_admin'], true)) {
+            $errors[] = 'Role pengguna tidak valid.';
+        } elseif ($id === (int)($_SESSION['user']['id'] ?? 0) && $submittedRole !== 'super_admin') {
+            $errors[] = 'Akun sendiri tidak boleh diturunkan dari super_admin.';
+        } else {
+            $stmt = db()->prepare("SELECT role FROM users WHERE id = ? LIMIT 1");
+            $stmt->execute([$id]);
+            $currentRole = (string)($stmt->fetchColumn() ?: '');
+            if ($currentRole === 'super_admin' && $submittedRole !== 'super_admin') {
+                $count = (int)db()->query("SELECT COUNT(*) FROM users WHERE role='super_admin'")->fetchColumn();
+                if ($count <= 1) $errors[] = 'Satu-satunya superadmin tidak boleh diturunkan atau dihapus.';
+            }
+        }
+    }
     if ($errors){ $_SESSION['flash_error']=implode(' ', $errors); header('Location: manage.php?m='.urlencode($moduleKey).($id?'&id='.$id:'')); exit; }
 
     // CREATE khusus materi: dukung multi-file upload (atomic insert + rollback file saat gagal)
@@ -461,20 +507,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header('Location: manage.php?m=' . urlencode($moduleKey)); exit;
 }
 
-/* Delete */
+/* GET tidak boleh mengubah data */
 if (isset($_GET['del'])) {
-    $delId = (int)$_GET['del'];
-    if ($moduleKey === 'users' && !is_super_admin()) {
-        $_SESSION['flash_error'] = 'Hanya Super Admin yang boleh menghapus pengguna.';
-        header('Location: manage.php?m=users');
-        exit;
-    }
-    try {
-        db()->prepare("DELETE FROM $table WHERE id = ?")->execute([$delId]);
-    } catch (PDOException $e) {
-        error_log('[manage.php DELETE] ' . $e->getMessage());
-        $_SESSION['flash_error'] = 'Gagal menghapus data. Silakan coba lagi.';
-    }
+    $_SESSION['flash_error'] = 'Penghapusan harus dilakukan melalui tombol POST yang aman.';
     header('Location: manage.php?m=' . urlencode($moduleKey));
     exit;
 }
@@ -599,7 +634,7 @@ $isMaint = !empty($maintenance['enabled']);
               <?php endif; ?>
               <?php if ($currentUrl): ?>
                 <div class="preview">
-                  <?php if ($currentUrl && preg_match('~\.(jpg|jpeg|png|webp|gif|svg)$~i', $currentUrl)): ?>
+                  <?php if ($currentUrl && preg_match('~\.(jpg|jpeg|png|webp|gif)$~i', $currentUrl)): ?>
                     <img class="thumb" src="<?= htmlspecialchars($currentUrl) ?>" alt="">
                   <?php elseif ($currentUrl): ?>
                     <a class="badge" href="<?= htmlspecialchars($currentUrl) ?>" target="_blank">Lihat</a>
@@ -646,7 +681,7 @@ $isMaint = !empty($maintenance['enabled']);
                       <?php elseif ($type === 'password'): ?>
                         ••••••
                       <?php elseif ($type === 'file'): ?>
-                        <?php if ($v && preg_match('~\.(jpg|jpeg|png|webp|gif|svg)$~i', $v)): ?>
+                        <?php if ($v && preg_match('~\.(jpg|jpeg|png|webp|gif)$~i', $v)): ?>
                           <img class="thumb" src="<?= htmlspecialchars($v) ?>" alt="">
                         <?php elseif ($v): ?>
                           <a class="badge" href="<?= htmlspecialchars($v) ?>" target="_blank">Lihat</a>
@@ -658,7 +693,17 @@ $isMaint = !empty($maintenance['enabled']);
                   <?php endforeach; ?>
                   <td>
                     <a class="btn btn-primary" href="?m=<?= urlencode($moduleKey) ?>&id=<?= (int)$row['id'] ?>"><i class="fa-solid fa-pen"></i> Edit</a>
-                    <a class="btn btn-danger" href="?m=<?= urlencode($moduleKey) ?>&del=<?= (int)$row['id'] ?>" onclick="return confirm('Hapus data ini?')"><i class="fa-solid fa-trash"></i> Hapus</a>
+                    <?php $isSelf = ($moduleKey === 'users' && (int)$row['id'] === (int)($_SESSION['user']['id'] ?? 0)); ?>
+                    <?php if (!$isSelf): ?>
+                    <form method="post" style="display:inline" onsubmit="return confirm('Hapus data ini?')">
+                      <?= csrf_field() ?>
+                      <input type="hidden" name="action" value="delete">
+                      <input type="hidden" name="id" value="<?= (int)$row['id'] ?>">
+                      <button class="btn btn-danger" type="submit"><i class="fa-solid fa-trash"></i> Hapus</button>
+                    </form>
+                    <?php else: ?>
+                    <button class="btn btn-danger" type="button" disabled title="Akun sendiri tidak dapat dihapus">Hapus</button>
+                    <?php endif; ?>
                   </td>
                 </tr>
               <?php endforeach; ?>

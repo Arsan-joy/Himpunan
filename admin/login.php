@@ -68,13 +68,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             csrf_regenerate();
 
             $_SESSION['user'] = ['id'=>$user['id'],'username'=>$user['username'],'role'=>$user['role']];
-            header('Location: ' . ($next ?: BASE_URL . 'admin/'));
+            header('Location: ' . safe_internal_redirect((string)($next ?: ''), BASE_URL . 'admin/'));
             exit;
         }
     }
 }
 
-$next = $_GET['next'] ?? '';
+$next = safe_internal_redirect((string)($_GET['next'] ?? ''), '');
 ?>
 <!doctype html>
 <html lang="id">

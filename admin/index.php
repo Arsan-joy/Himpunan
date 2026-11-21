@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/csrf.php';
 require_once __DIR__ . '/../includes/functions.php';
 require_admin();
 
@@ -27,6 +28,11 @@ $statusText    = $isMaintGlobal ? 'Maintenance Global' : ($pagesCount > 0 ? "Mai
 
 // Toggle cepat maintenance global (opsional)
 if (is_super_admin() && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['toggle_maintenance'])) {
+    if (!csrf_verify()) {
+        http_response_code(403);
+        die('Permintaan tidak valid (403).');
+    }
+    csrf_regenerate();
     set_maintenance_status(!$isMaintGlobal, $status['pages'] ?? [], $_SESSION['user']['username'] ?? 'admin');
     header('Location: index.php'); exit;
 }
@@ -84,6 +90,7 @@ if (is_super_admin() && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['t
         </div>
         <?php if (is_super_admin()): ?>
           <form method="post" style="margin-left:12px">
+            <?= csrf_field() ?>
             <input type="hidden" name="toggle_maintenance" value="1">
             <button class="btn btn-secondary" type="submit">
               <i class="fa-solid fa-screwdriver-wrench"></i> <?= $isMaintGlobal ? 'Nonaktifkan' : 'Aktifkan' ?> Global

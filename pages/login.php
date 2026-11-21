@@ -1,11 +1,21 @@
 <?php
 require_once __DIR__ . '/../includes/functions.php';
+require_once __DIR__ . '/../includes/csrf.php';
+require_once __DIR__ . '/../includes/rate_limiter.php';
 
 $error = '';
+$clientIp = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    sleep(1);
+    if (rate_limit_is_blocked($clientIp, 'user_login')) {
+        $error = 'Terlalu banyak percobaan login. Silakan coba lagi dalam beberapa menit.';
+    } elseif (!csrf_verify()) {
+        http_response_code(403);
+        die('Permintaan tidak valid (403).');
+    } else {
     $username = trim($_POST['username'] ?? '');
     $password = (string)($_POST['password'] ?? '');
-    $next     = $_POST['next'] ?? '';
+    $next     = safe_internal_redirect((string)($_POST['next'] ?? ''), BASE_URL);
 
     $stmt = db()->prepare("SELECT id, username, password_hash, role, active FROM users WHERE username=? LIMIT 1");
     $stmt->execute([$username]);
@@ -13,17 +23,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (!$user || !$user['active']) {
         $error = 'User tidak ditemukan / tidak aktif.';
+        rate_limit_record_attempt($clientIp, 'user_login', $username);
     } elseif (!password_verify($password, $user['password_hash'])) {
         $error = 'Password salah.';
+        rate_limit_record_attempt($clientIp, 'user_login', $username);
     } elseif ($user['role'] !== 'user') {
         $error = 'Akun ini bukan User. Gunakan halaman Login Admin.';
+        rate_limit_record_attempt($clientIp, 'user_login', $username);
     } else {
+        rate_limit_reset($clientIp, 'user_login');
+        session_regenerate_id(true);
+        csrf_regenerate();
         $_SESSION['user'] = ['id'=>$user['id'],'username'=>$user['username'],'role'=>$user['role']];
         header('Location: ' . ($next ?: BASE_URL));
         exit;
     }
+    }
 }
-$next = $_GET['next'] ?? '';
+$next = safe_internal_redirect((string)($_GET['next'] ?? ''), '');
 ?>
 <!doctype html>
 <html lang="id">
@@ -103,6 +120,7 @@ input{
 </head>
 <body>
 <form class="card" method="post">
+  <?= csrf_field() ?>
   <h1>Login User</h1>
   <p class="muted">Masuk untuk mengakses materi dan fitur anggota</p>
   <?php if ($error): ?><div class="error"><?= htmlspecialchars($error) ?></div><?php endif; ?>

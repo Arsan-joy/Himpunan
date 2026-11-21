@@ -13,6 +13,8 @@ function send_security_headers(bool $isAdmin = false): void {
     // Jangan kirim header jika sudah dikirim
     if (headers_sent()) return;
 
+    header_remove('X-Powered-By');
+
     // Cegah clickjacking
     header('X-Frame-Options: DENY');
 
@@ -21,9 +23,14 @@ function send_security_headers(bool $isAdmin = false): void {
 
     // Referrer policy
     header('Referrer-Policy: strict-origin-when-cross-origin');
+    header('Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()');
 
     // XSS Protection (untuk browser lama)
     header('X-XSS-Protection: 1; mode=block');
+
+    if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
+        header('Strict-Transport-Security: max-age=31536000; includeSubDomains');
+    }
 
     // Content Security Policy
     // Izinkan: self, cdnjs (Font Awesome), data: untuk gambar inline
