@@ -310,6 +310,19 @@ function get_kabinet_options(): array {
     ], $rows);
 }
 
+// Tentukan kabinet aktif dengan aturan yang sama di semua halaman.
+function get_active_kabinet(array $kabinetRows, ?int $currentYear = null): ?array {
+    $rows = array_values($kabinetRows);
+    $year = $currentYear ?? (int)date('Y');
+    foreach ($rows as $row) {
+        $period = strtolower(trim((string)($row['period'] ?? '')));
+        if ($period !== '' && strpos($period, (string)$year) !== false) {
+            return $row;
+        }
+    }
+    return $rows[0] ?? null;
+}
+
 /* ============================================================
    MAINTENANCE (GLOBAL & PARSIAL)
    ============================================================ */

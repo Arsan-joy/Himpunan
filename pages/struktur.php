@@ -13,18 +13,16 @@ $kabinet = db()->query("SELECT id, name, period, description, logo_url, created_
 // Tentukan kabinet aktif:
 // - Cari yang periodenya memuat tahun berjalan
 // - Jika tidak ketemu, gunakan baris pertama (terbaru)
-$currentYear = (int)date('Y');
+$activeCabinet = get_active_kabinet($kabinet);
 $activeIndex = null;
-foreach ($kabinet as $i => $row) {
-    $period = strtolower(trim((string)$row['period']));
-    if ($period !== '' && strpos($period, (string)$currentYear) !== false) {
-        $activeIndex = $i;
-        break;
+if ($activeCabinet) {
+    foreach ($kabinet as $i => $row) {
+        if ((int)$row['id'] === (int)$activeCabinet['id']) {
+            $activeIndex = $i;
+            break;
+        }
     }
 }
-if ($activeIndex === null && !empty($kabinet)) $activeIndex = 0;
-
-$activeCabinet = $activeIndex !== null ? $kabinet[$activeIndex] : null;
 $pastCabinets  = [];
 if ($activeIndex !== null) {
     foreach ($kabinet as $i => $row) {

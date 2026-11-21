@@ -48,4 +48,30 @@ final class PhaseTwoPerformanceTest extends TestCase
         $functions = file_get_contents($this->root('includes/functions.php'));
         $this->assertStringContainsString("require_once __DIR__ . '/cache.php';", $functions);
     }
+
+    public function testPhaseThreeCabinetAndDepartmentDataAreDatabaseDriven(): void
+    {
+        $index = file_get_contents($this->root('index.php'));
+        $this->assertStringContainsString('$active_kabinet', $index);
+        $this->assertStringNotContainsString('Kabinet Samagri 2024-2025', $index);
+
+        $functions = file_get_contents($this->root('includes/functions.php'));
+        $this->assertStringContainsString('function get_active_kabinet(', $functions);
+
+        $structure = file_get_contents($this->root('pages/struktur.php'));
+        $samagri = file_get_contents($this->root('pages/samagri.php'));
+        $this->assertStringContainsString('get_active_kabinet(', $structure);
+        $this->assertStringContainsString('get_active_kabinet(', $samagri);
+
+        $helpers = file_get_contents($this->root('includes/department_helpers.php'));
+        $this->assertStringContainsString('logo_url', $helpers);
+        $department = file_get_contents($this->root('pages/department.php'));
+        $this->assertStringContainsString('$dept[\'logo_url\']', $department);
+
+        foreach (['medkom.php', 'psda.php', 'keilmuan.php', 'external.php', 'kaderisasi.php', 'internal.php'] as $file) {
+            $legacy = file_get_contents($this->root('pages/departemensamagri/' . $file));
+            $this->assertStringContainsString('/pages/department.php', str_replace('\\\\', '/', $legacy));
+            $this->assertStringNotContainsString('Logo Departemen Medkomvis', $legacy);
+        }
+    }
 }

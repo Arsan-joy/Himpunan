@@ -9,6 +9,10 @@ include __DIR__ . '/includes/header.php';
 
 // Ambil event dari DB
 $upcoming_events = get_upcoming_events(9);
+$kabinetRows = db()->query("SELECT id, name, period, description, logo_url FROM kabinet ORDER BY id DESC")->fetchAll();
+$active_kabinet = get_active_kabinet($kabinetRows);
+$active_kabinet_name = trim((string)($active_kabinet['name'] ?? 'Kabinet HMTA'));
+$active_kabinet_period = trim((string)($active_kabinet['period'] ?? ''));
 ?>
 <!-- Banner Slideshow -->
 <div class="banner-container">
@@ -29,7 +33,7 @@ $upcoming_events = get_upcoming_events(9);
              srcset="Resource/img/banner2-480.webp 480w, Resource/img/banner2-768.webp 768w, Resource/img/banner2-1280.webp 1280w"
              sizes="100vw" alt="Kabinet HMTA ITERA" width="1280" height="564" loading="lazy">
         <div class="banner-content">
-            <h2>Kabinet Samagri 2024-2025</h2>
+            <h2><?= htmlspecialchars($active_kabinet_name . ($active_kabinet_period !== '' ? ' ' . $active_kabinet_period : '')) ?></h2>
             <p>Bersinergi dalam Keberagaman untuk Membangun Prestasi</p>
             <a href="pages/samagri.php" class="btn">Lihat Struktur</a>
         </div>
