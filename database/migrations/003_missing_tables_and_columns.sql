@@ -1,0 +1,80 @@
+-- Migration 003: sinkronkan tabel dan kolom produksi yang hilang dari repo lama
+
+CREATE TABLE IF NOT EXISTS members (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(120) NOT NULL,
+  student_id VARCHAR(50) DEFAULT NULL,
+  email VARCHAR(120) DEFAULT NULL,
+  phone VARCHAR(50) DEFAULT NULL,
+  photo_url VARCHAR(255) DEFAULT NULL,
+  kabinet_id INT DEFAULT NULL,
+  department_id INT DEFAULT NULL,
+  division_id INT DEFAULT NULL,
+  role VARCHAR(120) DEFAULT NULL,
+  active TINYINT(1) NOT NULL DEFAULT 1,
+  joined_at DATE DEFAULT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE IF NOT EXISTS leaders (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  department_id INT NOT NULL,
+  name VARCHAR(120) NOT NULL,
+  role VARCHAR(80) NOT NULL,
+  photo_url VARCHAR(255) DEFAULT NULL,
+  linkedin_url VARCHAR(255) DEFAULT NULL,
+  email VARCHAR(120) DEFAULT NULL,
+  sort_order INT DEFAULT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE IF NOT EXISTS organization_leaders (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(160) NOT NULL,
+  role VARCHAR(80) NOT NULL,
+  photo_url VARCHAR(255) DEFAULT NULL,
+  linkedin_url VARCHAR(255) DEFAULT NULL,
+  email VARCHAR(120) DEFAULT NULL,
+  sort_order INT DEFAULT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE IF NOT EXISTS programs (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  department_id INT NOT NULL,
+  name VARCHAR(160) NOT NULL,
+  description TEXT DEFAULT NULL,
+  frequency ENUM('Harian','Mingguan','Bulanan','Tahunan','Ad-hoc') DEFAULT NULL,
+  sort_order INT DEFAULT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE IF NOT EXISTS password_resets (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  token VARCHAR(64) NOT NULL,
+  expires_at DATETIME NOT NULL,
+  used_at DATETIME DEFAULT NULL,
+  ip VARCHAR(45) DEFAULT NULL,
+  ua VARCHAR(255) DEFAULT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY token (token)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+ALTER TABLE departments
+  ADD COLUMN IF NOT EXISTS logo_url VARCHAR(255) DEFAULT NULL;
+
+ALTER TABLE materials
+  ADD COLUMN IF NOT EXISTS category ENUM('praktikum','laporan_kp','laporan_ta','Semester_3','Semester_4','Semester_5','Semester_6','Semester_7') NOT NULL DEFAULT 'Semester_3';
+
+ALTER TABLE users
+  MODIFY COLUMN role ENUM('super_admin','admin','user') NOT NULL DEFAULT 'user';
+
+CREATE TABLE IF NOT EXISTS site_settings (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  setting_key VARCHAR(100) NOT NULL,
+  setting_label VARCHAR(200) NOT NULL,
+  setting_value TEXT NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY setting_key (setting_key)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

@@ -72,6 +72,17 @@ if (!defined('IMG_URL'))  define('IMG_URL',  BASE_URL . 'Resource/img/');
 if (!defined('UPLOAD_DIR')) define('UPLOAD_DIR', __DIR__ . '/../uploads');
 if (!defined('UPLOAD_URL')) define('UPLOAD_URL', BASE_URL . 'uploads/');
 
+// Konstanta konten situs (dipindahkan dari config/config.php legacy)
+if (!defined('SITE_NAME')) define('SITE_NAME', env('SITE_NAME', 'HMTA ITERA'));
+if (!defined('SITE_DESCRIPTION')) define('SITE_DESCRIPTION', env('SITE_DESCRIPTION', 'Himpunan Mahasiswa Teknik Pertambangan Institut Teknologi Sumatera'));
+if (!defined('CONTACT_EMAIL')) define('CONTACT_EMAIL', env('CONTACT_EMAIL', 'hmta.balakosa.itera@gmail.com'));
+if (!defined('CONTACT_PHONE')) define('CONTACT_PHONE', env('CONTACT_PHONE', '0851-3611-7417'));
+if (!defined('CONTACT_ADDRESS')) define('CONTACT_ADDRESS', env('CONTACT_ADDRESS', 'Jalan Terusan Ryacudu, Way Hui, Kecamatan Jati Agung, Lampung Selatan 35365'));
+if (!defined('LINKEDIN_URL')) define('LINKEDIN_URL', env('LINKEDIN_URL', 'https://id.linkedin.com/company/himpunan-mahasiswa-teknik-pertambangan-itera-hmta-itera'));
+if (!defined('INSTAGRAM_URL')) define('INSTAGRAM_URL', env('INSTAGRAM_URL', 'https://www.instagram.com/hmta_itera/'));
+if (!defined('YOUTUBE_URL')) define('YOUTUBE_URL', env('YOUTUBE_URL', 'https://m.youtube.com/@hmtaitera'));
+if (!defined('TIKTOK_URL')) define('TIKTOK_URL', env('TIKTOK_URL', 'https://www.tiktok.com/@hmta.balakosa.itera'));
+
 // ============================================================
 // Database Constants (dari .env)
 // ============================================================

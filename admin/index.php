@@ -47,32 +47,7 @@ if (is_super_admin() && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['t
 </head>
 <body>
 <div class="admin-wrap">
-  <aside class="sidebar">
-    <div class="brand">
-      <div class="brand-logo"><i class="fa-solid fa-check"></i></div>
-      <div><h1>HMTA Admin</h1><div style="opacity:.8;font-size:12px">Control Panel</div></div>
-    </div>
-    <nav class="nav">
-      <a class="active" href="<?= BASE_URL ?>admin/"><i class="fa-solid fa-house"></i> Dashboard</a>
-      <a href="manage.php?m=pengurus"><i class="fa-solid fa-user-tie"></i> Kelola Pengurus</a>
-      <a href="manage.php?m=leaders"><i class="fa-solid fa-users-gear"></i> Kelola Leader Departemen</a>
-      <a href="manage.php?m=programs"><i class="fa-solid fa-rocket"></i> Kelola Program</a>
-      <a href="manage.php?m=departemen"><i class="fa-solid fa-building"></i> Kelola Departemen</a>
-      <a href="manage.php?m=divisi"><i class="fa-solid fa-people-group"></i> Kelola Divisi</a>
-      <a href="manage.php?m=kabinet"><i class="fa-solid fa-layer-group"></i> Kelola Kabinet</a>
-      <a href="manage.php?m=anggota"><i class="fa-solid fa-user-friends"></i> Kelola Anggota</a>
-      <a href="manage.php?m=foto"><i class="fa-solid fa-image"></i> Kelola Foto</a>
-      <a href="manage.php?m=materi"><i class="fa-solid fa-book"></i> Kelola Materi</a>
-      <a href="manage.php?m=kegiatan"><i class="fa-solid fa-calendar-days"></i> Kelola Kegiatan</a>
-      <?php if (is_super_admin()): ?>
-        <a href="tools/import_members.php"><i class="fa-solid fa-file-import"></i> Impor Anggota</a>
-        <a href="manage.php?m=users"><i class="fa-solid fa-user-shield"></i> Kelola Pengguna</a>
-        <a href="maintenance.php"><i class="fa-solid fa-screwdriver-wrench"></i> Maintenance Mode</a>
-      <?php endif; ?>
-      <a href="<?= BASE_URL ?>" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> Lihat Website</a>
-      <a href="logout.php"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
-    </nav>
-  </aside>
+  <?php $activeSidebar = 'dashboard'; include dirname(__DIR__) . '/includes/admin_sidebar.php'; ?>
 
   <main class="main">
     <div class="topbar">

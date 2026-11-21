@@ -28,7 +28,7 @@ final class PhaseFourTest extends TestCase
         $this->assertStringContainsString('hmta.balakosa.itera@gmail.com', $footer);
         $this->assertStringNotContainsString('hmta.balakosa.itera.com', $footer);
 
-        $config = file_get_contents($this->root('config/config.php'));
+        $config = file_get_contents($this->root('database/config.php'));
         $this->assertStringContainsString('hmta.balakosa.itera@gmail.com', $config);
         $this->assertStringNotContainsString('Pertambagan', $config);
 

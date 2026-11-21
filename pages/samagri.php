@@ -22,7 +22,6 @@ $pengurus = [];
 try { $pengurus = get_organization_leaders(); } catch (Throwable $e) { $pengurus = []; }
 
 // Helper ringkas
-function h($s){ return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
 function dept_link(string $slug): string { return BASE_URL . 'pages/department.php?slug=' . rawurlencode($slug); }
 ?>
 <main>
