@@ -53,7 +53,7 @@ function map_type_to_filter(string $type): string {
                 <?php foreach ($past_events as $ev): ?>
                     <?php
                         $cat  = map_type_to_filter($ev['type'] ?? '');
-                        $img  = $ev['image_url'] ?: (BASE_URL . 'Resource/img/banner1.png');
+                        $img  = $ev['image_url'] ?: (BASE_URL . 'Resource/img/banner1.webp');
                         $desc = trim((string)($ev['description'] ?? ''));
                         $title = trim((string)($ev['title'] ?? 'Kegiatan'));
                     ?>

@@ -31,7 +31,7 @@ try {
                         <?php
                             $day   = date('d', strtotime($event['start_date']));
                             $month = date('M', strtotime($event['start_date']));
-                            $img   = $event['image_url'] ?: (BASE_URL . 'Resource/img/banner1.png');
+                            $img   = $event['image_url'] ?: (BASE_URL . 'Resource/img/banner1.webp');
                             $desc  = trim((string)($event['description'] ?? ''));
                         ?>
                         <div class="event-card" id="event-<?= (int)$event['id'] ?>">

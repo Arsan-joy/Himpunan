@@ -22,6 +22,7 @@ $dept_id   = (int)($dept['id'] ?? 0);
 $leaders   = $dept_id ? get_department_leaders($dept_id) : [];
 $divisions = $dept_id ? get_divisions($dept_id) : [];
 $programs  = $dept_id ? get_programs($dept_id) : [];
+$divisionMembers = get_division_members_batch(array_column($divisions, 'id'));
 
 $page_title     = $dept ? ('Departemen ' . $dept['name']) : 'Departemen HMTA';
 $additional_css = ['internal.css']; // style khusus
@@ -41,7 +42,7 @@ if (!function_exists('ph')) {
   <section class="department-header">
     <div class="container">
       <div class="header-content">
-        <img src="<?= BASE_URL ?>Resource/img/banner1.png" alt="Logo Departemen" class="dept-logo"
+        <img src="<?= h(!empty($dept['logo_url']) ? $dept['logo_url'] : BASE_URL.'Resource/img/banner1.webp') ?>" alt="Logo Departemen" class="dept-logo"
              width="120" height="120" loading="lazy"
              onerror="this.src='<?= ph(120,120,$dept['name']??'DEPT') ?>'">
         <h1><?= h($dept['name'] ?? 'Departemen HMTA') ?></h1>
@@ -115,7 +116,7 @@ if (!function_exists('ph')) {
 
         <div class="divisions-container">
           <?php foreach ($divisions as $dv): ?>
-            <?php $members = get_division_members((int)$dv['id']); ?>
+            <?php $members = $divisionMembers[(int)$dv['id']] ?? []; ?>
             <div class="division-card" data-category="<?= h($dv['slug'] ?: 'divisi') ?>" data-aos="fade-up">
               <div class="division-header">
                 <div class="division-icon"><i class="fas fa-puzzle-piece"></i></div>

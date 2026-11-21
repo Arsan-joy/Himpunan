@@ -25,9 +25,9 @@ include __DIR__ . '/../includes/header.php';
         <!-- Minerfesto Card -->
         <div class="program-card" id="minerfesto">
           <div class="program-image">
-            <img src="<?php echo BASE_URL; ?>Resource/img/minerfesto.jpg" alt="Minerfesto HMTA ITERA"
+            <img src="<?php echo BASE_URL; ?>Resource/img/banner1.webp" alt="Minerfesto HMTA ITERA"
                  width="600" height="400" loading="lazy"
-                 onerror="this.src='<?php echo BASE_URL; ?>Resource/default.jpg'">
+                 onerror="this.src='<?php echo BASE_URL; ?>Resource/img/banner1.webp'">
           </div>
           <div class="program-content">
             <h3>Minerfesto</h3>
@@ -54,9 +54,9 @@ include __DIR__ . '/../includes/header.php';
         <!-- Lustrum Card -->
         <div class="program-card" id="lustrum">
           <div class="program-image">
-            <img src="<?php echo BASE_URL; ?>Resource/lustrum.jpg" alt="Lustrum HMTA ITERA"
+            <img src="<?php echo BASE_URL; ?>Resource/img/banner3.webp" alt="Lustrum HMTA ITERA"
                  width="600" height="400" loading="lazy"
-                 onerror="this.src='<?php echo BASE_URL; ?>Resource/default.jpg'">
+                 onerror="this.src='<?php echo BASE_URL; ?>Resource/img/banner3.webp'">
           </div>
           <div class="program-content">
             <h3>Lustrum</h3>
@@ -125,9 +125,9 @@ include __DIR__ . '/../includes/header.php';
           <div class="testimonial-content">
             <p>"Minerfesto memberikan saya kesempatan untuk mengembangkan keterampilan teknis dan membangun jaringan profesional yang luas di industri pertambangan."</p>
             <div class="testimonial-author">
-              <img src="<?php echo BASE_URL; ?>Resource/testimonial1.jpg" alt="Testimonial Author"
+              <img src="<?php echo BASE_URL; ?>Resource/img/logo-header-120.png" alt="Testimonial Author"
                    width="60" height="60" loading="lazy"
-                   onerror="this.src='<?php echo BASE_URL; ?>Resource/default-profile.jpg'">
+                   onerror="this.src='<?php echo BASE_URL; ?>Resource/img/logo-header-120.png'">
               <div>
                 <h4>Andi Pratama</h4>
                 <p>Mahasiswa Teknik Pertambangan 2022</p>
@@ -139,9 +139,9 @@ include __DIR__ . '/../includes/header.php';
           <div class="testimonial-content">
             <p>"Acara Lustrum HMTA ITERA memperlihatkan bagaimana organisasi ini terus berkembang dan memberikan dampak positif bagi mahasiswa dan industri pertambangan Indonesia."</p>
             <div class="testimonial-author">
-              <img src="<?php echo BASE_URL; ?>Resource/testimonial2.jpg" alt="Testimonial Author"
+              <img src="<?php echo BASE_URL; ?>Resource/img/logo-header-120.png" alt="Testimonial Author"
                    width="60" height="60" loading="lazy"
-                   onerror="this.src='<?php echo BASE_URL; ?>Resource/default-profile.jpg'">
+                   onerror="this.src='<?php echo BASE_URL; ?>Resource/img/logo-header-120.png'">
               <div>
                 <h4>Dina Safitri</h4>
                 <p>Alumni Teknik Pertambangan 2019</p>
@@ -153,9 +153,9 @@ include __DIR__ . '/../includes/header.php';
           <div class="testimonial-content">
             <p>"Kompetisi di Minerfesto memberikan tantangan nyata yang mempersiapkan saya untuk menghadapi dunia kerja di sektor pertambangan."</p>
             <div class="testimonial-author">
-              <img src="<?php echo BASE_URL; ?>Resource/testimonial3.jpg" alt="Testimonial Author"
+              <img src="<?php echo BASE_URL; ?>Resource/img/logo-header-120.png" alt="Testimonial Author"
                    width="60" height="60" loading="lazy"
-                   onerror="this.src='<?php echo BASE_URL; ?>Resource/default-profile.jpg'">
+                   onerror="this.src='<?php echo BASE_URL; ?>Resource/img/logo-header-120.png'">
               <div>
                 <h4>Budi Santoso</h4>
                 <p>Pemenang Kompetisi Minerfesto 2023</p>

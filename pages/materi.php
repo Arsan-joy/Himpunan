@@ -35,7 +35,7 @@ if ($filterCategory !== 'all' && !in_array($filterCategory, $validCategories, tr
 }
 
 // ── Pagination config ────────────────────────────────────────────────────────
-const MATERI_PER_PAGE = 20;
+const MATERI_PER_PAGE = 10;
 
 $currentPage = max(1, (int)($_GET['page'] ?? 1));
 

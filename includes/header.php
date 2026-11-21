@@ -33,10 +33,10 @@ $_jsVer   = file_exists($_jsFile)  ? substr(md5_file($_jsFile),  0, 8) : '1';
 <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
 <!-- Preload LCP image (banner pertama) -->
-<link rel="preload" as="image" href="<?= (IMG_URL ?? (BASE_URL.'Resource/img/')) ?>banner1.png" fetchpriority="high">
+<link rel="preload" as="image" href="<?= (IMG_URL ?? (BASE_URL.'Resource/img/')) ?>banner1.webp" type="image/webp" fetchpriority="high">
 <link rel="stylesheet" href="<?= (CSS_URL ?? (BASE_URL.'Resource/css/')) ?>style.css?v=<?= $_cssVer ?>">
 <?php foreach ($additional_css as $css): ?><link rel="stylesheet" href="<?= $cssHref((string)$css) ?>"><?php endforeach; ?>
-<link rel="icon" href="<?= (IMG_URL ?? (BASE_URL.'Resource/')) ?>IMG_1381.png" type="image/png">
+<link rel="icon" href="<?= (IMG_URL ?? (BASE_URL.'Resource/img/')) ?>favicon-32.png" type="image/png" sizes="32x32">
 <!-- Font Awesome: media=print trick agar tidak blokir render, lalu swap ke all -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
       media="print" onload="this.media='all'">
@@ -87,7 +87,7 @@ $_jsVer   = file_exists($_jsFile)  ? substr(md5_file($_jsFile),  0, 8) : '1';
 </head>
 <body class="<?= $is_maintenance ? 'maintenance-no-scroll' : '' ?>">
 <header>
-  <a href="<?= BASE_URL ?>" class="logo"><img src="<?= (IMG_URL ?? (BASE_URL.'Resource/')) ?>IMG_1381.png" alt="Logo HMTA" width="60" height="60" fetchpriority="high"></a>
+  <a href="<?= BASE_URL ?>" class="logo"><img src="<?= (IMG_URL ?? (BASE_URL.'Resource/img/')) ?>logo-header-120.png" alt="Logo HMTA" width="60" height="60" fetchpriority="high"></a>
   <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="menu"><i class="fas fa-bars"></i></button>
   <nav id="mainNav">
     <ul>

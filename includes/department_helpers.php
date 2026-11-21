@@ -4,7 +4,7 @@
 // Ambil satu departemen berdasarkan slug (case-insensitive)
 function get_department_by_slug(string $slug): ?array {
     $stmt = db()->prepare("
-        SELECT id, name, slug, description
+        SELECT id, name, slug, description, logo_url
         FROM departments
         WHERE LOWER(slug) = LOWER(?)
         LIMIT 1
@@ -68,6 +68,43 @@ function get_division_members(int $division_id): array {
             return [];
         }
     }
+}
+
+// Ambil anggota semua divisi dalam satu query.
+function get_division_members_batch(array $division_ids): array {
+    $division_ids = array_values(array_unique(array_filter(array_map('intval', $division_ids))));
+    if (!$division_ids) return [];
+
+    $placeholders = implode(',', array_fill(0, count($division_ids), '?'));
+    try {
+        $stmt = db()->prepare("
+            SELECT id, division_id, name, role, photo_url
+            FROM members
+            WHERE division_id IN ($placeholders) AND (active = 1 OR active IS NULL)
+            ORDER BY id
+        ");
+        $stmt->execute($division_ids);
+        $rows = $stmt->fetchAll();
+    } catch (Throwable $e) {
+        try {
+            $stmt = db()->prepare("
+                SELECT id, division_id, name, role, photo_url
+                FROM division_members
+                WHERE division_id IN ($placeholders)
+                ORDER BY id
+            ");
+            $stmt->execute($division_ids);
+            $rows = $stmt->fetchAll();
+        } catch (Throwable $e2) {
+            return [];
+        }
+    }
+
+    $grouped = [];
+    foreach ($rows as $row) {
+        $grouped[(int)$row['division_id']][] = $row;
+    }
+    return $grouped;
 }
 
 // (Opsional) Pimpinan/leaders departemen jika tabelnya tersedia

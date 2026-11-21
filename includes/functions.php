@@ -1,6 +1,7 @@
 <?php
 require_once dirname(__DIR__) . '/database/config.php';
 require_once dirname(__DIR__) . '/database/db.php';
+require_once __DIR__ . '/cache.php';
 
 if (!defined('UPLOAD_DIR')) define('UPLOAD_DIR', dirname(__DIR__) . '/uploads');
 if (!defined('UPLOAD_URL')) define('UPLOAD_URL', BASE_URL . 'uploads/');
