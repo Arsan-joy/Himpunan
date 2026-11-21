@@ -42,15 +42,11 @@ $currentPage = max(1, (int)($_GET['page'] ?? 1));
 // ── Query: total item (dengan filter kategori jika aktif) ────────────────────
 // Jika kolom category belum ada di DB, abaikan filter dan tampilkan semua
 if ($hasCategoryCol && $filterCategory !== 'all') {
-    $sql = is_admin()
-        ? "SELECT COUNT(*) FROM materials WHERE category = ?"
-        : "SELECT COUNT(*) FROM materials WHERE category = ? AND is_public = 1";
+    $sql = "SELECT COUNT(*) FROM materials WHERE category = ?";
     $stmtCount = db()->prepare($sql);
     $stmtCount->execute([$filterCategory]);
 } else {
-    $stmtCount = db()->query(is_admin()
-        ? "SELECT COUNT(*) FROM materials"
-        : "SELECT COUNT(*) FROM materials WHERE is_public = 1");
+    $stmtCount = db()->query("SELECT COUNT(*) FROM materials");
 }
 $totalItems = (int)$stmtCount->fetchColumn();
 $totalPages = (int)ceil($totalItems / MATERI_PER_PAGE);
@@ -66,7 +62,7 @@ $selectCols = $hasCategoryCol
 
 if ($hasCategoryCol && $filterCategory !== 'all') {
     // Filter by category + pagination
-    $where = is_admin() ? "category = ?" : "category = ? AND is_public = 1";
+    $where = "category = ?";
     $stmt = db()->prepare(
         "SELECT $selectCols FROM materials
          WHERE $where
@@ -76,9 +72,8 @@ if ($hasCategoryCol && $filterCategory !== 'all') {
     $stmt->execute([$filterCategory, MATERI_PER_PAGE, $offset]);
 } else {
     // Semua kategori + pagination
-    $where = is_admin() ? "" : " WHERE is_public = 1";
     $stmt = db()->prepare(
-        "SELECT $selectCols FROM materials$where
+        "SELECT $selectCols FROM materials
          ORDER BY id DESC
          LIMIT ? OFFSET ?"
     );
