@@ -8,8 +8,7 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
 
-// Izinkan admin & super_admin
-require_admin();
+require_super_admin();
 
 $current = get_maintenance_status();
 $message = '';

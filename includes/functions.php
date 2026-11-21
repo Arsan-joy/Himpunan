@@ -25,6 +25,15 @@ function require_login(): void {
     if (!is_logged_in()) { header('Location: ' . BASE_URL . 'pages/login.php?next=' . urlencode($_SERVER['REQUEST_URI'])); exit; }
 }
 
+function safe_internal_redirect(string $next, string $fallback): string {
+    $next = trim($next);
+    if ($next === '' || $next[0] !== '/' || str_starts_with($next, '//') || str_starts_with($next, '\\')) {
+        return $fallback;
+    }
+    if (preg_match('/^[a-z][a-z0-9+.-]*:/i', $next)) return $fallback;
+    return $next;
+}
+
 function format_date_id(string $ymd): string {
     if(!$ymd) return '';
     $b=["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
@@ -67,6 +76,12 @@ function save_uploaded_file(string $field, string $subdir, array $allowedExt, in
 
     // Validasi ekstensi
     $ext = strtolower(pathinfo($f['name'], PATHINFO_EXTENSION));
+    if ($ext === 'svg') {
+        if (function_exists('log_security')) {
+            log_security('upload_rejected', ['reason' => 'svg_disabled', 'filename' => $f['name']]);
+        }
+        throw new RuntimeException('Upload SVG tidak diizinkan.');
+    }
     if (!in_array($ext, $allowedExt, true)) throw new RuntimeException('Ekstensi tidak diizinkan: '.$ext);
 
     // Cegah double extension berbahaya (mis. file.php.jpg)
@@ -85,7 +100,6 @@ function save_uploaded_file(string $field, string $subdir, array $allowedExt, in
     $allowedMimes = [
         'jpg'  => 'image/jpeg',  'jpeg' => 'image/jpeg',
         'png'  => 'image/png',   'gif'  => 'image/gif',
-        'webp' => 'image/webp',  'svg'  => 'image/svg+xml',
         'pdf'  => 'application/pdf',
         'doc'  => 'application/msword',
         'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',

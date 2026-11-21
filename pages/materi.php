@@ -42,10 +42,15 @@ $currentPage = max(1, (int)($_GET['page'] ?? 1));
 // ── Query: total item (dengan filter kategori jika aktif) ────────────────────
 // Jika kolom category belum ada di DB, abaikan filter dan tampilkan semua
 if ($hasCategoryCol && $filterCategory !== 'all') {
-    $stmtCount = db()->prepare("SELECT COUNT(*) FROM materials WHERE category = ?");
+    $sql = is_admin()
+        ? "SELECT COUNT(*) FROM materials WHERE category = ?"
+        : "SELECT COUNT(*) FROM materials WHERE category = ? AND is_public = 1";
+    $stmtCount = db()->prepare($sql);
     $stmtCount->execute([$filterCategory]);
 } else {
-    $stmtCount = db()->query("SELECT COUNT(*) FROM materials");
+    $stmtCount = db()->query(is_admin()
+        ? "SELECT COUNT(*) FROM materials"
+        : "SELECT COUNT(*) FROM materials WHERE is_public = 1");
 }
 $totalItems = (int)$stmtCount->fetchColumn();
 $totalPages = (int)ceil($totalItems / MATERI_PER_PAGE);
@@ -61,17 +66,19 @@ $selectCols = $hasCategoryCol
 
 if ($hasCategoryCol && $filterCategory !== 'all') {
     // Filter by category + pagination
+    $where = is_admin() ? "category = ?" : "category = ? AND is_public = 1";
     $stmt = db()->prepare(
         "SELECT $selectCols FROM materials
-         WHERE category = ?
+         WHERE $where
          ORDER BY id DESC
          LIMIT ? OFFSET ?"
     );
     $stmt->execute([$filterCategory, MATERI_PER_PAGE, $offset]);
 } else {
     // Semua kategori + pagination
+    $where = is_admin() ? "" : " WHERE is_public = 1";
     $stmt = db()->prepare(
-        "SELECT $selectCols FROM materials
+        "SELECT $selectCols FROM materials$where
          ORDER BY id DESC
          LIMIT ? OFFSET ?"
     );
@@ -195,12 +202,12 @@ include __DIR__ . '/../includes/header.php';
             <div class="card-actions">
               <?php if (preg_match('~\.pdf$~i', $m['file_url'])): ?>
                 <button class="btn-view"
-                        onclick="viewPDF('<?= htmlspecialchars($m['file_url'], ENT_QUOTES) ?>')">
+                        onclick="viewPDF('<?= BASE_URL ?>pages/materi_download.php?id=<?= (int)$m['id'] ?>')">
                   <i class="fas fa-eye"></i> Lihat
                 </button>
               <?php endif; ?>
               <button class="btn-download"
-                      onclick="downloadPDF('<?= htmlspecialchars($m['file_url'], ENT_QUOTES) ?>','<?= htmlspecialchars($m['title'], ENT_QUOTES) ?>')">
+                      onclick="downloadPDF('<?= BASE_URL ?>pages/materi_download.php?id=<?= (int)$m['id'] ?>&download=1','<?= htmlspecialchars($m['title'], ENT_QUOTES) ?>')">
                 <i class="fas fa-download"></i> Download
               </button>
             </div>
