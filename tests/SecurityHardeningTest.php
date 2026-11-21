@@ -47,4 +47,21 @@ class SecurityHardeningTest extends TestCase
         $this->assertStringContainsString('require_login();', $materi);
         $this->assertStringNotContainsString('is_public = 1', $materi);
     }
+
+    public function testSecurityHeadersAllowSameOriginFraming(): void
+    {
+        $headers = file_get_contents(__DIR__ . '/../includes/security_headers.php');
+        $this->assertStringContainsString("header('X-Frame-Options: SAMEORIGIN');", $headers);
+        $this->assertStringContainsString("\"frame-ancestors 'self'\"", $headers);
+        $this->assertStringNotContainsString('X-Frame-Options: DENY', $headers);
+        $this->assertStringNotContainsString("\"frame-ancestors 'none'\"", $headers);
+    }
+
+    public function testMaterialDownloadDoesNotSendCspSandbox(): void
+    {
+        $download = file_get_contents(__DIR__ . '/../pages/materi_download.php');
+        $this->assertStringContainsString("header('X-Content-Type-Options: nosniff');", $download);
+        $this->assertStringNotContainsString('Content-Security-Policy', $download);
+        $this->assertStringNotContainsString('sandbox', $download);
+    }
 }
