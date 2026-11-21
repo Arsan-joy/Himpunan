@@ -257,6 +257,17 @@ $modules = [
           'image_upload' => ['label'=>'Gambar (opsional)','type'=>'file','accept'=>'image/*','target'=>'image_url','subdir'=>'events','allowed'=>['jpg','jpeg','png','webp'],'maxMB'=>10],
       ],
   ],
+  'pengaturan' => [
+      'title' => 'Pengaturan Konten',
+      'table' => 'site_settings',
+      'order' => 'id DESC',
+      'allowed_orders' => ['id', 'setting_key', 'setting_label'],
+      'fields' => [
+          'setting_key' => ['label'=>'Kunci','required'=>true],
+          'setting_label' => ['label'=>'Nama Konten','required'=>true],
+          'setting_value' => ['label'=>'Nilai','type'=>'textarea','required'=>true],
+      ],
+  ],
   'users' => [
       'title' => 'Pengguna','table' => 'users','order' => 'id DESC',
       'allowed_orders' => ['id', 'username', 'role', 'active'],
@@ -547,6 +558,7 @@ $isMaint = !empty($maintenance['enabled']);
       <a class="<?= $moduleKey==='foto'?'active':'' ?>" href="?m=foto"><i class="fa-solid fa-image"></i> Kelola Foto</a>
       <a class="<?= $moduleKey==='materi'?'active':'' ?>" href="?m=materi"><i class="fa-solid fa-book"></i> Kelola Materi</a>
       <a class="<?= $moduleKey==='kegiatan'?'active':'' ?>" href="?m=kegiatan"><i class="fa-solid fa-calendar-days"></i> Kelola Kegiatan</a>
+      <a class="<?= $moduleKey==='pengaturan'?'active':'' ?>" href="?m=pengaturan"><i class="fa-solid fa-sliders"></i> Kelola Konten</a>
       <?php if (is_super_admin()): ?>
       <a class="<?= $moduleKey==='users'?'active':'' ?>" href="?m=users"><i class="fa-solid fa-user-shield"></i> Kelola Pengguna</a>
       <a href="tools/import_members.php"><i class="fa-solid fa-file-import"></i> Impor Anggota</a>
@@ -685,9 +697,19 @@ $isMaint = !empty($maintenance['enabled']);
                           <img class="thumb" src="<?= htmlspecialchars($v) ?>" alt="">
                         <?php elseif ($v): ?>
                           <a class="badge" href="<?= htmlspecialchars($v) ?>" target="_blank">Lihat</a>
-                        <?php else: ?><span class="hint">-</span><?php endif; ?>
+                          <?php else: ?><span class="hint">-</span><?php endif; ?>
+                      <?php elseif ($type === 'select'):
+                          $options = !empty($meta['options_sql']) ? fetch_options_sql($meta['options_sql']) : ($meta['options'] ?? []);
+                          $display = (string)$v;
+                          foreach ((array)$options as $opt) {
+                              $ov = is_array($opt) ? ($opt['value'] ?? '') : (string)$opt;
+                              $ol = is_array($opt) ? ($opt['label'] ?? $ov) : ucfirst((string)$opt);
+                              if ((string)$v === (string)$ov) { $display = (string)$ol; break; }
+                          }
+                      ?>
+                          <?= htmlspecialchars($display) ?>
                       <?php else: ?>
-                        <?= htmlspecialchars((string)$v) ?>
+                          <?= htmlspecialchars((string)$v) ?>
                       <?php endif; ?>
                     </td>
                   <?php endforeach; ?>

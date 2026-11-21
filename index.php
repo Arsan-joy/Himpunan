@@ -13,6 +13,11 @@ $kabinetRows = db()->query("SELECT id, name, period, description, logo_url FROM 
 $active_kabinet = get_active_kabinet($kabinetRows);
 $active_kabinet_name = trim((string)($active_kabinet['name'] ?? 'Kabinet HMTA'));
 $active_kabinet_period = trim((string)($active_kabinet['period'] ?? ''));
+$settings = get_site_settings(['stat_active_members', 'stat_annual_events', 'stat_achievements', 'stat_years']);
+$stat_active_members = (int)($settings['stat_active_members'] ?? 440);
+$stat_annual_events = (int)($settings['stat_annual_events'] ?? 50);
+$stat_achievements = (int)($settings['stat_achievements'] ?? 25);
+$stat_years = (int)($settings['stat_years'] ?? 5);
 ?>
 <!-- Banner Slideshow -->
 <div class="banner-container">
@@ -22,7 +27,7 @@ $active_kabinet_period = trim((string)($active_kabinet['period'] ?? ''));
              srcset="Resource/img/banner1-480.webp 480w, Resource/img/banner1-768.webp 768w, Resource/img/banner1-1280.webp 1280w"
              sizes="100vw" alt="Banner HMTA ITERA" width="1280" height="564" fetchpriority="high">
         <div class="banner-content">
-            <h2>Selamat Datang di HMTA ITERA</h2>
+            <h1>Selamat Datang di HMTA ITERA</h1>
             <p>Himpunan Mahasiswa Teknik Pertambangan Institut Teknologi Sumatera</p>
             <a href="pages/profile.php" class="btn">Tentang Kami</a>
         </div>
@@ -99,28 +104,28 @@ $active_kabinet_period = trim((string)($active_kabinet['period'] ?? ''));
     <div class="stat-card">
         <div class="stat-icon"><i class="fas fa-users"></i></div>
         <div class="stat-content">
-            <div class="stat-value"><span class="counter" data-target="200">0</span>+</div>
+            <div class="stat-value"><span class="counter" data-target="<?= $stat_active_members ?>">0</span>+</div>
             <div class="stat-label">Anggota Aktif</div>
         </div>
     </div>
     <div class="stat-card">
         <div class="stat-icon"><i class="fas fa-calendar-alt"></i></div>
         <div class="stat-content">
-            <div class="stat-value"><span class="counter" data-target="50">0</span>+</div>
+            <div class="stat-value"><span class="counter" data-target="<?= $stat_annual_events ?>">0</span>+</div>
             <div class="stat-label">Event Tahunan</div>
         </div>
     </div>
     <div class="stat-card">
         <div class="stat-icon"><i class="fas fa-trophy"></i></div>
         <div class="stat-content">
-            <div class="stat-value"><span class="counter" data-target="25">0</span>+</div>
+            <div class="stat-value"><span class="counter" data-target="<?= $stat_achievements ?>">0</span>+</div>
             <div class="stat-label">Prestasi</div>
         </div>
     </div>
     <div class="stat-card">
         <div class="stat-icon"><i class="fas fa-graduation-cap"></i></div>
         <div class="stat-content">
-            <div class="stat-value"><span class="counter" data-target="5">0</span></div>
+            <div class="stat-value"><span class="counter" data-target="<?= $stat_years ?>">0</span></div>
             <div class="stat-label">Tahun Berdiri</div>
         </div>
     </div>

@@ -18,6 +18,21 @@ CREATE TABLE IF NOT EXISTS kabinet (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- Konten tahunan dan counter yang dapat dikelola admin
+CREATE TABLE IF NOT EXISTS site_settings (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  setting_key VARCHAR(100) NOT NULL UNIQUE,
+  setting_label VARCHAR(200) NOT NULL,
+  setting_value TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+INSERT IGNORE INTO site_settings (setting_key, setting_label, setting_value) VALUES
+  ('stat_active_members', 'Anggota Aktif', '440'),
+  ('stat_annual_events', 'Event Tahunan', '50'),
+  ('stat_achievements', 'Prestasi', '25'),
+  ('stat_years', 'Tahun Berdiri', '5');
+
 -- Departemen / Divisi
 CREATE TABLE IF NOT EXISTS departments (
   id INT AUTO_INCREMENT PRIMARY KEY,

@@ -15,6 +15,13 @@ $cssHref = fn($css)=> (preg_match('~^https?://|^/~',$css)?$css:(CSS_URL ?? (BASE
 $is_maintenance = function_exists('is_maintenance_active') ? is_maintenance_active() : false;
 // Untuk meta informasi (optional)
 $maintenance = function_exists('get_maintenance_status') ? get_maintenance_status() : ['enabled' => false, 'pages' => [], 'updated_by' => '', 'updated_at' => ''];
+$canonicalPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+$basePath = parse_url(BASE_URL, PHP_URL_PATH) ?: '/';
+$relativePath = $basePath !== '/' && str_starts_with($canonicalPath, $basePath)
+    ? substr($canonicalPath, strlen(rtrim($basePath, '/')))
+    : $canonicalPath;
+$canonicalUrl = rtrim(BASE_URL, '/') . '/' . ltrim($relativePath, '/');
+$ogImage = (IMG_URL ?? (BASE_URL.'Resource/img/')) . 'banner1.webp';
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -22,6 +29,14 @@ $maintenance = function_exists('get_maintenance_status') ? get_maintenance_statu
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="<?= htmlspecialchars($site_desc) ?>">
 <title><?= htmlspecialchars($page_title ?: 'Halaman') ?> | <?= htmlspecialchars($site_name) ?></title>
+<link rel="canonical" href="<?= htmlspecialchars($canonicalUrl) ?>">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="id_ID">
+<meta property="og:site_name" content="<?= htmlspecialchars($site_name) ?>">
+<meta property="og:title" content="<?= htmlspecialchars(($page_title ?: 'Halaman') . ' | ' . $site_name) ?>">
+<meta property="og:description" content="<?= htmlspecialchars($site_desc) ?>">
+<meta property="og:url" content="<?= htmlspecialchars($canonicalUrl) ?>">
+<meta property="og:image" content="<?= htmlspecialchars($ogImage) ?>">
 <?php
 // Cache busting: gunakan hash dari file jika ada, fallback ke filemtime
 $_cssFile = defined('ROOT_PATH') ? ROOT_PATH . '/Resource/css/style.css' : (dirname(__DIR__) . '/Resource/css/style.css');

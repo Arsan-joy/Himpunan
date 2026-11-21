@@ -109,7 +109,7 @@ include __DIR__ . '/../includes/header.php';
           <div class="timeline-content">
             <h3>2024</h3>
             <h4>Minerfesto III & Lustrum I</h4>
-            <p>Perayaan 4 tahun berdiri nya HMTA ITERA dan 5 tahun Program Studi Teknik Pertambagan</p>
+            <p>Perayaan 4 tahun berdiri nya HMTA ITERA dan 5 tahun Program Studi Teknik Pertambangan</p>
           </div>
         </div>
       </div>

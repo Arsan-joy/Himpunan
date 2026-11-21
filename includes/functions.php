@@ -310,6 +310,25 @@ function get_kabinet_options(): array {
     ], $rows);
 }
 
+/**
+ * Ambil pengaturan konten tahunan dari database.
+ * Mengembalikan fallback jika tabel pengaturan belum tersedia.
+ */
+function get_site_settings(array $keys): array {
+    $values = [];
+    try {
+        $placeholders = implode(',', array_fill(0, count($keys), '?'));
+        $stmt = db()->prepare("SELECT setting_key, setting_value FROM site_settings WHERE setting_key IN ($placeholders)");
+        $stmt->execute(array_values($keys));
+        foreach ($stmt->fetchAll() as $row) {
+            $values[(string)$row['setting_key']] = (string)$row['setting_value'];
+        }
+    } catch (Throwable $e) {
+        // Tabel belum dimigrasikan: template tetap aman memakai fallback.
+    }
+    return $values;
+}
+
 // Tentukan kabinet aktif dengan aturan yang sama di semua halaman.
 function get_active_kabinet(array $kabinetRows, ?int $currentYear = null): ?array {
     $rows = array_values($kabinetRows);
