@@ -24,7 +24,9 @@ $divisions = $dept_id ? get_divisions($dept_id) : [];
 $programs  = $dept_id ? get_programs($dept_id) : [];
 $divisionMembers = get_division_members_batch(array_column($divisions, 'id'));
 
-$page_title     = $dept ? ('Departemen ' . $dept['name']) : 'Departemen HMTA';
+$deptTitleName   = $dept ? preg_replace('/^Departemen\s+/iu', '', (string)$dept['name']) : '';
+$page_title      = $deptTitleName !== '' ? ('Departemen ' . $deptTitleName) : 'Departemen HMTA';
+$deptDisplayName = $deptTitleName !== '' ? $deptTitleName : ($dept['name'] ?? 'Departemen HMTA');
 $additional_css = ['internal.css']; // style khusus
 $additional_js  = ['department.js','medkom-init.js']; // JANGAN tambah index.js (sudah dari header)
 
@@ -45,7 +47,7 @@ if (!function_exists('ph')) {
         <img src="<?= h(!empty($dept['logo_url']) ? $dept['logo_url'] : BASE_URL.'Resource/img/banner1.webp') ?>" alt="Logo Departemen" class="dept-logo"
              width="120" height="120" loading="lazy"
              onerror="this.src='<?= ph(120,120,$dept['name']??'DEPT') ?>'">
-        <h1><?= h($dept['name'] ?? 'Departemen HMTA') ?></h1>
+        <h1><?= h($deptDisplayName) ?></h1>
         <p><?= h($dept['description'] ?? 'Deskripsi departemen belum tersedia.') ?></p>
       </div>
     </div>

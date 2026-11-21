@@ -28,12 +28,12 @@ define('SITE_NAME', 'HMTA ITERA');
 define('SITE_DESCRIPTION', 'Himpunan Mahasiswa Teknik Pertambangan Institut Teknologi Sumatera');
 
 // Kontak
-define('CONTACT_EMAIL', 'hmtaitera@gmail.com');
+define('CONTACT_EMAIL', 'hmta.balakosa.itera@gmail.com');
 define('CONTACT_PHONE', '0821-XXXX-XXXX');
 define('CONTACT_ADDRESS', 'ITERA, Lampung');
 
 // Sosial
-define('LINKEDIN_URL', 'https://www.linkedin.com/company/himpunan-mahasiswa-teknik-pertambagan-itera-hmta-itera/');
+define('LINKEDIN_URL', 'https://www.linkedin.com/company/himpunan-mahasiswa-teknik-pertambangan-itera-hmta-itera/');
 define('INSTAGRAM_URL', 'https://www.instagram.com/@hmta_itera');
 define('YOUTUBE_URL', 'https://www.youtube.com/@hmtaitera');
 define('TIKTOK_URL', 'https://www.tiktok.com/@hmta.balakosa.itera');

@@ -6,6 +6,12 @@ $additional_css = ['styleminer.css']; // pastikan ada di Resource/css/styleminer
 $additional_js  = ['miner.js'];       // pastikan ada di Resource/js/miner.js
 
 include dirname(__DIR__, 2) . '/includes/header.php';
+
+$settings = get_site_settings([
+  'minerfesto_name', 'minerfesto_event_dates', 'minerfesto_registration_dates',
+  'minerfesto_location', 'minerfesto_registration_url', 'minerfesto_guidebook_url'
+]);
+$registrationEnabled = $settings['minerfesto_registration_dates'] ?? '';
 ?>
 <main>
   <!-- Hero Section -->
@@ -173,34 +179,35 @@ include dirname(__DIR__, 2) . '/includes/header.php';
     </div>
   </section>
 
+  <?php if ($registrationEnabled !== ''): ?>
   <!-- Registration Section -->
   <section class="registration">
     <div class="container">
       <h2 class="section-title">Pendaftaran Minerfesto</h2>
       <div class="registration-content">
         <div class="registration-info">
-          <h3>Minerfesto 2025</h3>
+          <h3><?= htmlspecialchars($settings['minerfesto_name'] ?? 'Minerfesto') ?></h3>
           <p>Siap untuk menjadi bagian dari Minerfesto tahun ini? Daftar sekarang dan ikuti berbagai rangkaian acara yang telah kami siapkan!</p>
           <div class="registration-details">
             <div class="detail-item">
               <i class="fas fa-calendar-alt"></i>
               <div>
                 <h4>Tanggal Pelaksanaan</h4>
-                <p>15-20 September 2025</p>
+                <p><?= htmlspecialchars($settings['minerfesto_event_dates'] ?? '') ?></p>
               </div>
             </div>
             <div class="detail-item">
               <i class="fas fa-map-marker-alt"></i>
               <div>
                 <h4>Lokasi</h4>
-                <p>Institut Teknologi Sumatera, Lampung</p>
+                <p><?= htmlspecialchars($settings['minerfesto_location'] ?? 'Institut Teknologi Sumatera, Lampung') ?></p>
               </div>
             </div>
             <div class="detail-item">
               <i class="fas fa-clipboard-list"></i>
               <div>
                 <h4>Pendaftaran Dibuka</h4>
-                <p>1 Juni - 31 Agustus 2025</p>
+                <p><?= htmlspecialchars($registrationEnabled) ?></p>
               </div>
             </div>
             <div class="detail-item">
@@ -212,8 +219,8 @@ include dirname(__DIR__, 2) . '/includes/header.php';
             </div>
           </div>
           <div class="registration-buttons">
-            <a href="#" class="btn-primary">Daftar Sekarang</a>
-            <a href="#" class="btn-secondary">Unduh Guidebook</a>
+            <?php if (!empty($settings['minerfesto_registration_url'])): ?><a href="<?= htmlspecialchars($settings['minerfesto_registration_url']) ?>" class="btn-primary">Daftar Sekarang</a><?php endif; ?>
+            <?php if (!empty($settings['minerfesto_guidebook_url'])): ?><a href="<?= htmlspecialchars($settings['minerfesto_guidebook_url']) ?>" class="btn-secondary">Unduh Guidebook</a><?php endif; ?>
           </div>
         </div>
         <div class="registration-image">
@@ -223,6 +230,7 @@ include dirname(__DIR__, 2) . '/includes/header.php';
       </div>
     </div>
   </section>
+  <?php endif; ?>
 
   <!-- Sponsors Section -->
   <section class="sponsors">
@@ -353,4 +361,4 @@ include dirname(__DIR__, 2) . '/includes/header.php';
     </div>
   </section>
 </main>
-<?php include dirname(__DIR__, 2) . '/../includes/footer.php'; ?>
+<?php include __DIR__ . '/../../includes/footer.php'; ?>
