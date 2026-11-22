@@ -15,25 +15,31 @@ function get_department_by_slug(string $slug): ?array {
 }
 
 // Ambil daftar divisi pada departemen
-function get_divisions(int $department_id): array {
+function get_divisions(int $department_id, ?int $kabinet_id = null): array {
+    $params = [$department_id];
+    $cabinetClause = '';
+    if ($kabinet_id !== null) {
+        $cabinetClause = ' AND (kabinet_id = ? OR kabinet_id IS NULL)';
+        $params[] = $kabinet_id;
+    }
     try {
         $stmt = db()->prepare("
             SELECT id, name, slug, description, member_count
             FROM divisions
-            WHERE department_id = ?
+            WHERE department_id = ?" . $cabinetClause . "
             ORDER BY COALESCE(sort_order, 9999), id
         ");
-        $stmt->execute([$department_id]);
+        $stmt->execute($params);
         return $stmt->fetchAll();
     } catch (Throwable $e) {
         // Fallback jika kolom sort_order/member_count belum ada
         $stmt = db()->prepare("
             SELECT id, name, slug, description
             FROM divisions
-            WHERE department_id = ?
+            WHERE department_id = ?" . $cabinetClause . "
             ORDER BY id
         ");
-        $stmt->execute([$department_id]);
+        $stmt->execute($params);
         $rows = $stmt->fetchAll();
         foreach ($rows as &$r) {
             if (!isset($r['member_count'])) $r['member_count'] = null;
@@ -104,19 +110,33 @@ function get_division_members_batch(array $division_ids): array {
     foreach ($rows as $row) {
         $grouped[(int)$row['division_id']][] = $row;
     }
+    foreach ($grouped as &$members) {
+        usort($members, function (array $a, array $b): int {
+            $aHead = strtolower(trim((string)($a['role'] ?? ''))) === 'kepala divisi';
+            $bHead = strtolower(trim((string)($b['role'] ?? ''))) === 'kepala divisi';
+            return $aHead === $bHead ? ((int)$a['id'] <=> (int)$b['id']) : ($aHead ? -1 : 1);
+        });
+    }
+    unset($members);
     return $grouped;
 }
 
 // (Opsional) Pimpinan/leaders departemen jika tabelnya tersedia
-function get_department_leaders(int $department_id): array {
+function get_department_leaders(int $department_id, ?int $kabinet_id = null): array {
+    $params = [$department_id];
+    $cabinetClause = '';
+    if ($kabinet_id !== null) {
+        $cabinetClause = ' AND (kabinet_id = ? OR kabinet_id IS NULL)';
+        $params[] = $kabinet_id;
+    }
     try {
         $stmt = db()->prepare("
             SELECT id, name, role, photo_url, linkedin_url, email
             FROM leaders
-            WHERE department_id = ?
+            WHERE department_id = ?" . $cabinetClause . "
             ORDER BY COALESCE(sort_order, id), id
         ");
-        $stmt->execute([$department_id]);
+        $stmt->execute($params);
         return $stmt->fetchAll();
     } catch (Throwable $e) {
         return [];
@@ -124,15 +144,21 @@ function get_department_leaders(int $department_id): array {
 }
 
 // (Opsional) Program kerja departemen jika tabelnya tersedia
-function get_programs(int $department_id): array {
+function get_programs(int $department_id, ?int $kabinet_id = null): array {
+    $params = [$department_id];
+    $cabinetClause = '';
+    if ($kabinet_id !== null) {
+        $cabinetClause = ' AND (kabinet_id = ? OR kabinet_id IS NULL)';
+        $params[] = $kabinet_id;
+    }
     try {
         $stmt = db()->prepare("
             SELECT id, name, description, frequency
             FROM programs
-            WHERE department_id = ?
+            WHERE department_id = ?" . $cabinetClause . "
             ORDER BY COALESCE(sort_order, id), id
         ");
-        $stmt->execute([$department_id]);
+        $stmt->execute($params);
         return $stmt->fetchAll();
     } catch (Throwable $e) {
         return [];
