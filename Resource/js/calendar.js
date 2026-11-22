@@ -1,22 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
 
-    // ── Navbar mobile ────────────────────────────────────────────────────────
-    const mobileMenuBtn     = document.getElementById('mobileMenuBtn');
-    const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
-    const mainNav           = document.getElementById('mainNav');
-    if (mobileMenuBtn && mainNav && mobileMenuOverlay) {
-        mobileMenuBtn.addEventListener('click', function () {
-            mainNav.classList.toggle('active');
-            mobileMenuOverlay.classList.toggle('active');
-            document.body.classList.toggle('menu-open');
-        });
-        mobileMenuOverlay.addEventListener('click', function () {
-            mainNav.classList.remove('active');
-            mobileMenuOverlay.classList.remove('active');
-            document.body.classList.remove('menu-open');
-        });
-    }
-
     // ── Elemen kalender ──────────────────────────────────────────────────────
     const calendar        = document.getElementById('calendar');
     const eventList       = document.getElementById('eventList');

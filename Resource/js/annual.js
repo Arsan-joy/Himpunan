@@ -1,25 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Mobile Menu Toggle
-    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
     const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
     const mainNav = document.getElementById('mainNav');
     const dropdowns = document.querySelectorAll('.dropdown');
-  
-    if (mobileMenuBtn) {
-      mobileMenuBtn.addEventListener('click', function() {
-        mainNav.classList.toggle('active');
-        mobileMenuOverlay.style.display = mainNav.classList.contains('active') ? 'block' : 'none';
-        document.body.style.overflow = mainNav.classList.contains('active') ? 'hidden' : '';
-      });
-    }
-  
-    if (mobileMenuOverlay) {
-      mobileMenuOverlay.addEventListener('click', function() {
-        mainNav.classList.remove('active');
-        mobileMenuOverlay.style.display = 'none';
-        document.body.style.overflow = '';
-      });
-    }
   
     // Mobile Dropdown Toggle
     dropdowns.forEach(dropdown => {

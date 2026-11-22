@@ -1,20 +1,4 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-    const mainNav = document.getElementById('mainNav');
-    const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
-    if (mobileMenuBtn && mainNav && mobileMenuOverlay) {
-        mobileMenuBtn.addEventListener('click', function() {
-            mainNav.classList.toggle('active');
-            mobileMenuOverlay.classList.toggle('active');
-            document.body.classList.toggle('menu-open');
-        });
-        mobileMenuOverlay.addEventListener('click', function() {
-            mainNav.classList.remove('active');
-            mobileMenuOverlay.classList.remove('active');
-            document.body.classList.remove('menu-open');
-        });
-    }
-
     const filterButtons = document.querySelectorAll('.filter-btn');
     const galleryItems = document.querySelectorAll('.gallery-item');
     const searchBox = document.getElementById('gallery-search');

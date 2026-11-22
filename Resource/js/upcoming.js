@@ -1,28 +1,6 @@
 // Menunggu hingga seluruh konten HTML dimuat sebelum menjalankan skrip
 document.addEventListener('DOMContentLoaded', function() {
 
-    // --- Fungsionalitas untuk Menu Mobile ---
-    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-    const mainNav = document.getElementById('mainNav');
-    const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
-    const body = document.body;
-
-    if (mobileMenuBtn && mainNav && mobileMenuOverlay) {
-        // Ketika tombol menu di-klik
-        mobileMenuBtn.addEventListener('click', () => {
-            mainNav.classList.toggle('active');
-            mobileMenuOverlay.classList.toggle('active');
-            body.classList.toggle('no-scroll'); // Mencegah scroll di background
-        });
-
-        // Ketika overlay gelap di-klik (area di luar menu)
-        mobileMenuOverlay.addEventListener('click', () => {
-            mainNav.classList.remove('active');
-            mobileMenuOverlay.classList.remove('active');
-            body.classList.remove('no-scroll');
-        });
-    }
-
     // Fokus: dropdown Event pada mobile (hamburger ditangani global di index.js)
 document.addEventListener('DOMContentLoaded', function() {
     const dropdownTriggers = document.querySelectorAll('.dropdown > a');

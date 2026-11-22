@@ -1,30 +1,5 @@
-// Mobile Menu Toggle
 document.addEventListener('DOMContentLoaded', function() {
-    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-    const mainNav = document.getElementById('mainNav');
-    const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
     const dropdowns = document.querySelectorAll('.dropdown');
-  
-    // Toggle mobile menu
-    mobileMenuBtn.addEventListener('click', function() {
-      mainNav.classList.toggle('active');
-      mobileMenuOverlay.classList.toggle('active');
-      
-      // Change menu icon
-      const icon = mobileMenuBtn.querySelector('i');
-      if (mainNav.classList.contains('active')) {
-        icon.className = 'fas fa-times';
-      } else {
-        icon.className = 'fas fa-bars';
-      }
-    });
-  
-    // Close menu when clicking outside
-    mobileMenuOverlay.addEventListener('click', function() {
-      mainNav.classList.remove('active');
-      mobileMenuOverlay.classList.remove('active');
-      mobileMenuBtn.querySelector('i').className = 'fas fa-bars';
-    });
   
     // Handle dropdown clicks on mobile
     dropdowns.forEach(dropdown => {
