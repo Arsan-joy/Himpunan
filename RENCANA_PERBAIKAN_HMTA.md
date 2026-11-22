@@ -166,7 +166,7 @@ Detail lengkap ada di `audit-kode-hmta-2026-11-21.md` §16. Tiga akar masalah: k
 - **Kerjakan:** tambahkan `logo_url` ke SELECT di `get_department_by_slug()` dan tampilkan di `department.php` (dengan fallback ke `banner1.png` bila kosong).
 - **Kriteria selesai:** tiap halaman departemen menampilkan logo departemennya sendiri, bukan banner1.png.
 
-### 3.2 Data — slug tertukar (tugas manual via panel admin / SQL)
+### 3.2 Data — slug tertukar (diperbaiki via migrasi 004, dijalankan di produksi sebelum/saat deploy)
 
 - Lookup slug di kode sudah benar (case-insensitive, exact match). Yang salah datanya: baris Medkominfo slug-nya "Internal".
 - **Perbaiki di DB:** Medkominfo → `medkominfo`, Internal → `internal`. Perbarui tautan yang memakai slug lama. Inkonsistensi terkait: file logo menyebut "Medkomvis" (`Logo-Departemen-Medkomvis.jpg`) sementara departemennya "Medkominfo" — samakan penamaannya.

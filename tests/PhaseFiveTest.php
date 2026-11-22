@@ -53,4 +53,17 @@ final class PhaseFiveTest extends TestCase
         $internal = file_get_contents($this->root('pages/departemensamagri/internal.php'));
         $this->assertStringNotContainsString('medkom-init.js', $internal);
     }
+
+    public function testDepartmentSlugMigrationIsIdempotentAndLimitedToCorrections(): void
+    {
+        $migration = file_get_contents($this->root('database/migrations/004_fix_department_slugs.sql'));
+
+        $this->assertStringContainsString("UPDATE departments SET slug = 'medkominfo' WHERE slug = 'Internal';", $migration);
+        $this->assertStringContainsString("UPDATE departments SET slug = 'internal' WHERE slug = 'intern';", $migration);
+        $this->assertStringNotContainsString('DELETE', strtoupper($migration));
+        $this->assertStringNotContainsString('INSERT', strtoupper($migration));
+
+        $schema = file_get_contents($this->root('database/schema.sql'));
+        $this->assertStringContainsString('UNIQUE KEY slug (slug)', $schema);
+    }
 }
