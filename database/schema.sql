@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS divisions (
   description TEXT DEFAULT NULL,
   member_count INT DEFAULT 0,
   sort_order INT DEFAULT 0,
-  UNIQUE KEY uniq_division_slug (department_id, slug),
+  UNIQUE KEY uniq_division_kabinet_slug (department_id, kabinet_id, slug),
   FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE CASCADE,
   FOREIGN KEY (kabinet_id) REFERENCES kabinet(id) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
