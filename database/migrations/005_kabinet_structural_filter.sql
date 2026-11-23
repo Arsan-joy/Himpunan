@@ -1,5 +1,4 @@
-- Migration 005: pemisahan data struktural per kabinet
-
+-- Migration 005: pemisahan data struktural per kabinet
 ALTER TABLE organization_leaders ADD COLUMN IF NOT EXISTS kabinet_id INT NULL;
 ALTER TABLE leaders ADD COLUMN IF NOT EXISTS kabinet_id INT NULL;
 ALTER TABLE programs ADD COLUMN IF NOT EXISTS kabinet_id INT NULL;

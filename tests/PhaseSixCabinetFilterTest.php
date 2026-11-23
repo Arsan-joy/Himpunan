@@ -23,7 +23,7 @@ final class PhaseSixCabinetFilterTest extends TestCase
         $this->assertMatchesRegularExpression('/CREATE TABLE IF NOT EXISTS organization_leaders[\s\S]*kabinet_id INT DEFAULT NULL[\s\S]*FOREIGN KEY \(kabinet_id\)/', $schema);
         $this->assertMatchesRegularExpression('/CREATE TABLE IF NOT EXISTS programs[\s\S]*kabinet_id INT DEFAULT NULL[\s\S]*FOREIGN KEY \(kabinet_id\)/', $schema);
 
-        $this->assertStringContainsString("period = '2026/2027'", $migration);
+        $this->assertStringContainsString("period = '2026-2027'", $migration);
         $this->assertStringContainsString('ADD COLUMN IF NOT EXISTS kabinet_id', $migration);
     }
 
@@ -58,6 +58,6 @@ final class PhaseSixCabinetFilterTest extends TestCase
     public function testAdminModulesExposeCabinetField(): void
     {
         $manage = file_get_contents($this->root('admin/manage.php'));
-        $this->assertSame(4, substr_count($manage, "'kabinet_id' => ['label'=>'Kabinet'"));
+        $this->assertSame(5, substr_count($manage, "'kabinet_id' => ['label'=>'Kabinet'"));
     }
 }
