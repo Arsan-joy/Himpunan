@@ -96,7 +96,7 @@ if ($activeIndex !== null) {
                                     <span><?= htmlspecialchars($activeCabinet['period'] ?: date('Y')) ?></span>
                                 </div>
                             </div>
-                            <a href="<?= BASE_URL; ?>pages/samagri.php" class="kabinet-btn">
+                            <a href="<?= BASE_URL; ?>pages/samagri.php?kabinet=<?= (int)$activeCabinet['id'] ?>" class="kabinet-btn">
                                 <span>Lihat Detail</span>
                                 <i class="fas fa-arrow-right"></i>
                             </a>
@@ -132,7 +132,7 @@ if ($activeIndex !== null) {
                                         <span><?= htmlspecialchars($row['period'] ?: '-') ?></span>
                                     </div>
                                 </div>
-                                <a href="<?= BASE_URL; ?>pages/samagri.php" class="kabinet-btn">
+                                <a href="<?= BASE_URL; ?>pages/samagri.php?kabinet=<?= (int)$row['id'] ?>" class="kabinet-btn">
                                     <span>Lihat Detail</span>
                                     <i class="fas fa-arrow-right"></i>
                                 </a>

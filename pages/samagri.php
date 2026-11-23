@@ -11,18 +11,32 @@ include __DIR__ . '/../includes/header.php';
 // Ambil Kabinet dari DB
 $kabinetRows = db()->query("SELECT id, name, period, description, logo_url FROM kabinet ORDER BY id DESC")->fetchAll();
 
-// Tentukan kabinet aktif dengan logika bersama
+// Terima kabinet pilihan; fallback ke kabinet aktif bila ID tidak valid/tidak diberikan.
 $activeCabinet = get_active_kabinet($kabinetRows);
+$requestedKabinet = filter_input(INPUT_GET, 'kabinet', FILTER_VALIDATE_INT);
+if ($requestedKabinet !== false && $requestedKabinet !== null) {
+    foreach ($kabinetRows as $row) {
+        if ((int)$row['id'] === (int)$requestedKabinet) {
+            $activeCabinet = $row;
+            break;
+        }
+    }
+}
+$kabinetId = $activeCabinet ? (int)$activeCabinet['id'] : null;
 
 // Ambil daftar departemen dari DB (SEKARANG termasuk logo_url)
 $departments = db()->query("SELECT id, name, slug, description, logo_url FROM departments ORDER BY name ASC")->fetchAll();
 
 // Ambil Pengurus Himpunan
 $pengurus = [];
-try { $pengurus = get_organization_leaders(); } catch (Throwable $e) { $pengurus = []; }
+try { $pengurus = get_organization_leaders(null, $kabinetId); } catch (Throwable $e) { $pengurus = []; }
 
 // Helper ringkas
-function dept_link(string $slug): string { return BASE_URL . 'pages/department.php?slug=' . rawurlencode($slug); }
+function dept_link(string $slug, ?int $kabinetId): string {
+    $url = BASE_URL . 'pages/department.php?slug=' . rawurlencode($slug);
+    if ($kabinetId !== null) $url .= '&kabinet=' . $kabinetId;
+    return $url;
+}
 ?>
 <main>
     <!-- Hero Section -->
@@ -102,7 +116,7 @@ function dept_link(string $slug): string { return BASE_URL . 'pages/department.p
                             <?php
                               $deptLogo = !empty($d['logo_url']) ? $d['logo_url'] : (BASE_URL . 'Resource/img/banner1.webp');
                             ?>
-                            <a href="<?= dept_link($d['slug']) ?>" class="department-card" title="Lihat <?= h($d['name']) ?>">
+                            <a href="<?= dept_link($d['slug'], $kabinetId) ?>" class="department-card" title="Lihat <?= h($d['name']) ?>">
                                 <img class="logo-kabinet"
                                      src="<?= h($deptLogo) ?>"
                                      alt="<?= h($d['name']) ?>"

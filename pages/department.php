@@ -17,11 +17,24 @@ require_once $helpersPath;
 $slugParam = $_GET['slug'] ?? '';
 $slug = $slugParam !== '' ? strtolower($slugParam) : (isset($slug) ? strtolower($slug) : 'internal');
 
+$kabinetRows = db()->query("SELECT id, name, period, description, logo_url FROM kabinet ORDER BY id DESC")->fetchAll();
+$activeCabinet = get_active_kabinet($kabinetRows);
+$requestedKabinet = filter_input(INPUT_GET, 'kabinet', FILTER_VALIDATE_INT);
+if ($requestedKabinet !== false && $requestedKabinet !== null) {
+    foreach ($kabinetRows as $row) {
+        if ((int)$row['id'] === (int)$requestedKabinet) {
+            $activeCabinet = $row;
+            break;
+        }
+    }
+}
+$kabinetId = $activeCabinet ? (int)$activeCabinet['id'] : null;
+
 $dept      = get_department_by_slug($slug);
 $dept_id   = (int)($dept['id'] ?? 0);
-$leaders   = $dept_id ? get_department_leaders($dept_id) : [];
-$divisions = $dept_id ? get_divisions($dept_id) : [];
-$programs  = $dept_id ? get_programs($dept_id) : [];
+$leaders   = $dept_id ? get_department_leaders($dept_id, $kabinetId) : [];
+$divisions = $dept_id ? get_divisions($dept_id, $kabinetId) : [];
+$programs  = $dept_id ? get_programs($dept_id, $kabinetId) : [];
 $divisionMembers = get_division_members_batch(array_column($divisions, 'id'));
 
 $deptTitleName   = $dept ? preg_replace('/^Departemen\s+/iu', '', (string)$dept['name']) : '';

@@ -136,6 +136,7 @@ $modules = [
       'allowed_orders' => ['id', 'name', 'department_id'],
       'fields' => [
           'department_id' => ['label'=>'Departemen','type'=>'select','required'=>true,'options_sql'=>"SELECT id, name FROM departments ORDER BY name ASC"],
+          'kabinet_id' => ['label'=>'Kabinet','type'=>'select','options_sql'=>"SELECT id, CONCAT(name, ' (', IFNULL(period,''), ')') AS name FROM kabinet ORDER BY id DESC"],
           'name' => ['label'=>'Nama','required'=>true],
           'slug' => ['label'=>'Slug','required'=>true],
           'description' => ['label'=>'Deskripsi','type'=>'textarea'],
@@ -158,6 +159,7 @@ $modules = [
       'allowed_orders' => ['id', 'name', 'sort_order'],
       'fields' => [
           'name' => ['label'=>'Nama','required'=>true],
+          'kabinet_id' => ['label'=>'Kabinet','type'=>'select','options_sql'=>"SELECT id, CONCAT(name, ' (', IFNULL(period,''), ')') AS name FROM kabinet ORDER BY id DESC"],
           'role' => ['label'=>'Jabatan','type'=>'select','required'=>true,'options'=>[
               'Ketua Himpunan',
               'Sekretaris Umum 1','Sekretaris Umum 2',
@@ -176,6 +178,7 @@ $modules = [
       'allowed_orders' => ['id', 'name', 'sort_order', 'department_id'],
       'fields' => [
           'department_id' => ['label'=>'Departemen','type'=>'select','required'=>true,'options_sql'=>"SELECT id, name FROM departments ORDER BY name ASC"],
+          'kabinet_id' => ['label'=>'Kabinet','type'=>'select','options_sql'=>"SELECT id, CONCAT(name, ' (', IFNULL(period,''), ')') AS name FROM kabinet ORDER BY id DESC"],
           'name' => ['label'=>'Nama','required'=>true],
           'role' => ['label'=>'Peran','type'=>'select','options'=>['Kepala Departemen','Sekretaris Departemen'],'required'=>true],
           'photo_file' => ['label'=>'Foto','type'=>'file','accept'=>'image/*','target'=>'photo_url','subdir'=>'leaders','allowed'=>['jpg','jpeg','png','webp'],'maxMB'=>5],
@@ -190,6 +193,7 @@ $modules = [
       'allowed_orders' => ['id', 'name', 'sort_order', 'department_id'],
       'fields' => [
           'department_id' => ['label'=>'Departemen','type'=>'select','required'=>true,'options_sql'=>"SELECT id, name FROM departments ORDER BY name ASC"],
+          'kabinet_id' => ['label'=>'Kabinet','type'=>'select','options_sql'=>"SELECT id, CONCAT(name, ' (', IFNULL(period,''), ')') AS name FROM kabinet ORDER BY id DESC"],
           'name' => ['label'=>'Nama Program','required'=>true],
           'description' => ['label'=>'Deskripsi','type'=>'textarea'],
           'frequency' => ['label'=>'Frekuensi','type'=>'select','options'=>['Harian','Mingguan','Bulanan','Tahunan','Ad-hoc']],
