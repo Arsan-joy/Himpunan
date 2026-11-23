@@ -4,16 +4,16 @@ ALTER TABLE leaders ADD COLUMN IF NOT EXISTS kabinet_id INT NULL;
 ALTER TABLE programs ADD COLUMN IF NOT EXISTS kabinet_id INT NULL;
 ALTER TABLE divisions ADD COLUMN IF NOT EXISTS kabinet_id INT NULL;
 
-SET @sql = (SELECT IF(COUNT(*) > 0,
-  'ALTER TABLE divisions DROP INDEX uniq_division_slug',
-  'SELECT 1') FROM information_schema.statistics
-  WHERE table_schema = DATABASE() AND table_name = 'divisions' AND index_name = 'uniq_division_slug');
-PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
-
 SET @sql = (SELECT IF(COUNT(*) = 0,
   'ALTER TABLE divisions ADD UNIQUE INDEX uniq_division_kabinet_slug (department_id, kabinet_id, slug)',
   'SELECT 1') FROM information_schema.statistics
   WHERE table_schema = DATABASE() AND table_name = 'divisions' AND index_name = 'uniq_division_kabinet_slug');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+SET @sql = (SELECT IF(COUNT(*) > 0,
+  'ALTER TABLE divisions DROP INDEX uniq_division_slug',
+  'SELECT 1') FROM information_schema.statistics
+  WHERE table_schema = DATABASE() AND table_name = 'divisions' AND index_name = 'uniq_division_slug');
 PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 
 SET @sql = (SELECT IF(COUNT(*) = 0,
