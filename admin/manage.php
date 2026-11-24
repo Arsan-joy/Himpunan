@@ -277,6 +277,7 @@ $modules = [
       'allowed_orders' => ['id', 'username', 'role', 'active'],
       'fields' => [
           'username' => ['label'=>'Username','required'=>true],
+          'email' => ['label'=>'Email','type'=>'email'],
           'password' => ['label'=>'Password (kosong = tidak ganti)','type'=>'password'],
           'role' => ['label'=>'Role','type'=>'select','options'=>['user','admin','super_admin'],'required'=>true],
           'active' => ['label'=>'Aktif?','type'=>'bool'],
@@ -381,6 +382,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
     if ($moduleKey==='users' && !is_super_admin() && isset($_POST['role'])) $errors[]='Hanya Super Admin yang boleh mengubah peran pengguna.';
+    if ($moduleKey === 'users') {
+        $email = strtolower(trim((string)($_POST['email'] ?? '')));
+        if ($email !== '') {
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $errors[] = 'Format email tidak valid.';
+            } else {
+                $stmt = db()->prepare('SELECT id FROM users WHERE email = ? LIMIT 1');
+                $stmt->execute([$email]);
+                $emailOwner = $stmt->fetchColumn();
+                if ($emailOwner !== false && (int)$emailOwner !== (int)($id ?? 0)) {
+                    $errors[] = 'Email sudah digunakan oleh pengguna lain.';
+                }
+            }
+        }
+    }
     if ($moduleKey === 'users' && $id) {
         $submittedRole = (string)($_POST['role'] ?? '');
         if (!in_array($submittedRole, ['user','admin','super_admin'], true)) {
@@ -484,6 +500,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Select / text / date
         $val = $_POST[$col] ?? null;
+        if ($moduleKey === 'users' && $col === 'email') {
+            $val = trim((string)$val);
+            $val = $val === '' ? null : strtolower($val);
+        }
         $cols[] = $col; $vals[] = $val;
     }
 
