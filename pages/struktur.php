@@ -73,9 +73,9 @@ if ($activeIndex !== null) {
                     <div class="kabinet-card current" data-year="<?= htmlspecialchars(preg_replace('~[^0-9-]~','', (string)$activeCabinet['period'])) ?>" data-status="current">
                         <div class="kabinet-badge">Kabinet Aktif</div>
                         <div class="kabinet-image">
-                            <img src="<?= htmlspecialchars($activeCabinet['logo_url'] ?: (BASE_URL . 'Resource/img/banner1.webp')) ?>"
+                            <img src="<?= htmlspecialchars(!empty($activeCabinet['logo_url']) ? local_image_url($activeCabinet['logo_url'], BASE_URL.'Resource/default-event.jpg') : (BASE_URL . 'Resource/img/banner1.webp')) ?>"
                                  loading="lazy" width="400" height="300"
-                                 onerror="this.src='<?= BASE_URL; ?>Resource/img/banner1.webp'"
+                                 onerror="this.src='<?= BASE_URL; ?>Resource/default-event.jpg'"
                                  alt="<?= htmlspecialchars($activeCabinet['name']) ?>">
                             <div class="kabinet-overlay">
                                 <div class="kabinet-year"><?= htmlspecialchars($activeCabinet['period'] ?: date('Y')) ?></div>
@@ -109,9 +109,9 @@ if ($activeIndex !== null) {
                     <?php foreach ($pastCabinets as $row): ?>
                         <div class="kabinet-card" data-year="<?= htmlspecialchars(preg_replace('~[^0-9-]~','', (string)$row['period'])) ?>" data-status="past">
                             <div class="kabinet-image">
-                                <img src="<?= htmlspecialchars($row['logo_url'] ?: (BASE_URL . 'Resource/img/banner1.webp')) ?>"
+                                <img src="<?= htmlspecialchars(!empty($row['logo_url']) ? local_image_url($row['logo_url'], BASE_URL.'Resource/default-event.jpg') : (BASE_URL . 'Resource/img/banner1.webp')) ?>"
                                      loading="lazy" width="400" height="300"
-                                     onerror="this.src='<?= BASE_URL; ?>Resource/img/banner1.webp'"
+                                     onerror="this.src='<?= BASE_URL; ?>Resource/default-event.jpg'"
                                      alt="<?= htmlspecialchars($row['name']) ?>">
                                 <div class="kabinet-overlay">
                                     <div class="kabinet-year"><?= htmlspecialchars($row['period'] ?: '-') ?></div>

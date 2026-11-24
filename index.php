@@ -69,7 +69,7 @@ $stat_years = (int)($settings['stat_years'] ?? 5);
             <?php if (!empty($upcoming_events)): ?>
                 <?php foreach ($upcoming_events as $event): ?>
                     <div class="event-card">
-                        <div class="event-image" style="background-image: url('<?= htmlspecialchars($event['image_url'] ?: (BASE_URL . 'Resource/default-event.jpg')) ?>')"></div>
+                        <div class="event-image" style="background-image: url('<?= htmlspecialchars(!empty($event['image_url']) ? event_image_url($event['image_url']) : (BASE_URL . 'Resource/default-event.jpg')) ?>')"></div>
                         <div class="event-details">
                             <div class="event-date"><?= htmlspecialchars(format_date_id($event['start_date'])) ?></div>
                             <h3 class="event-title"><?= htmlspecialchars($event['title']) ?></h3>

@@ -9,6 +9,46 @@ if (!is_dir(UPLOAD_DIR)) @mkdir(UPLOAD_DIR, 0775, true);
 
 function getBaseUrl(): string { return BASE_URL; }
 
+/**
+ * Kembalikan placeholder bila URL gambar lokal mengarah ke file yang tidak ada.
+ * URL eksternal tetap dikembalikan apa adanya.
+ */
+function local_image_url(?string $url, string $fallback): string {
+    $url = trim((string)$url);
+    if ($url === '') return $fallback;
+
+    if (preg_match('/^https?:\/\//i', $url) || str_starts_with($url, '//')) {
+        if (str_starts_with($url, BASE_URL)) {
+            $relative = substr($url, strlen(BASE_URL));
+        } else {
+            return $url;
+        }
+    } else {
+        $relative = $url;
+        $basePath = parse_url(BASE_URL, PHP_URL_PATH) ?: '/';
+        if (str_starts_with($relative, $basePath)) {
+            $relative = substr($relative, strlen(rtrim($basePath, '/')) + 1);
+        } else {
+            $relative = ltrim($relative, '/');
+        }
+    }
+
+    $relative = ltrim((string)parse_url($relative, PHP_URL_PATH), '/');
+    if ($relative === '' || str_contains($relative, "\0")) return $fallback;
+
+    $root = realpath(dirname(__DIR__)) ?: dirname(__DIR__);
+    $candidate = realpath($root . '/' . $relative);
+    if ($candidate !== false && str_starts_with(str_replace('\\', '/', $candidate), str_replace('\\', '/', $root) . '/')) {
+        return $url;
+    }
+
+    return $fallback;
+}
+
+function event_image_url(?string $url): string {
+    return local_image_url($url, BASE_URL . 'Resource/default-event.jpg');
+}
+
 function h($value): string {
     return htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8');
 }

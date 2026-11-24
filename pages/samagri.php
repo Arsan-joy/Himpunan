@@ -61,10 +61,10 @@ function dept_link(string $slug, ?int $kabinetId): string {
                     <a href="<?= BASE_URL ?>pages/profile.php" class="btn-secondary">Selengkapnya</a>
                 </div>
                 <div class="overview-image">
-                    <img src="<?= h($activeCabinet['logo_url'] ?? (BASE_URL . 'Resource/img/banner1.webp')) ?>"
+                    <img src="<?= h(!empty($activeCabinet['logo_url']) ? local_image_url($activeCabinet['logo_url'], BASE_URL.'Resource/default-event.jpg') : (BASE_URL . 'Resource/img/banner1.webp')) ?>"
                          alt="<?= h($activeCabinet['name'] ?? 'Kabinet HMTA') ?>"
                          width="480" height="360" loading="lazy"
-                         onerror="this.src='<?= BASE_URL ?>Resource/img/banner1.webp'">
+                         onerror="this.src='<?= BASE_URL ?>Resource/default-event.jpg'">
                 </div>
             </div>
         </div>
@@ -79,7 +79,7 @@ function dept_link(string $slug, ?int $kabinetId): string {
                 <?php foreach ($pengurus as $p): ?>
                 <div class="team-card" data-aos="zoom-in">
                   <div class="team-image">
-                    <img src="<?= htmlspecialchars($p['photo_url'] ?: (BASE_URL.'Resource/default-profile.jpg')) ?>"
+                    <img src="<?= htmlspecialchars(local_image_url($p['photo_url'] ?? null, BASE_URL.'Resource/default-profile.jpg')) ?>"
                          alt="<?= htmlspecialchars($p['name']) ?>"
                          width="200" height="200" loading="lazy"
                          onerror="this.src='<?= BASE_URL ?>Resource/default-profile.jpg'">
@@ -118,10 +118,10 @@ function dept_link(string $slug, ?int $kabinetId): string {
                             ?>
                             <a href="<?= dept_link($d['slug'], $kabinetId) ?>" class="department-card" title="Lihat <?= h($d['name']) ?>">
                                 <img class="logo-kabinet"
-                                     src="<?= h($deptLogo) ?>"
+                                     src="<?= h(!empty($d['logo_url']) ? local_image_url($d['logo_url'], BASE_URL.'Resource/default-event.jpg') : $deptLogo) ?>"
                                      alt="<?= h($d['name']) ?>"
                                      width="120" height="120" loading="lazy"
-                                     onerror="this.src='<?= BASE_URL ?>Resource/img/banner1.webp'">
+                                     onerror="this.src='<?= BASE_URL ?>Resource/default-event.jpg'">
                                 <h4><?= h($d['name']) ?></h4>
                             </a>
                         <?php endforeach; ?>

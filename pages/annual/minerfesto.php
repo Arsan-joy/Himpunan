@@ -40,7 +40,7 @@ $registrationEnabled = $settings['minerfesto_registration_dates'] ?? '';
         </div>
         <div class="about-image">
           <img src="<?php echo BASE_URL; ?>Resource/minerfesto-about.jpg" alt="Kegiatan Minerfesto"
-               onerror="this.src='<?php echo BASE_URL; ?>Resource/default.jpg'">
+               onerror="this.src='<?php echo BASE_URL; ?>Resource/default-event.jpg'">
         </div>
       </div>
     </div>
@@ -114,32 +114,32 @@ $registrationEnabled = $settings['minerfesto_registration_dates'] ?? '';
       <div class="gallery-grid">
         <div class="gallery-item">
           <img src="<?php echo BASE_URL; ?>Resource/minerfesto-gallery1.jpg" alt="Minerfesto Competition"
-               onerror="this.src='<?php echo BASE_URL; ?>Resource/default.jpg'">
+               onerror="this.src='<?php echo BASE_URL; ?>Resource/default-event.jpg'">
           <div class="gallery-caption">Kompetisi Mine Design 2023</div>
         </div>
         <div class="gallery-item">
           <img src="<?php echo BASE_URL; ?>Resource/minerfesto-gallery2.jpg" alt="Minerfesto Seminar"
-               onerror="this.src='<?php echo BASE_URL; ?>Resource/default.jpg'">
+               onerror="this.src='<?php echo BASE_URL; ?>Resource/default-event.jpg'">
           <div class="gallery-caption">Seminar Nasional Pertambangan 2022</div>
         </div>
         <div class="gallery-item">
           <img src="<?php echo BASE_URL; ?>Resource/minerfesto-gallery3.jpg" alt="Minerfesto Workshop"
-               onerror="this.src='<?php echo BASE_URL; ?>Resource/default.jpg'">
+               onerror="this.src='<?php echo BASE_URL; ?>Resource/default-event.jpg'">
           <div class="gallery-caption">Workshop Software Pertambangan 2023</div>
         </div>
         <div class="gallery-item">
           <img src="<?php echo BASE_URL; ?>Resource/minerfesto-gallery4.jpg" alt="Minerfesto Exhibition"
-               onerror="this.src='<?php echo BASE_URL; ?>Resource/default.jpg'">
+               onerror="this.src='<?php echo BASE_URL; ?>Resource/default-event.jpg'">
           <div class="gallery-caption">Pameran Teknologi Pertambangan 2024</div>
         </div>
         <div class="gallery-item">
           <img src="<?php echo BASE_URL; ?>Resource/minerfesto-gallery5.jpg" alt="Minerfesto Awarding"
-               onerror="this.src='<?php echo BASE_URL; ?>Resource/default.jpg'">
+               onerror="this.src='<?php echo BASE_URL; ?>Resource/default-event.jpg'">
           <div class="gallery-caption">Malam Penghargaan Minerfesto 2023</div>
         </div>
         <div class="gallery-item">
           <img src="<?php echo BASE_URL; ?>Resource/minerfesto-gallery6.jpg" alt="Minerfesto Participants"
-               onerror="this.src='<?php echo BASE_URL; ?>Resource/default.jpg'">
+               onerror="this.src='<?php echo BASE_URL; ?>Resource/default-event.jpg'">
           <div class="gallery-caption">Peserta Minerfesto 2024</div>
         </div>
       </div>
@@ -225,7 +225,7 @@ $registrationEnabled = $settings['minerfesto_registration_dates'] ?? '';
         </div>
         <div class="registration-image">
           <img src="<?php echo BASE_URL; ?>Resource/minerfesto-registration.jpg" alt="Pendaftaran Minerfesto"
-               onerror="this.src='<?php echo BASE_URL; ?>Resource/default.jpg'">
+               onerror="this.src='<?php echo BASE_URL; ?>Resource/default-event.jpg'">
         </div>
       </div>
     </div>
@@ -237,12 +237,12 @@ $registrationEnabled = $settings['minerfesto_registration_dates'] ?? '';
     <div class="container">
       <h2 class="section-title">Sponsor dan Mitra Kami</h2>
       <div class="sponsors-grid">
-        <div class="sponsor-item"><img src="<?php echo BASE_URL; ?>Resource/sponsor1.png" alt="Sponsor 1" onerror="this.src='<?php echo BASE_URL; ?>Resource/default.png'"></div>
-        <div class="sponsor-item"><img src="<?php echo BASE_URL; ?>Resource/sponsor2.png" alt="Sponsor 2" onerror="this.src='<?php echo BASE_URL; ?>Resource/default.png'"></div>
-        <div class="sponsor-item"><img src="<?php echo BASE_URL; ?>Resource/sponsor3.png" alt="Sponsor 3" onerror="this.src='<?php echo BASE_URL; ?>Resource/default.png'"></div>
-        <div class="sponsor-item"><img src="<?php echo BASE_URL; ?>Resource/sponsor4.png" alt="Sponsor 4" onerror="this.src='<?php echo BASE_URL; ?>Resource/default.png'"></div>
-        <div class="sponsor-item"><img src="<?php echo BASE_URL; ?>Resource/sponsor5.png" alt="Sponsor 5" onerror="this.src='<?php echo BASE_URL; ?>Resource/default.png'"></div>
-        <div class="sponsor-item"><img src="<?php echo BASE_URL; ?>Resource/sponsor6.png" alt="Sponsor 6" onerror="this.src='<?php echo BASE_URL; ?>Resource/default.png'"></div>
+        <div class="sponsor-item"><img src="<?php echo BASE_URL; ?>Resource/sponsor1.png" alt="Sponsor 1" onerror="this.src='<?php echo BASE_URL; ?>Resource/default-profile.jpg'"></div>
+        <div class="sponsor-item"><img src="<?php echo BASE_URL; ?>Resource/sponsor2.png" alt="Sponsor 2" onerror="this.src='<?php echo BASE_URL; ?>Resource/default-profile.jpg'"></div>
+        <div class="sponsor-item"><img src="<?php echo BASE_URL; ?>Resource/sponsor3.png" alt="Sponsor 3" onerror="this.src='<?php echo BASE_URL; ?>Resource/default-profile.jpg'"></div>
+        <div class="sponsor-item"><img src="<?php echo BASE_URL; ?>Resource/sponsor4.png" alt="Sponsor 4" onerror="this.src='<?php echo BASE_URL; ?>Resource/default-profile.jpg'"></div>
+        <div class="sponsor-item"><img src="<?php echo BASE_URL; ?>Resource/sponsor5.png" alt="Sponsor 5" onerror="this.src='<?php echo BASE_URL; ?>Resource/default-profile.jpg'"></div>
+        <div class="sponsor-item"><img src="<?php echo BASE_URL; ?>Resource/sponsor6.png" alt="Sponsor 6" onerror="this.src='<?php echo BASE_URL; ?>Resource/default-profile.jpg'"></div>
       </div>
     </div>
   </section>
