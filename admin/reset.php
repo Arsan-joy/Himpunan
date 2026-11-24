@@ -14,8 +14,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (!$row) {
         $error = 'Token tidak valid atau sudah kedaluwarsa.';
-    } elseif (strlen($pwd) < 6) {
-        $error = 'Password minimal 6 karakter.';
+    } elseif (strlen($pwd) < 8) {
+        $error = 'Password minimal 8 karakter.';
     } elseif ($pwd !== $pwd2) {
         $error = 'Konfirmasi password tidak cocok.';
     } else {
@@ -124,11 +124,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <input type="hidden" name="token" value="<?= htmlspecialchars($token) ?>">
         <div class="field">
           <label>Password Baru</label>
-          <input type="password" name="password" required minlength="6">
+          <input type="password" name="password" required minlength="8">
         </div>
         <div class="field">
           <label>Ulangi Password Baru</label>
-          <input type="password" name="password2" required minlength="6">
+          <input type="password" name="password2" required minlength="8">
         </div>
         <button class="btn" type="submit">Simpan Password</button>
       </form>

@@ -116,6 +116,14 @@ input{
     text-decoration:none;
     font-weight:700
 }
+.ok{
+    background:#ecfdf5;
+    color:#065f46;
+    border:1px solid #a7f3d0;
+    border-radius:10px;
+    padding:10px;
+    margin-bottom:12px
+}
 </style>
 </head>
 <body>
@@ -128,7 +136,13 @@ input{
   <div class="field"><label>Username</label><input name="username" required autocomplete="username"></div>
   <div class="field"><label>Password</label><input type="password" name="password" required autocomplete="current-password"></div>
   <button class="btn" type="submit">Masuk</button>
-  <div class="switch"><a href="<?= BASE_URL ?>admin/login.php">Login sebagai Admin</a></div>
+  <?php if (isset($_GET['reset']) && $_GET['reset'] === 'success'): ?>
+    <div class="ok">Password berhasil diubah. Silakan login kembali.</div>
+  <?php endif; ?>
+  <div class="switch">
+    <a href="<?= BASE_URL ?>pages/forgot.php">Lupa password?</a> ·
+    <a href="<?= BASE_URL ?>admin/login.php">Login sebagai Admin</a>
+  </div>
 </form>
 </body>
 </html>
