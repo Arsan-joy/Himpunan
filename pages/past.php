@@ -53,14 +53,14 @@ function map_type_to_filter(string $type): string {
                 <?php foreach ($past_events as $ev): ?>
                     <?php
                         $cat  = map_type_to_filter($ev['type'] ?? '');
-                        $img  = $ev['image_url'] ?: (BASE_URL . 'Resource/img/banner1.webp');
+                        $img  = event_image_url($ev['image_url'] ?: (BASE_URL . 'Resource/img/banner1.webp'));
                         $desc = trim((string)($ev['description'] ?? ''));
                         $title = trim((string)($ev['title'] ?? 'Kegiatan'));
                     ?>
                     <div class="event-card" data-category="<?= htmlspecialchars($cat) ?>">
                         <img src="<?= htmlspecialchars($img) ?>" alt="<?= htmlspecialchars($title) ?>"
                              width="400" height="250" loading="lazy"
-                             onerror="this.src='https://via.placeholder.com/400x250?text=HMTA'">
+                             onerror="this.src='<?= BASE_URL ?>Resource/default-event.jpg'">
                         <div class="card-content">
                             <h3><?= htmlspecialchars($title) ?></h3>
                             <?php if ($desc !== ''): ?>

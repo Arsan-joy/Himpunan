@@ -26,6 +26,10 @@ try {
         FROM events
         ORDER BY start_date ASC, id ASC
     ")->fetchAll();
+    foreach ($events as &$calendarEvent) {
+        $calendarEvent['image_url'] = event_image_url($calendarEvent['image_url'] ?? '');
+    }
+    unset($calendarEvent);
 } catch (PDOException $e) {
     error_log('[calendar.php] ' . $e->getMessage());
     $events = [];

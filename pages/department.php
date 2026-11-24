@@ -49,7 +49,6 @@ if ($slug === 'medkominfo') {
 include __DIR__ . '/../includes/header.php';
 
 if (!function_exists('ph')) {
-    function ph($w=600,$h=400,$t='HMTA'){ return "https://via.placeholder.com/{$w}x{$h}?text=".rawurlencode($t); }
 }
 ?>
 <main class="department-page">
@@ -57,9 +56,9 @@ if (!function_exists('ph')) {
   <section class="department-header">
     <div class="container">
       <div class="header-content">
-        <img src="<?= h(!empty($dept['logo_url']) ? $dept['logo_url'] : BASE_URL.'Resource/img/banner1.webp') ?>" alt="Logo Departemen" class="dept-logo"
+        <img src="<?= h(!empty($dept['logo_url']) ? local_image_url($dept['logo_url'], BASE_URL.'Resource/default-event.jpg') : BASE_URL.'Resource/img/banner1.webp') ?>" alt="Logo Departemen" class="dept-logo"
              width="120" height="120" loading="lazy"
-             onerror="this.src='<?= ph(120,120,$dept['name']??'DEPT') ?>'">
+             onerror="this.src='<?= BASE_URL ?>Resource/default-event.jpg'">
         <h1><?= h($deptDisplayName) ?></h1>
         <p><?= h($dept['description'] ?? 'Deskripsi departemen belum tersedia.') ?></p>
       </div>
@@ -75,7 +74,7 @@ if (!function_exists('ph')) {
           <?php foreach ($leaders as $ld): ?>
             <div class="team-card" data-aos="zoom-in">
               <div class="team-image">
-                <img src="<?= h($ld['photo_url'] ?: (BASE_URL.'Resource/default-profile.jpg')) ?>"
+                <img src="<?= h(local_image_url($ld['photo_url'] ?? null, BASE_URL.'Resource/default-profile.jpg')) ?>"
                      alt="<?= h($ld['name']) ?>"
                      width="200" height="200" loading="lazy"
                      onerror="this.src='<?= BASE_URL ?>Resource/default-profile.jpg'">
@@ -156,7 +155,7 @@ if (!function_exists('ph')) {
                     <div class="staff-grid">
                       <?php foreach ($members as $m): ?>
                         <div class="staff-member">
-                          <img src="<?= h($m['photo_url'] ?: (BASE_URL.'Resource/default-profile.jpg')) ?>"
+                          <img src="<?= h(local_image_url($m['photo_url'] ?? null, BASE_URL.'Resource/default-profile.jpg')) ?>"
                                alt="<?= h($m['name']) ?>"
                                width="80" height="80" loading="lazy"
                                onerror="this.src='<?= BASE_URL ?>Resource/default-profile.jpg'">

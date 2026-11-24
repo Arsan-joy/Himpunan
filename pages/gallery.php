@@ -117,9 +117,9 @@ include __DIR__ . '/../includes/header.php';
                  data-date="<?= htmlspecialchars(date('d M Y', strtotime($p['created_at']))) ?>"
                  data-description="<?= htmlspecialchars($p['album'] ?: '-') ?>">
               <div class="gallery-image">
-                <img src="<?= htmlspecialchars($p['url']) ?>" alt="<?= htmlspecialchars($p['caption'] ?: 'Foto') ?>"
+                <img src="<?= htmlspecialchars(local_image_url($p['url'], BASE_URL . 'Resource/default-event.jpg')) ?>" alt="<?= htmlspecialchars($p['caption'] ?: 'Foto') ?>"
                      loading="lazy" width="400" height="300"
-                     onerror="this.src='https://via.placeholder.com/400x300?text=HMTA'">
+                     onerror="this.src='<?= BASE_URL ?>Resource/default-event.jpg'">
                 <div class="overlay">
                   <div class="overlay-content">
                     <h3><?= htmlspecialchars($p['caption'] ?: 'Foto Galeri') ?></h3>
