@@ -65,7 +65,7 @@ ALTER TABLE departments
   ADD COLUMN IF NOT EXISTS logo_url VARCHAR(255) DEFAULT NULL;
 
 ALTER TABLE materials
-  ADD COLUMN IF NOT EXISTS category ENUM('praktikum','laporan_kp','laporan_ta','Semester_3','Semester_4','Semester_5','Semester_6','Semester_7') NOT NULL DEFAULT 'Semester_3';
+  ADD COLUMN IF NOT EXISTS category ENUM('kuliah','praktikum','laporan_kp','laporan_ta') NOT NULL DEFAULT 'kuliah';
 
 ALTER TABLE users
   MODIFY COLUMN role ENUM('super_admin','admin','user') NOT NULL DEFAULT 'user';

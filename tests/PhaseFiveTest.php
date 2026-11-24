@@ -25,8 +25,24 @@ final class PhaseFiveTest extends TestCase
             $this->assertStringContainsString("CREATE TABLE IF NOT EXISTS {$table}", $schema);
         }
         $this->assertStringContainsString("logo_url VARCHAR(255)", $schema);
-        $this->assertStringContainsString("category ENUM", $schema);
+        $this->assertStringContainsString("category ENUM('kuliah','praktikum','laporan_kp','laporan_ta')", $schema);
+        $this->assertStringContainsString("DEFAULT 'kuliah'", $schema);
         $this->assertStringContainsString("'super_admin','admin','user'", $schema);
+    }
+
+    public function testMaterialsCategoryMigrationNormalizesBeforeEnumModification(): void
+    {
+        $migration = file_get_contents($this->root('database/migrations/006_fix_materials_category_enum.sql'));
+
+        $this->assertStringContainsString("'Semester_3', 'Semester_4', 'Semester_5', 'Semester_6', 'Semester_7', ''", $migration);
+        $this->assertStringContainsString("SET category = 'kuliah'", $migration);
+
+        $updatePosition = strpos($migration, 'UPDATE materials');
+        $modifyPosition = strpos($migration, 'MODIFY COLUMN category');
+        $this->assertNotFalse($updatePosition);
+        $this->assertNotFalse($modifyPosition);
+        $this->assertLessThan($modifyPosition, $updatePosition);
+        $this->assertStringContainsString("ENUM('kuliah', 'praktikum', 'laporan_kp', 'laporan_ta')", $migration);
     }
 
     public function testDeadCodeAndDuplicateHelpersAreRemoved(): void

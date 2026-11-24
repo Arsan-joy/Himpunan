@@ -145,7 +145,7 @@ CREATE TABLE IF NOT EXISTS password_resets (
 CREATE TABLE IF NOT EXISTS materials (
   id INT AUTO_INCREMENT PRIMARY KEY,
   title VARCHAR(200) NOT NULL,
-  category ENUM('praktikum','laporan_kp','laporan_ta','Semester_3','Semester_4','Semester_5','Semester_6','Semester_7') NOT NULL DEFAULT 'Semester_3',
+  category ENUM('kuliah','praktikum','laporan_kp','laporan_ta') NOT NULL DEFAULT 'kuliah',
   file_url VARCHAR(500) NOT NULL,
   is_public TINYINT(1) NOT NULL DEFAULT 0,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
