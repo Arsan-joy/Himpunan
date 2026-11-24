@@ -142,7 +142,7 @@ CREATE TABLE `login_attempts` (
 CREATE TABLE `materials` (
   `id` int(11) NOT NULL,
   `title` varchar(200) NOT NULL,
-  `category` enum('praktikum','laporan_kp','laporan_ta','Semester_3','Semester_4','Semester_5','Semester_6','Semester_7') NOT NULL DEFAULT 'Semester_3',
+  `category` enum('kuliah','praktikum','laporan_kp','laporan_ta') NOT NULL DEFAULT 'kuliah',
   `file_url` varchar(500) NOT NULL,
   `is_public` tinyint(1) NOT NULL DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
